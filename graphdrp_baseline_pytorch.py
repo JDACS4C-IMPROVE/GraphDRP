@@ -5,6 +5,7 @@ from pathlib import Path
 import sys
 from random import shuffle
 from time import time
+import json
 
 import candle
 import numpy as np
@@ -227,19 +228,15 @@ def launch(modeling, args):
     rmse_test = rmse(G_test, P_test)
     test_scores = {"pcc": pcc_test, "scc": scc_test, "rmse": rmse_test}
 
-    import json
-
     with open(outdir / f"test_scores_{val_scheme}_{model_st}_{dataset}.json", "w", encoding="utf-8") as f:
         json.dump(test_scores, f, ensure_ascii=False, indent=4)
 
     # Supervisor HPO
-    print("\nIMPROVE_RESULT val_loss:\t{}\n".format(best_mse))
     val_scores = {"val_loss": float(best_mse), "pcc": float(best_pearson), "scc": float(best_spearman), "rmse": float(best_rmse)}
-    with open(outdir / "scores.json", "w", encoding="utf-8") as f:
-        json.dump(val_scores, f, ensure_ascii=False, indent=4)
 
     timer.display_timer()
     print("Scores:\n\t{}".format(val_scores))
+    
     return val_scores
 
 
@@ -250,6 +247,13 @@ def run(gParameters):
 
     # Call launch() with specific model arch and args with all HPs
     scores = launch(modeling, args)
+    
+    # Dump values for Supervisor HPO
+    import json
+    print("\nIMPROVE_RESULT val_loss:\t{}\n".format(scores['rmse']))
+    with open(args.output_dir + "/scores.json", "w", encoding="utf-8") as f:
+        json.dump(val_scores, f, ensure_ascii=False, indent=4)
+    
     return scores
 
 
