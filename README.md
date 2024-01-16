@@ -72,6 +72,22 @@ This will download the cross-study benchmark data into `./csa_data/`.
 
 ### 3. Set computational environment
 * Install dependencies (check `conda_env_py37.sh`)
+```bash
+conda create -n GraphDRP_py37 python=3.7 pip --yes
+conda activate GraphDRP_py37
+
+conda install pytorch torchvision cudatoolkit=10.2 -c pytorch --yes
+conda install pyg -c pyg -c conda-forge --yes
+conda install -c conda-forge matplotlib --yes
+conda install -c conda-forge h5py=3.1 --yes
+conda install -c bioconda pubchempy --yes
+conda install -c rdkit rdkit --yes
+conda install -c anaconda networkx --yes
+conda install -c conda-forge pyarrow=10.0 --yes
+conda install -c pyston psutil --yes
+
+pip install git+https://github.com/ECP-CANDLE/candle_lib@develop # CANDLE
+```
 * Set the required environment variables to point towards the data folder and improve lib. You need to download the improve lib repo (follow this repo for more info `https://github.com/JDACS4C-IMPROVE/IMPROVE`).
 ```bash
 export IMPROVE_DATA_DIR="./csa_data/"
