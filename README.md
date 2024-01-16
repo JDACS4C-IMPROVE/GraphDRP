@@ -60,8 +60,8 @@ Note! `./data` contains data files that were used to train and evaluate the Grap
 ### 1. Clone the repo
 ```
 git clone https://github.com/JDACS4C-IMPROVE/GraphDRP.git
-git checkout develop
 cd GraphDRP
+git checkout develop
 ```
 
 ### 2. Download benchmark data
