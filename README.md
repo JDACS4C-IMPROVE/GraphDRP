@@ -79,12 +79,11 @@ conda activate GraphDRP_py37
 conda install pytorch torchvision cudatoolkit=10.2 -c pytorch --yes
 conda install pyg -c pyg --yes
 conda install -c conda-forge matplotlib --yes
-conda install -c conda-forge h5py=3.1 --yes
 conda install -c bioconda pubchempy --yes
 conda install -c rdkit rdkit --yes
 conda install -c anaconda networkx --yes
-conda install -c conda-forge pyarrow=10.0 --yes
 conda install -c pyston psutil --yes
+pip install h5py==3.1 pyarrow==10.0
 
 pip install git+https://github.com/ECP-CANDLE/candle_lib@develop # CANDLE
 ```
