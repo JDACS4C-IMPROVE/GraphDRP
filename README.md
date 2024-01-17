@@ -77,7 +77,7 @@ conda create -n GraphDRP_py37 python=3.7 pip --yes
 conda activate GraphDRP_py37
 
 conda install pytorch torchvision cudatoolkit=10.2 -c pytorch --yes
-conda install pyg -c pyg -c conda-forge --yes
+conda install pyg -c pyg --yes
 conda install -c conda-forge matplotlib --yes
 conda install -c conda-forge h5py=3.1 --yes
 conda install -c bioconda pubchempy --yes
