@@ -58,7 +58,7 @@ csa_data/raw_data/
     └── response.tsv
 ```
 
-Note: `./data` contains data files that were used to train and evaluate the GraphDRP from the original paper.
+*Note: `./data` contains data files that were used to train and evaluate the GraphDRP from the original paper.*
 
 ## Step-by-step running
 
@@ -146,6 +146,8 @@ Generates:
 * trained model: `model.pt`
 * predictions on val data (tabular data): `val_y_data_predicted.csv`
 * prediction performance scores on val data: `val_scores.json`
+
+The file locations of the best and last models are saved as symbolic links.
 ```
 out_models
 └── GDSCv1
@@ -167,7 +169,6 @@ out_models
         ├── val_scores.json
         └── val_y_data_predicted.csv
 ```
-The file locations of the best and last models are saved as symbolic links.
 
 ### 6. Run inference on test data with trained GraphDRP model
 ```bash
