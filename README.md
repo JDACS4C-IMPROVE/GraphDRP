@@ -3,13 +3,13 @@ GraphDRP model for drug response prediction (DRP).
 # Dependencies
 Check `conda_env_py37.sh`
 + [candle_lib](https://github.com/ECP-CANDLE/candle_lib) -- improve lib dependency
-+ [Torch](https://pytorch.org/)
-+ [Pytorch_geometric](https://github.com/rusty1s/pytorch_geometric) -- graph neural network (GNN)
++ [PyTorch](https://pytorch.org/)
++ [PyTorch Geometric (PyG)](https://github.com/rusty1s/pytorch_geometric) -- graph neural network (GNN)
 + [Matplotlib](https://matplotlib.org/)
 + [Pandas](https://pandas.pydata.org/)
 + [Numpy](https://numpy.org/)
 + [Scipy](https://docs.scipy.org/doc/)
-+ [Rdkit](https://www.rdkit.org/) -- to create molecular graph structures for drug representation
++ [RDKit](https://www.rdkit.org/) -- to create molecular graph structures for drug representation
 
 ## Source codes
 + `graphdrp_preprocess_improve.py`: creates data files for drug resposne prediction (DRP)
