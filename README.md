@@ -1,24 +1,29 @@
+# GraphDRP
+
 GraphDRP model for drug response prediction (DRP).
 
-# Dependencies
-Check `conda_env_py37.sh`
-+ [candle_lib](https://github.com/ECP-CANDLE/candle_lib) -- improve lib dependency
+## Dependencies
+Check `conda_env_py37.sh` for all dependencies.
+
++ [candle_lib](https://github.com/ECP-CANDLE/candle_lib) - enables various hyperparameter optimization (HPO) schemes and automatically distributes the workload across available computing resources
 + [PyTorch](https://pytorch.org/)
-+ [PyTorch Geometric (PyG)](https://github.com/rusty1s/pytorch_geometric) -- graph neural network (GNN)
++ [PyTorch Geometric (PyG)](https://github.com/rusty1s/pytorch_geometric) - graph neural network (GNN)
 + [Matplotlib](https://matplotlib.org/)
 + [Pandas](https://pandas.pydata.org/)
 + [Numpy](https://numpy.org/)
 + [Scipy](https://docs.scipy.org/doc/)
-+ [RDKit](https://www.rdkit.org/) -- to create molecular graph structures for drug representation
++ [RDKit](https://www.rdkit.org/) - creates molecular graph structures for drug representation
++ [IMPROVE](https://github.com/JDACS4C-IMPROVE/IMPROVE) - contains scripts specific for the IMPROVE project 
 
 ## Source codes
-+ `graphdrp_preprocess_improve.py`: creates data files for drug resposne prediction (DRP)
++ `graphdrp_preprocess_improve.py`: creates data files for the DRP model
 + `graphdrp_train_improve.py`: trains the GraphDRP model
 + `graphdrp_infer_improve.py`: runs inference with the trained GraphDRP model
 + `graphdrp_params.txt`: parameter file
 
-# Dataset
+## Dataset
 Benchmark data for cross-study analysis (CSA) can be downloaded from this [site](https://web.cels.anl.gov/projects/IMPROVE_FTP/candle/public/improve/benchmarks/single_drug_drp/benchmark-data-pilot1/csa_data/).
+
 The required data tree is shown below:
 
 ```
@@ -53,25 +58,27 @@ csa_data/raw_data/
     └── response.tsv
 ```
 
-Note! `./data` contains data files that were used to train and evaluate the GraphDRP for the original paper.
+Note: `./data` contains data files that were used to train and evaluate the GraphDRP from the original paper.
 
-# Step-by-step running
+## Step-by-step running
 
-### 1. Clone the repo
+### 1. Clone the repository
 ```
 git clone https://github.com/JDACS4C-IMPROVE/GraphDRP.git
 cd GraphDRP
 git checkout develop
 ```
 
-### 2. Download benchmark data
+### 2. Download CSA data
 ```
 sh ./download_csa.sh
 ```
-This will download the cross-study benchmark data into `./csa_data/`.
+This will download the cross-study analysis benchmark data into `./csa_data/`.
 
-### 3. Set computational environment
-* Install dependencies (check `conda_env_py37.sh`)
+### 3. Set up the environment
+
+Install dependencies (check `conda_env_py37.sh`):
+
 ```bash
 conda create -n GraphDRP_py37 python=3.7 pip --yes
 conda activate GraphDRP_py37
@@ -85,21 +92,35 @@ conda install -c anaconda networkx --yes
 conda install -c pyston psutil --yes
 pip install h5py==3.1 pyarrow==10.0
 
-pip install git+https://github.com/ECP-CANDLE/candle_lib@develop # CANDLE
+pip install git+https://github.com/ECP-CANDLE/candle_lib@develop
 ```
-* Set the required environment variables to point towards the data folder and improve lib. You need to download the improve lib repo (follow this repo for more info `https://github.com/JDACS4C-IMPROVE/IMPROVE`).
+Clone the `IMPROVE library` (outside of GraphDRP's folder):
+
 ```bash
-export IMPROVE_DATA_DIR="./csa_data/"
-export PYTHONPATH=$PYTHONPATH:/lambda_stor/data/apartin/projects/IMPROVE/pan-models/IMPROVE
+cd ..
+git clone https://github.com/JDACS4C-IMPROVE/IMPROVE
+cd IMPROVE
+git checkout develop
+export MY_PATH_TO_IMPROVE=`pwd`
+cd ..
 ```
 
-### 4. Preprocess benchmark data (_raw data_) to construct model input data (_ML data_)
+Set the required environment variables to point towards the location of the data folder and `IMPROVE library`: 
+```bash
+cd GraphDRP
+export IMPROVE_DATA_DIR="./csa_data/"
+export PYTHONPATH=$PYTHONPATH:${MY_PATH_TO_IMPROVE}
+```
+
+### 4. Preprocess CSA data (_raw data_) to construct model input data (_ML data_)
 ```bash
 python graphdrp_preprocess_improve.py
 ```
+Preprocesses the CSA data into train, validation (val), and test datasets.
+
 Generates:
 * three model input data files: `train_data.pt`, `val_data.pt`, `test_data.pt`
-* three tabular data files, each containing y data (responses) and metadata: `train_y_data.csv`, `val_y_data.csv`, `test_y_data.csv`
+* three y data files, each containing the drug response values (i.e. AUC) and corresponding metadata: `train_y_data.csv`, `val_y_data.csv`, `test_y_data.csv`
 
 ```
 ml_data
@@ -119,7 +140,7 @@ ml_data
 ```bash
 python graphdrp_train_improve.py
 ```
-Trains GraphDRP using the processed data: `train_data.pt` (training), `val_data.pt` (for early stopping).
+Trains a GraphDRP model using the ML data: `train_data.pt` (training), `val_data.pt` (early stopping).
 
 Generates:
 * trained model: `model.pt`
@@ -146,10 +167,13 @@ out_models
         ├── val_scores.json
         └── val_y_data_predicted.csv
 ```
+The file locations of the best and last models are saved as symbolic links.
 
-### 6. Run the trained model in inference mode on test data
-```python graphdrp_infer_improve.py```
-This script uses the processed data and the trained model to evaluate performance.
+### 6. Run inference on test data with trained GraphDRP model
+```bash
+python graphdrp_infer_improve.py
+```
+Evaluates the performance of a test dataset with the trained model.
 
 Generates:
 * predictions on test data (tabular data): `test_y_data_predicted.csv`
