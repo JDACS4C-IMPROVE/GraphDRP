@@ -76,7 +76,7 @@ This will download the cross-study benchmark data into `./csa_data/`.
 conda create -n GraphDRP_py37 python=3.7 pip --yes
 conda activate GraphDRP_py37
 
-conda install pytorch torchvision cudatoolkit=10.2 -c pytorch --yes
+conda install pytorch==1.12.1 torchvision==0.13.1 cudatoolkit=10.2 -c pytorch --yes
 conda install pyg -c pyg --yes
 conda install -c conda-forge matplotlib --yes
 conda install -c bioconda pubchempy --yes
