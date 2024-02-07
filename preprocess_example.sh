@@ -9,28 +9,14 @@
 # ----------------------------------------
 
 # # Within-study
-# python frm_preprocess_tr_vl_te.py \
-#     --train_data_name CCLE \
-#     --val_data_name CCLE \
-#     --test_data_name CCLE \
-#     --train_split_file_name CCLE_split_4_train.txt \
-#     --val_split_file_name CCLE_split_4_val.txt \
-#     --test_split_file_name CCLE_split_4_test.txt \
-#     --outdir csa_data/ml_data/CCLE-CCLE/split_4
-
-# # Cross-study
-# python frm_preprocess_tr_vl_te.py \
-#     --train_data_name CCLE \
-#     --val_data_name CCLE \
-#     --test_data_name GDSCv1 \
-#     --train_split_file_name CCLE_split_4_train.txt \
-#     --val_split_file_name CCLE_split_4_val.txt \
-#     --test_split_file_name GDSCv1_all.txt \
-#     --outdir csa_data/ml_data/CCLE-GDSCv1/split_4
-
+# python graphdrp_preprocess_improve.py \
+#     --train_split_file CCLE_split_0_train.txt \
+#     --val_split_file CCLE_split_0_val.txt \
+#     --test_split_file CCLE_split_0_test.txt \
+#     --ml_data_outdir ml_data/CCLE-CCLE/split_0
 
 # Cross-study
-python -m ipdb graphdrp_preprocess_improve.py \
+python graphdrp_preprocess_improve.py \
     --train_split_file GDSCv1_split_0_train.txt \
     --val_split_file GDSCv1_split_0_val.txt \
     --test_split_file CCLE_all.txt \
@@ -42,24 +28,18 @@ python -m ipdb graphdrp_preprocess_improve.py \
 # ----------------------------------------
 
 # # Train with sample size 1000
-# python frm_preprocess_tr_vl_te.py \
-#     --train_data_name CCLE \
-#     --val_data_name CCLE \
-#     --test_data_name CCLE \
-#     --train_split_file_name CCLE_split_4_train_size_1024.txt \
-#     --val_split_file_name CCLE_split_4_val.txt \
-#     --test_split_file_name CCLE_split_4_test.txt \
-#     --outdir csa_data/ml_data/CCLE/split_4/size_1000
+# python graphdrp_preprocess_improve.py \
+#     --train_split_file CCLE_split_4_train_size_1024.txt \
+#     --val_split_file CCLE_split_4_val.txt \
+#     --test_split_file CCLE_split_4_test.txt \
+#     --ml_data_outdir ml_data/CCLE/split_4/size_1000
 
 # # Train with sample size 8000
-# python frm_preprocess_tr_vl_te.py \
-#     --train_data_name CCLE \
-#     --val_data_name CCLE \
-#     --test_data_name CCLE \
-#     --train_split_file_name CCLE_split_4_train_size_8000.txt \
-#     --val_split_file_name CCLE_split_4_val.txt \
-#     --test_split_file_name CCLE_split_4_test.txt \
-#     --outdir csa_data/ml_data/CCLE/split_4/size_8000
+# python graphdrp_preprocess_improve.py \
+#     --train_split_file CCLE_split_4_train_size_8000.txt \
+#     --val_split_file CCLE_split_4_val.txt \
+#     --test_split_file CCLE_split_4_test.txt \
+#     --ml_data_outdir ml_data/CCLE/split_4/size_8000
 
 
 # ----------------------------------------
@@ -67,14 +47,11 @@ python -m ipdb graphdrp_preprocess_improve.py \
 # ----------------------------------------
 
 # # Train with ...
-# python frm_preprocess_tr_vl_te.py \
-#     --train_data_name CCLE \
-#     --val_data_name CCLE \
-#     --test_data_name CCLE \
-#     --train_split_file_name CCLE_split_4_train.txt \
-#     --val_split_file_name CCLE_split_4_val.txt \
-#     --test_split_file_name CCLE_split_4_test.txt \
-#     --outdir csa_data/ml_data/CCLE/split_4
+# python graphdrp_preprocess_improve.py \
+#     --train_split_file CCLE_split_4_train.txt \
+#     --val_split_file CCLE_split_4_val.txt \
+#     --test_split_file CCLE_split_4_test.txt \
+#     --ml_data_outdir ml_data/CCLE/split_4
 
 
 # ----------------------------------------
@@ -82,21 +59,15 @@ python -m ipdb graphdrp_preprocess_improve.py \
 # ----------------------------------------
 
 # # Train with noise level of 2 added to x data
-# python frm_preprocess_tr_vl_te.py \
-#     --train_data_name CCLE \
-#     --val_data_name CCLE \
-#     --test_data_name CCLE \
-#     --train_split_file_name CCLE_split_4_train.txt \
-#     --val_split_file_name CCLE_split_4_val.txt \
-#     --test_split_file_name CCLE_split_4_test.txt \
-#     --outdir csa_data/ml_data/CCLE/split_4/x_noise_2
+# python graphdrp_preprocess_improve.py \
+#     --train_split_file CCLE_split_4_train.txt \
+#     --val_split_file CCLE_split_4_val.txt \
+#     --test_split_file CCLE_split_4_test.txt \
+#     --ml_data_outdir ml_data/CCLE/split_4/x_noise_2
 
 # # Train with noise level of 7 added to x data
-# python frm_preprocess_tr_vl_te.py \
-#     --train_data_name CCLE \
-#     --val_data_name CCLE \
-#     --test_data_name CCLE \
-#     --train_split_file_name CCLE_split_4_train.txt \
-#     --val_split_file_name CCLE_split_4_val.txt \
-#     --test_split_file_name CCLE_split_4_test.txt \
-#     --outdir csa_data/ml_data/CCLE/split_4/x_noise_7
+# python graphdrp_preprocess_improve.py \
+#     --train_split_file CCLE_split_4_train.txt \
+#     --val_split_file CCLE_split_4_val.txt \
+#     --test_split_file CCLE_split_4_test.txt \
+#     --ml_data_outdir ml_data/CCLE/split_4/x_noise_7

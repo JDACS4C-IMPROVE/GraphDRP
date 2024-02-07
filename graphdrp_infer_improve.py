@@ -22,7 +22,6 @@ import pandas as pd
 
 # [Req] IMPROVE/CANDLE imports
 from improve import framework as frm
-from improve.metrics import compute_metrics
 
 # Model-specific imports
 from model_utils.torch_utils import (
@@ -61,7 +60,6 @@ model_infer_params = []
 # [Req] Combine the two lists (the combined parameter list will be passed to
 # frm.initialize_parameters() in the main().
 infer_params = app_infer_params + model_infer_params
-# req_infer_params = []
 # ---------------------
 
 

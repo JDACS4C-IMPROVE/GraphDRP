@@ -1,6 +1,9 @@
 """ Python implementation of cross-study analysis workflow """
+# cuda_name = "cuda:2"
+cuda_name = "cuda:3"
+# cuda_name = "cuda:4"
 # cuda_name = "cuda:6"
-cuda_name = "cuda:7"
+# cuda_name = "cuda:7"
 
 import os
 import subprocess
@@ -45,7 +48,7 @@ fdir = Path(__file__).resolve().parent
 y_col_name = "auc"
 # y_col_name = "auc1"
 
-maindir = Path(f"./{y_col_name}")
+maindir = Path(f"./{y_col_name}_exh")
 MAIN_ML_DATA_DIR = Path(f"./{maindir}/ml.data")
 MAIN_MODEL_DIR = Path(f"./{maindir}/models")
 MAIN_INFER_OUTDIR = Path(f"./{maindir}/infer")
@@ -74,8 +77,8 @@ print_fn(f"File path: {fdir}")
 
 ### Source and target data sources
 ## Set 1 - full analysis
-source_datasets = ["CCLE", "CTRPv2", "gCSI", "GDSCv1", "GDSCv2"]
-target_datasets = ["CCLE", "CTRPv2", "gCSI", "GDSCv1", "GDSCv2"]
+# source_datasets = ["CCLE", "CTRPv2", "gCSI", "GDSCv1", "GDSCv2"]
+# target_datasets = ["CCLE", "CTRPv2", "gCSI", "GDSCv1", "GDSCv2"]
 ## Set 2 - smaller datasets
 # source_datasets = ["CCLE", "gCSI", "GDSCv1", "GDSCv2"]
 # target_datasets = ["CCLE", "gCSI", "GDSCv1", "GDSCv2"]
@@ -85,9 +88,10 @@ target_datasets = ["CCLE", "CTRPv2", "gCSI", "GDSCv1", "GDSCv2"]
 # source_datasets = ["CCLE"]
 # source_datasets = ["CTRPv2"]
 # source_datasets = ["GDSCv1"]
+source_datasets = ["GDSCv2"]
 # target_datasets = ["CCLE", "CTRPv2", "gCSI", "GDSCv1", "GDSCv2"]
 # target_datasets = ["CCLE", "gCSI", "GDSCv1", "GDSCv2"]
-# target_datasets = ["CCLE", "gCSI", "GDSCv2"]
+target_datasets = ["CCLE", "gCSI", "GDSCv2"]
 ## Set 4 - same source and target
 # source_datasets = ["CCLE"]; target_datasets = source_datasets
 # source_datasets = ["GDSCv1"]; target_datasets = source_datasets
@@ -101,8 +105,8 @@ only_cross_study = False
 ## Splits
 # split_nums = []  # all splits
 # split_nums = [0]
-# split_nums = [4, 7]
-split_nums = [1, 4, 7]
+split_nums = [4, 7]
+# split_nums = [1, 4, 7]
 # split_nums = [1, 3, 5, 7, 9]
 
 ## Parameters of the experiment/run/workflow
@@ -110,8 +114,8 @@ split_nums = [1, 4, 7]
 # epochs = 2
 # epochs = 30
 # epochs = 50
-# epochs = 70
-epochs = 100
+epochs = 70
+# epochs = 100
 # epochs = 150
 
 def build_split_fname(source, split, phasea):
@@ -180,15 +184,7 @@ for source_data_name in source_datasets:
 
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             # p1 (none): Preprocess train data
-            # train_split_files = list((ig.splits_dir).glob(f"{source_data_name}_split_0_train*.txt"))  # TODO: placeholder for lc analysis
             timer_preprocess = Timer()
-            # ml_data_path = graphdrp_preprocess_improve.main([
-            #     "--train_split_file", f"{source_data_name}_split_{split}_train.txt",
-            #     "--val_split_file", f"{source_data_name}_split_{split}_val.txt",
-            #     "--test_split_file", str(test_split_file_name),
-            #     "--ml_data_outdir", str(ml_data_outdir),
-            #     "--y_col_name", y_col_name
-            # ])
             print_fn("\nPreprocessing")
             train_split_file = f"{source_data_name}_split_{split}_train.txt"
             val_split_file = f"{source_data_name}_split_{split}_val.txt"
@@ -213,37 +209,30 @@ for source_data_name in source_datasets:
             # p2 (p1): Train model
             # Train a single model for a given [source, split] pair
             # Train using train samples and early stop using val samples
-            model_outdir = MAIN_MODEL_DIR/f"{source_data_name}"/f"split_{split}"
-            if model_outdir.exists() is False:
-                train_ml_data_dir = ml_data_outdir
-                val_ml_data_dir = ml_data_outdir
-                timer_train = Timer()
-                # graphdrp_train_improve.main([
-                #     "--train_ml_data_dir", str(train_ml_data_dir),
-                #     "--val_ml_data_dir", str(val_ml_data_dir),
-                #     "--model_outdir", str(model_outdir),
-                #     "--epochs", str(epochs),  # available in config_file
-                #     # "--ckpt_directory", str(MODEL_OUTDIR),  # TODO: we'll use candle known param ckpt_directory instead of model_outdir
-                #     # "--cuda_name", "cuda:5"
-                # ])
-                print_fn("\nTrain")
-                print_fn(f"train_ml_data_dir: {train_ml_data_dir}")
-                print_fn(f"val_ml_data_dir:   {val_ml_data_dir}")
-                print_fn(f"model_outdir:      {model_outdir}")
-                train_run = ["python",
-                      "graphdrp_train_improve.py",
-                      "--train_ml_data_dir", str(train_ml_data_dir),
-                      "--val_ml_data_dir", str(val_ml_data_dir),
-                      "--model_outdir", str(model_outdir),
-                      "--epochs", str(epochs),
-                      "--cuda_name", cuda_name,
-                      "--y_col_name", y_col_name
-                ]
-                result = subprocess.run(train_run, capture_output=True,
-                                        text=True, check=True)
-                # print(result.stdout)
-                # print(result.stderr)
-                timer_train.display_timer(print_fn)
+            ##model_outdir = MAIN_MODEL_DIR/f"{source_data_name}"/f"split_{split}"
+            model_outdir = MAIN_MODEL_DIR/f"{source_data_name}-{target_data_name}"/f"split_{split}"
+            ##if model_outdir.exists() is False:
+            train_ml_data_dir = ml_data_outdir
+            val_ml_data_dir = ml_data_outdir
+            timer_train = Timer()
+            print_fn("\nTrain")
+            print_fn(f"train_ml_data_dir: {train_ml_data_dir}")
+            print_fn(f"val_ml_data_dir:   {val_ml_data_dir}")
+            print_fn(f"model_outdir:      {model_outdir}")
+            train_run = ["python",
+                  "graphdrp_train_improve.py",
+                  "--train_ml_data_dir", str(train_ml_data_dir),
+                  "--val_ml_data_dir", str(val_ml_data_dir),
+                  "--model_outdir", str(model_outdir),
+                  "--epochs", str(epochs),
+                  "--cuda_name", cuda_name,
+                  "--y_col_name", y_col_name
+            ]
+            result = subprocess.run(train_run, capture_output=True,
+                                    text=True, check=True)
+            # print(result.stdout)
+            # print(result.stderr)
+            timer_train.display_timer(print_fn)
 
             # Infer
             # p3 (p1, p2): Inference
@@ -251,12 +240,6 @@ for source_data_name in source_datasets:
             model_dir = model_outdir
             infer_outdir = MAIN_INFER_OUTDIR/f"{source_data_name}-{target_data_name}"/f"split_{split}"
             timer_infer = Timer()
-            # graphdrp_infer_improve.main([
-            #     "--test_ml_data_dir", str(test_ml_data_dir),
-            #     "--model_dir", str(model_dir),
-            #     "--infer_outdir", str(infer_outdir),
-            #     # "--cuda_name", "cuda:5"
-            # ])
             print_fn("\nInfer")
             print_fn(f"test_ml_data_dir: {test_ml_data_dir}")
             print_fn(f"infer_outdir:     {infer_outdir}")
