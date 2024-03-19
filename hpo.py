@@ -1,159 +1,89 @@
+"""
+Before running hpo.py, first need to preprocess the data.
+This can be done by running preprocess_example.sh
+
+It is assumed that the csa benchmark data is downloaded via download_csa.sh
+and the env vars $IMPROVE_DATA_DIR and $PYTHONPATH are set:
+export IMPROVE_DATA_DIR="./csa_data/"
+export PYTHONPATH=$PYTHONPATH:/path/to/IMPROVE_lib
+"""
 import copy
-import os
-import traceback
 
-from deephyper.evaluator import profile
+from deephyper.evaluator import Evaluator, profile
+from deephyper.evaluator.callback import TqdmCallback
 from deephyper.problem import HpProblem
-# from deephyper.stopper.integration.tensorflow import TFKerasStopperCallback
+from deephyper.search.hps import CBO
 
-from .model import run_pipeline
-
-
-DEEPHYPER_BENCHMARK_MAX_EPOCHS = int(
-    os.environ.get("DEEPHYPER_BENCHMARK_MAX_EPOCHS", 50)
-)
-DEEPHYPER_BENCHMARK_TIMEOUT = int(os.environ.get("DEEPHYPER_BENCHMARK_TIMEOUT", 1800))
-DEEPHYPER_BENCHMARK_MOO = bool(int(os.environ.get("DEEPHYPER_BENCHMARK_MOO", 0)))
+# from .graphdrp_train_improve_dh import run as run_train_grapdrp
+from .graphdrp_train_improve_dh import main as main_train_grapdrp
 
 
+# ---------------------
+# Model hyperparameters
+# ---------------------
 problem = HpProblem()
 
-# Model hyperparameters
-ACTIVATIONS = [
-    "elu",
-    "gelu",
-    "hard_sigmoid",
-    "linear",
-    "relu",
-    "selu",
-    "sigmoid",
-    "softplus",
-    "softsign",
-    "swish",
-    "tanh",
-]
-default_dense = [1000, 1000, 1000]
-default_dense_feature_layers = [1000, 1000, 1000]
+# problem.add_hyperparameter((0, 0.5), "dropout", default_value=0.0)
+problem.add_hyperparameter((8, 512, "log-uniform"), "batch_size", default_value=64)
+problem.add_hyperparameter((1e-6, 1e-2, "log-uniform"), "learning_rate", default_value=0.001)
 
-for i in range(len(default_dense)):
-    problem.add_hyperparameter(
-        (10, 1024, "log-uniform"),
-        f"dense_{i}",
-        default_value=default_dense[i],
-    )
+# problem.add_hyperparameter([True, False], "early_stopping", default_value=False)
+# problem.add_hyperparameter((5, 20), "early_stopping_patience", default_value=5)
 
-    problem.add_hyperparameter(
-        (10, 1024, "log-uniform"),
-        f"dense_feature_layers_{i}",
-        default_value=default_dense_feature_layers[i],
-    )
-
-problem.add_hyperparameter(ACTIVATIONS, "activation", default_value="relu")
-
-# Optimization hyperparameters
-problem.add_hyperparameter(
-    [
-        "sgd",
-        "rmsprop",
-        "adagrad",
-        "adadelta",
-        "adam",
-    ],
-    "optimizer",
-    default_value="sgd",
-)
-
-problem.add_hyperparameter((0, 0.5), "dropout", default_value=0.0)
-problem.add_hyperparameter((8, 512, "log-uniform"), "batch_size", default_value=32)
-
-problem.add_hyperparameter(
-    (1e-5, 1e-2, "log-uniform"), "learning_rate", default_value=0.001
-)
-problem.add_hyperparameter((1e-5, 1e-2, "log-uniform"), "base_lr", default_value=0.001)
-problem.add_hyperparameter([True, False], "residual", default_value=False)
-
-problem.add_hyperparameter([True, False], "early_stopping", default_value=False)
-problem.add_hyperparameter((5, 20), "early_stopping_patience", default_value=5)
-
-problem.add_hyperparameter([True, False], "reduce_lr", default_value=False)
-problem.add_hyperparameter((0.1, 1.0), "reduce_lr_factor", default_value=0.5)
-problem.add_hyperparameter((5, 20), "reduce_lr_patience", default_value=5)
-
-problem.add_hyperparameter([True, False], "warmup_lr", default_value=False)
-problem.add_hyperparameter([True, False], "batch_normalization", default_value=False)
-
-problem.add_hyperparameter(
-    ["mse", "mae", "logcosh", "mape", "msle", "huber"], "loss", default_value="mse"
-)
-
-problem.add_hyperparameter(["std", "minmax", "maxabs"], "scaling", default_value="std")
-
-
-def remap_hyperparameters(config: dict):
-    """Transform input configurations of hyperparameters to the format accepted by the candle benchmark."""
-    dense = []
-    dense_feature_layers = []
-    for i in range(len(default_dense)):
-        key = f"dense_{i}"
-        dense.append(config.pop(key))
-
-        key = f"dense_feature_layers_{i}"
-        dense_feature_layers.append(config.pop(key))
-
-    config["dense"] = dense
-    config["dense_feature_layers"] = dense_feature_layers
+# Path of the directory where "results" of HPO will be stored
+source = "CCLE"
+split = 0
+train_ml_data_dir = f"ml_data/{source}-{source}/split_{split}"
+val_ml_data_dir = f"ml_data/{source}-{source}/split_{split}"
+model_outdir = f"out_models_hpo/{source}/split_{split}"
+log_dir = "hpo_logs/"
 
 
 @profile
 def run(job, optuna_trial=None):
-    config = copy.deepcopy(job.parameters)
 
-    params = {
-        "epochs": DEEPHYPER_BENCHMARK_MAX_EPOCHS,
-        "timeout": DEEPHYPER_BENCHMARK_TIMEOUT,
-        "verbose": False,
-    }
-    if len(config) > 0:
-        remap_hyperparameters(config)
-        params.update(config)
+    # config = copy.deepcopy(job.parameters)
+    # params = {
+    #     "epochs": DEEPHYPER_BENCHMARK_MAX_EPOCHS,
+    #     "timeout": DEEPHYPER_BENCHMARK_TIMEOUT,
+    #     "verbose": False,
+    # }
+    # if len(config) > 0:
+    #     remap_hyperparameters(config)
+    #     params.update(config)
 
-    if optuna_trial is None:
-        stopper_callback = TFKerasStopperCallback(job, monitor="val_r2", mode="max")
-    else:
-        from deephyper_benchmark.integration.optuna import KerasPruningCallback
-        stopper_callback = KerasPruningCallback(optuna_trial, "val_r2")
+    model_outdir_job_id = model_outdir + f"/{job_id}"
 
-    try:
-        score = run_pipeline(params, mode="valid", stopper_callback=stopper_callback)
-    except Exception as e:
-        print(traceback.format_exc())
-        score = {"objective": "F"}
-        keys = "m:num_parameters,m:num_parameters_train,m:duration_train,m:duration_batch_inference,m:budget,m:stopped,m:train_mse,m:train_mae,m:train_r2,m:train_corr,m:valid_mse,m:valid_mae,m:valid_r2,m:valid_corr,m:test_mse,m:test_mae,m:test_r2,m:test_corr,m:lc_train_mse,m:lc_valid_mse,m:lc_train_mae,m:lc_valid_mae,m:lc_train_r2,m:lc_valid_r2"
-        metadata = {k.strip("m:"): None for k in keys.split(",")}
-        score["metadata"] = metadata
+    val_scores = main_train_grapdrp([
+        "--train_ml_data_dir", str(train_ml_data_dir),
+        "--val_ml_data_dir", str(val_ml_data_dir),
+        "--model_outdir", str(model_outdir_job_id),
+    ])
 
-    # Handle multi-objective optimization (all maximized)
-    if DEEPHYPER_BENCHMARK_MOO:
-        if score["objective"] == "F":
-            score["objective"] = ["F", "F", "F"]
-        else:
-            score["objective"] = [
-                score["objective"],
-                -score["metadata"]["num_parameters_train"],
-                -score["metadata"]["duration_batch_inference"],
-            ]
+    score = val_scores["val_loss"]
 
-    return score
+    # Checkpoint the model weights
+    with open(f"{log_dir}/model_{job.id}.pkl", "w") as f:
+        f.write("model weights")
+
+    # return score
+    # return {"objective": objective, "metadata": metadata}
+    return {"objective": objective, "metadata": val_scores}
 
 
-def evaluate(config):
-    """Evaluate an hyperparameter configuration on training/validation and testing data."""
+if __name__ == "__main__":
+    with Evaluator.create(
+        run, method="mpicomm", method_kwargs={"callbacks": [TqdmCallback()]}
+    ) as evaluator:
 
-    params = {
-        "epochs": 100,
-        "timeout": 60 * 60,
-        "verbose": True,
-    }  # 60 minutes per model
-    remap_hyperparameters(config)
-    params.update(config)
-    run_pipeline(params, mode="test")
+        if evaluator is not None:
+            print(problem)
+
+            search = CBO(
+                problem,
+                evaluator,
+                log_dir=log_dir,
+                verbose=1,
+            )
+
+            results = search.search(max_evals=100)
