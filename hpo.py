@@ -14,6 +14,7 @@ from deephyper.evaluator.callback import TqdmCallback
 from deephyper.problem import HpProblem
 from deephyper.search.hps import CBO
 
+# Import the function that returns the objective to be maximized
 # from .graphdrp_train_improve_dh import run as run_train_grapdrp
 from .graphdrp_train_improve_dh import main as main_train_grapdrp
 
@@ -30,7 +31,9 @@ problem.add_hyperparameter((1e-6, 1e-2, "log-uniform"), "learning_rate", default
 # problem.add_hyperparameter([True, False], "early_stopping", default_value=False)
 # problem.add_hyperparameter((5, 20), "early_stopping_patience", default_value=5)
 
-# Path of the directory where "results" of HPO will be stored
+# ---------------------
+# Some IMPROVE settings
+# ---------------------
 source = "CCLE"
 split = 0
 train_ml_data_dir = f"ml_data/{source}-{source}/split_{split}"
@@ -60,7 +63,7 @@ def run(job, optuna_trial=None):
         "--model_outdir", str(model_outdir_job_id),
     ])
 
-    score = val_scores["val_loss"]
+    objective = -val_scores["val_loss"]
 
     # Checkpoint the model weights
     with open(f"{log_dir}/model_{job.id}.pkl", "w") as f:
