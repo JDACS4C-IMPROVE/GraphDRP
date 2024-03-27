@@ -137,7 +137,10 @@ out_models
 ```
 
 ### 6. Run the trained model in inference mode on test data
-```python graphdrp_infer_improve.py```
+```python
+python graphdrp_infer_improve.py
+```
+
 This script uses the processed data and the trained model to evaluate performance.
 
 Generates:
@@ -149,4 +152,21 @@ out_infer
     └── split_0
         ├── test_scores.json
         └── test_y_data_predicted.csv
+```
+
+# Deephyper
+1. Set up env variables `$IMPROVE_DATA_DIR` and `$PYTHONPATH`
+```bach
+export IMPROVE_DATA_DIR="./csa_data/"
+export PYTHONPATH=$PYTHONPATH:/path/to/IMPROVE_lib
+```
+    
+2. Activate deephyper conda env
+```bach
+conda activate dh
+```
+
+5. Run `hpo_subprocess.py`
+```bach
+mpirun -np 2 python hpo_subprocess.py
 ```

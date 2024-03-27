@@ -205,6 +205,7 @@ def run(params):
 
     num_epoch = params["epochs"]
     log_interval = params["log_interval"]
+    log_interval_epoch = params["log_interval_epoch"]
     patience = params["patience"]
 
     # Settings for early stop and best model settings
@@ -220,7 +221,7 @@ def run(params):
     val_loss_list = []
     train_loss_list = []
     # log_interval_epoch = 1
-    log_interval_epoch = 5
+    # log_interval_epoch = 5
 
     print(f"Epochs: {initial_epoch + 1} to {num_epoch}")
     for epoch in range(initial_epoch, num_epoch):

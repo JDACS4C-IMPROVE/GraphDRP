@@ -147,6 +147,7 @@ def train_epoch(model, device, train_loader, optimizer, loss_fn, epoch: int,
 
     :params DataLoader train_loader: PyTorch data loader with training data.
     :params int epoch: Current training epoch (for display purposes only).
+    :params int log_interval: After how many batches to log scores.
 
     :return: Average loss for executed training epoch.
     :rtype: float
