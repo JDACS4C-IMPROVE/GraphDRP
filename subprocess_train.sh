@@ -25,13 +25,14 @@ echo "val_ml_data_dir:   $val_ml_data_dir"
 echo "model_outdir:      $model_outdir"
 
 # epochs=10
-epochs=20
+# epochs=20
 # epochs=50
+epochs=100
 
 # All train outputs are saved in params["model_outdir"]
-# python graphdrp_train_improve.py \
 # CUDA_VISIBLE_DEVICES=5 python graphdrp_train_improve.py \
-CUDA_VISIBLE_DEVICES=6,7 python graphdrp_train_improve.py \
+# CUDA_VISIBLE_DEVICES=6,7 python graphdrp_train_improve.py \
+python graphdrp_train_improve.py \
     --train_ml_data_dir $train_ml_data_dir \
     --val_ml_data_dir $val_ml_data_dir \
     --model_outdir $model_outdir \

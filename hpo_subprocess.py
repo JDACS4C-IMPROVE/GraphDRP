@@ -14,6 +14,7 @@ TODO: how to distribute HPO to mulitple GPUs?
 # import copy
 import json
 import subprocess
+import os
 import pandas as pd
 
 from deephyper.evaluator import Evaluator, profile
@@ -21,7 +22,25 @@ from deephyper.evaluator.callback import TqdmCallback
 from deephyper.problem import HpProblem
 from deephyper.search.hps import CBO
 
-# import os
+import mpi4py
+mpi4py.rc.initialize = False
+mpi4py.rc.threads = True
+mpi4py.rc.thread_level = "multiple"
+mpi4py.rc.recv_mprobe = False
+
+from mpi4py import MPI
+
+if not MPI.Is_initialized():
+    MPI.Init_thread()
+
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+size = comm.Get_size()
+
+# breakpoint()
+num_gpus_per_node = 4
+gpu_id0 = 4
+os.environ["CUDA_VISIBLE_DEVICES"] = str(rank % num_gpus_per_node + gpu_id0)
 # os.environ["CUDA_VISIBLE_DEVICES"] = "6,7"
 
 # ---------------------
@@ -38,12 +57,16 @@ problem.add_hyperparameter((1e-6, 1e-2, "log-uniform"),
 # ---------------------
 # Some IMPROVE settings
 # ---------------------
-source = "CCLE"
+# source = "CCLE"
+source = "CTRPv2"
+# source = "gCSI"
+# source = "GDSCv1"
+# source = "GDSCv2"
 split = 0
 train_ml_data_dir = f"ml_data/{source}-{source}/split_{split}"
 val_ml_data_dir = f"ml_data/{source}-{source}/split_{split}"
-model_outdir = f"dh_hpo_improve/{source}/split_{split}"
-log_dir = "dh_hpo_logs/"
+model_outdir = f"{source}_dh_hpo_improve/{source}/split_{split}"
+log_dir = f"{source}_dh_hpo_logs/"
 subprocess_bashscript = "subprocess_train.sh"
 
 
@@ -97,6 +120,8 @@ def run(job, optuna_trial=None):
 
 
 if __name__ == "__main__":
+    import time
+    t0 = time.time()
     with Evaluator.create(
         run, method="mpicomm", method_kwargs={"callbacks": [TqdmCallback()]}
     ) as evaluator:
@@ -121,4 +146,4 @@ if __name__ == "__main__":
             results = results.sort_values("m:val_loss", ascending=True)
             results.to_csv(model_outdir + "/hpo_results.csv", index=False)
 
-    print("Finished deephyper HPO.")
+    print(f"Finished deephyper HPO (rank {rank}) in {(time.time() - t0) / 60} mins.")

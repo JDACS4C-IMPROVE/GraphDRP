@@ -24,10 +24,10 @@ batch_size = 256
 val_batch = 256
 loss = "mse"
 early_stop_metric = "mse"
-patience = 20
-ckpt_save_interval = 5
+patience = 10
 model_arch = "GINConvNet"
 log_interval = 100
+log_interval_epoch = 2
 cuda_name = "cuda:7"
 
 [Infer]
