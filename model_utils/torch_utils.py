@@ -232,7 +232,7 @@ def load_GraphDRP(params, modelpath, device):
     return model
 
 
-def determine_device(cuda_name_from_params):
+def determine_device(cuda_name_from_params: str):
     """Determine device to run PyTorch functions.
 
     PyTorch functions can run on CPU or on GPU. In the latter case, it
