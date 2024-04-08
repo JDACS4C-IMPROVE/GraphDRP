@@ -21,6 +21,7 @@ All the outputs from this train script are saved in params["model_outdir"].
    scores are saved as json in val_scores.json
 """
 
+import json
 import sys
 from pathlib import Path
 from typing import Dict
@@ -145,6 +146,19 @@ def run(params):
     # Build model path
     modelpath = frm.build_model_path(params, model_dir=params["model_outdir"])
 
+    # Dump params to json
+    # TODO: does candle have a build-in method for this??
+    params_to_json = {}
+    import numbers
+    for kk, vv in params.items():
+        if isinstance(vv, numbers.Number):
+            params_to_json[kk] = vv
+        else:
+            params_to_json[kk] = str(vv)
+    # breakpoint()
+    with open(Path(params["model_outdir"])/"params.json", "w", encoding="utf-8") as f:
+        json.dump(params_to_json, f, ensure_ascii=False, indent=4)
+
     # ------------------------------------------------------
     # [Req] Create data names for train and val sets
     # ------------------------------------------------------
@@ -205,7 +219,8 @@ def run(params):
 
     num_epoch = params["epochs"]
     log_interval = params["log_interval"]
-    log_interval_epoch = params["log_interval_epoch"]
+    log_interval_epoch_val = params["log_interval_epoch_val"]
+    log_interval_epoch_train = params["log_interval_epoch_train"]
     patience = params["patience"]
 
     # Settings for early stop and best model settings
@@ -220,8 +235,6 @@ def run(params):
     epoch_list = []
     val_loss_list = []
     train_loss_list = []
-    # log_interval_epoch = 1
-    # log_interval_epoch = 5
 
     print(f"Epochs: {initial_epoch + 1} to {num_epoch}")
     for epoch in range(initial_epoch, num_epoch):
@@ -233,13 +246,22 @@ def run(params):
         val_true, val_pred = predicting(model, device, val_loader)
         val_scores = compute_metrics(val_true, val_pred, metrics_list)
 
-        if epoch % log_interval_epoch == 0:
+        # Log val scores
+        if epoch % log_interval_epoch_val == 0:
             epoch_list.append(epoch)
             val_loss_list.append(val_scores[early_stop_metric])
 
+            # train_true, train_pred = predicting(model, device, train_loader)
+            # train_scores = compute_metrics(train_true, train_pred, metrics_list)
+            # train_loss_list.append(train_scores[early_stop_metric])
+
+        # Log train scores
+        if epoch % log_interval_epoch_train == 0:
             train_true, train_pred = predicting(model, device, train_loader)
             train_scores = compute_metrics(train_true, train_pred, metrics_list)
             train_loss_list.append(train_scores[early_stop_metric])
+        else:
+            train_loss_list.append(np.nan)
 
         # For early stop
         print(f"{early_stop_metric}, {val_scores[early_stop_metric]}")
@@ -307,7 +329,8 @@ def main(args):
         # default_model="graphdrp_default_model.txt",
         # default_model="graphdrp_params.txt",
         # default_model="params_ws.txt",
-        default_model="params_cs.txt",
+        # default_model="params_cs.txt",
+        default_model="params_hpo.txt",
         additional_definitions=additional_definitions,
         # required=req_train_args,
         required=None,
