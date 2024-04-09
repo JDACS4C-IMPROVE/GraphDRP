@@ -9,7 +9,8 @@ import pandas as pd
 
 # IMPROVE/CANDLE imports
 # from improve import framework as frm
-from improve.csa import cross_study_postprocess
+# from improve.csa import cross_study_postprocess
+from improve.evaluation_schemes.cross_study_analysis import cross_study_postprocess
 
 # Imports from preprocess script
 # from graphdrp_preprocess_improve import preprocess_params
