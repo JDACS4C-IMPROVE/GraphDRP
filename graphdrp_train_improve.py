@@ -161,6 +161,7 @@ def run(params):
     print("\nTrain data:")
     print(f"train_ml_data_dir: {params['train_ml_data_dir']}")
     print(f"batch_size: {params['batch_size']}")
+    sys.stdout.flush()
     train_loader = build_GraphDRP_dataloader(params["train_ml_data_dir"],
                                              train_data_fname,
                                              params["batch_size"],
@@ -170,6 +171,7 @@ def run(params):
     print("\nVal data:")
     print(f"val_ml_data_dir: {params['val_ml_data_dir']}")
     print(f"val_batch: {params['val_batch']}")
+    sys.stdout.flush()
     val_loader = build_GraphDRP_dataloader(params["val_ml_data_dir"],
                                            val_data_fname,
                                            params["val_batch"],
@@ -223,8 +225,10 @@ def run(params):
     log_interval_epoch = 5
 
     print(f"Epochs: {initial_epoch + 1} to {num_epoch}")
+    sys.stdout.flush()
     for epoch in range(initial_epoch, num_epoch):
-        # Train epoch and ckechpoint model
+        print(f"Start epoch: {epoch}")
+        # Train epoch and checkpoint model
         train_loss = train_epoch(model, device, train_loader, optimizer, loss_fn, epoch + 1, log_interval)
         # ckpt_obj.ckpt_epoch(epoch, train_loss) # checkpoints the best model by default
 
@@ -242,6 +246,7 @@ def run(params):
 
         # For early stop
         print(f"{early_stop_metric}, {val_scores[early_stop_metric]}")
+        sys.stdout.flush()
         if val_scores[early_stop_metric] < best_score:
             torch.save(model.state_dict(), modelpath)
             best_epoch = epoch + 1
@@ -297,9 +302,7 @@ def run(params):
     return val_scores
 
 
-# [Req]
-def main(args):
-# [Req]
+def initialize_parameters():
     additional_definitions = preprocess_params + train_params
     params = frm.initialize_parameters(
         filepath,
@@ -311,6 +314,13 @@ def main(args):
         # required=req_train_args,
         required=None,
     )
+    return params
+
+
+# [Req]
+def main(args):
+# [Req]
+    initialize_parameters()
     val_scores = run(params)
     print("\nFinished training GraphDRP model.")
 
