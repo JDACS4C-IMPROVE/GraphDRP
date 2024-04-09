@@ -11,20 +11,28 @@
 # Within-study
 SOURCE=CCLE
 TARGET=CCLE
+# SOURCE=CTRPv2
+# TARGET=CTRPv2
+# SOURCE=gCSI
+# TARGET=gCSI
+# SOURCE=GDSCv1
+# TARGET=GDSCv1
+# SOURCE=GDSCv2
+# TARGET=GDSCv2
 python graphdrp_preprocess_improve.py \
     --train_split_file ${SOURCE}_split_0_train.txt \
     --val_split_file ${SOURCE}_split_0_val.txt \
     --test_split_file ${TARGET}_split_0_test.txt \
     --ml_data_outdir ml_data/${SOURCE}-${TARGET}/split_0
 
-# Cross-study
-SOURCE=GDSCv1
-TARGET=CCLE
-python graphdrp_preprocess_improve.py \
-    --train_split_file ${SOURCE}_split_0_train.txt \
-    --val_split_file ${SOURCE}_split_0_val.txt \
-    --test_split_file ${TARGET}_all.txt \
-    --ml_data_outdir ml_data/${SOURCE}-${TARGET}/split_0
+# # Cross-study
+# SOURCE=GDSCv1
+# TARGET=CCLE
+# python graphdrp_preprocess_improve.py \
+#     --train_split_file ${SOURCE}_split_0_train.txt \
+#     --val_split_file ${SOURCE}_split_0_val.txt \
+#     --test_split_file ${TARGET}_all.txt \
+#     --ml_data_outdir ml_data/${SOURCE}-${TARGET}/split_0
 
 # ----------------------------------------
 # LCA (learning curve analysis) exmple
