@@ -320,7 +320,7 @@ def initialize_parameters():
 # [Req]
 def main(args):
 # [Req]
-    initialize_parameters()
+    params = initialize_parameters()
     val_scores = run(params)
     print("\nFinished training GraphDRP model.")
 
