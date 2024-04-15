@@ -15,7 +15,8 @@
 # 2. IMPROVE lib
 # TODO finish this
 # -------------------
-current_dir=/lambda_stor/data/apartin/projects/IMPROVE/pan-models/GraphDRP
+# current_dir=/lambda_stor/data/apartin/projects/IMPROVE/pan-models/GraphDRP
+current_dir=$PWD
 echo "PWD: $current_dir"
 
 # Set env variable for IMPROVE lib
@@ -30,8 +31,11 @@ echo "PWD: $current_dir"
 # 1. Within-study
 # ---------------
 
-SOURCE=CCLE
-TARGET=CCLE
+# SOURCE=CCLE
+# TARGET=CCLE
+SOURCE=gCSI
+TARGET=gCSI
+
 
 # Preprocess
 # All preprocess outputs are saved in params["ml_data_outdir"]
