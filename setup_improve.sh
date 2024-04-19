@@ -1,7 +1,9 @@
 #!/bin/bash --login
-# run it like this: source setup_improve.sh
+# run it like this: source ./setup_improve.sh
+# TODO. Wierd behavior: only when this script is sourced, the tmux pane is automatically terminated
+#       when I get an error in other bash scripts.
 
-set -e
+# set -e
 
 # Get current dir and model dir
 model_path=$PWD
