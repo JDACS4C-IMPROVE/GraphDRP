@@ -254,7 +254,7 @@ def determine_device(cuda_name_from_params: str):
             # CUDA_VISIBLE_DEVICES, the values in python script are reindexed
             # and start from 0.
             print("CUDA_VISIBLE_DEVICES: ", cuda_env_visible)
-            cuda_name = "cuda:0"
+            cuda_name = f"cuda:{cuda_env_visible[0]}"
         else:
             cuda_name = cuda_name_from_params
         device = cuda_name

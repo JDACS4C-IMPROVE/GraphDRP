@@ -19,20 +19,22 @@ val_ml_data_dir = "./ml_data/GDSCv1-CCLE/split_0"
 model_outdir = "./out_models/GDSCv1/split_0"
 model_file_name = "model"
 model_file_format = ".pt"
-epochs = 500
+epochs = 100
 batch_size = 256
 val_batch = 256
+learning_rate = 0.0001
 loss = "mse"
 early_stop_metric = "mse"
 patience = 10
 model_arch = "GINConvNet"
 log_interval = 100
-log_interval_epoch = 2
-cuda_name = "cuda:7"
+log_interval_epoch_val = 1
+log_interval_epoch_train = 5
+cuda_name = "cuda:0"
 
 [Infer]
 test_ml_data_dir = "./ml_data/GDSCv1-CCLE/split_0"
 model_dir = "./out_models/GDSCv1/split_0"
 infer_outdir = "./out_infer/GDSCv1-CCLE/split_0"
 test_batch = 256
-cuda_name = "cuda:7"
+cuda_name = "cuda:0"
