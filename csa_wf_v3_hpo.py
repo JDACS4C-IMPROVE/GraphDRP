@@ -1,12 +1,23 @@
 """ Python implementation of cross-study analysis workflow """
+# cuda_name = "cuda:4"
+# cuda_name = "cuda:5"
 # cuda_name = "cuda:6"
 cuda_name = "cuda:7"
+
+import logging
+logging.basicConfig(
+    # filename=f"deephyper.{rank}.log, # optional if we want to store the logs to disk
+    level=logging.INFO, # logging.DEBUG
+    format="%(asctime)s - %(levelname)s - %(filename)s:%(funcName)s - %(message)s",
+    # force=True,
+)
 
 import os
 import subprocess
 import warnings
 from time import time
 from pathlib import Path
+from pprint import pprint
 
 import pandas as pd
 
@@ -45,8 +56,11 @@ fdir = Path(__file__).resolve().parent
 y_col_name = "auc"
 # y_col_name = "auc1"
 
+# hpo_method = "Supervisor"
+hpo_method = "Deephyper"
+
 # maindir = Path(f"./{y_col_name}")
-maindir = Path(f"./{y_col_name}_hpo")
+maindir = Path(f"./{y_col_name}_hpo_{hpo_method.lower()}")
 MAIN_ML_DATA_DIR = Path(f"./{maindir}/ml.data")
 MAIN_MODEL_DIR = Path(f"./{maindir}/models")
 MAIN_INFER_OUTDIR = Path(f"./{maindir}/infer")
@@ -82,10 +96,14 @@ target_datasets = ["CCLE", "CTRPv2", "gCSI", "GDSCv1", "GDSCv2"]
 # target_datasets = ["CCLE", "gCSI", "GDSCv1", "GDSCv2"]
 # source_datasets = ["GDSCv1", "CTRPv2"]
 # target_datasets = ["CCLE", "gCSI", "GDSCv1", "GDSCv2"]
+# source_datasets = ["gCSI", "GDSCv2"]
+# target_datasets = ["CCLE", "CTRPv2", "gCSI", "GDSCv1", "GDSCv2"]
 ## Set 3 - full analysis for a single source
 # source_datasets = ["CCLE"]
 # source_datasets = ["CTRPv2"]
+# source_datasets = ["gCSI"]
 # source_datasets = ["GDSCv1"]
+# source_datasets = ["GDSCv2"]
 # target_datasets = ["CCLE", "CTRPv2", "gCSI", "GDSCv1", "GDSCv2"]
 # target_datasets = ["CCLE", "gCSI", "GDSCv1", "GDSCv2"]
 # target_datasets = ["CCLE", "gCSI", "GDSCv2"]
@@ -100,20 +118,20 @@ only_cross_study = False
 # only_cross_study = True
 
 ## Splits
-# split_nums = []  # all splits
+split_nums = []  # all splits
 # split_nums = [0]
 # split_nums = [4, 7]
-split_nums = [1, 4, 7]
+# split_nums = [1, 4, 7]
 # split_nums = [1, 3, 5, 7, 9]
 
 ## Parameters of the experiment/run/workflow
 # TODO: this should be stored as the experiment metadata that we can go back check
-epochs = 2
+# epochs = 2
 # epochs = 30
 # epochs = 50
 # epochs = 70
 # epochs = 100
-# epochs = 150
+epochs = 150
 
 def build_split_fname(source, split, phasea):
     """ Build split file name. If file does not exist continue """
@@ -122,27 +140,33 @@ def build_split_fname(source, split, phasea):
 # --------------
 # HPO
 # --------------
-# breakpoint()
-import json
-model_name = "GraphDRP"
-HPO_scale = "MEDIUM"
+breakpoint()
+if hpo_method == "Supervisor":
+    # breakpoint()
+    import json
+    model_name = "GraphDRP"
+    HPO_scale = "MEDIUM"
 
-# # TODO: finish when everything is available
-# hpo_dict = {}
-# for src in source_datasets:
-#     print(src)
-#     hpo_path = fdir/f"../HPO/HallOfFame/{model_name}/{src}/{HPO_scale}/best-1.json"
-#     if hpo_path.exists():
-#         with open(hpo_path, "r") as f:
-#             hps = json.load(f)
-#     hpo_dict[src] = hps
+    # # TODO: finish when everything is available
+    # hpo_dict = {}
+    # for src in source_datasets:
+    #     print_fn(src)
+    #     hpo_path = fdir/f"../HPO/HallOfFame/{model_name}/{src}/{HPO_scale}/best-1.json"
+    #     if hpo_path.exists():
+    #         with open(hpo_path, "r") as f:
+    #             hps = json.load(f)
+    #     hpo_dict[src] = hps
 
-src = "CCLE"
-hpo_path = fdir/f"../HPO/HallOfFame/{model_name}/{src}/{HPO_scale}/best-1.json"
-if hpo_path.exists():
-    with open(hpo_path, "r") as f:
-        hps = json.load(f)
-print(hps)
+    src = "CCLE"
+    hpo_path = fdir/f"../HPO/HallOfFame/{model_name}/{src}/{HPO_scale}/best-1.json"
+    if hpo_path.exists():
+        with open(hpo_path, "r") as f:
+            hps = json.load(f)
+    print_fn(hps)
+
+elif hpo_method == "Deephyper":
+    hpo_res_dir_path = fdir/"hpo_deephyper_res"
+
 # --------------
 
 # ===============================================================
@@ -174,6 +198,17 @@ for source_data_name in source_datasets:
 
     files_joined = [str(s) for s in split_files]
 
+    # Get the hyperparameters (deephyper)
+    # breakpoint()
+    if hpo_method == "Deephyper":
+        hps = {}
+        hps_df = pd.read_csv(hpo_res_dir_path/f"{source_data_name}_dh_hpo_improve/{source_data_name}/split_0/hpo_results.csv")
+        hps_df = hps_df.sort_values("m:val_loss", ascending=True)
+        hps["batch_size"] = hps_df["p:batch_size"][0]
+        hps["learning_rate"] = hps_df["p:learning_rate"][0]
+        print_fn("Hyperparameter:")
+        pprint(hps)
+
     # --------------------
     # Preprocess and Train
     # --------------------
@@ -185,7 +220,7 @@ for source_data_name in source_datasets:
         # TODO: check this!
         for phase in ["train", "val", "test"]:
             fname = build_split_fname(source_data_name, split, phase)
-            # print(f"{phase}: {fname}")
+            # print_fn(f"{phase}: {fname}")
             if fname not in "\t".join(files_joined):
                 warnings.warn(f"\nThe {phase} split file {fname} is missing (continue to next split)")
                 continue
@@ -233,8 +268,8 @@ for source_data_name in source_datasets:
             ]
             result = subprocess.run(preprocess_run, capture_output=True,
                                     text=True, check=True)
-            # print(result.stdout)
-            # print(result.stderr)
+            # print_fn(result.stdout)
+            # print_fn(result.stderr)
             timer_preprocess.display_timer(print_fn)
 
             # p2 (p1): Train model
@@ -270,8 +305,8 @@ for source_data_name in source_datasets:
                 ]
                 result = subprocess.run(train_run, capture_output=True,
                                         text=True, check=True)
-                # print(result.stdout)
-                # print(result.stderr)
+                # print_fn(result.stdout)
+                # print_fn(result.stderr)
                 timer_train.display_timer(print_fn)
 
             # Infer
