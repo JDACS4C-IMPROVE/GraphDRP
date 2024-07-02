@@ -299,8 +299,8 @@ def main(args):
         filepath,
         # default_model="graphdrp_default_model.txt",
         # default_model="graphdrp_params.txt",
-        # default_model="params_ws.txt",
-        default_model="params_cs.txt",
+        default_model="params_ws.txt",
+        # default_model="params_cs.txt",
         additional_definitions=additional_definitions,
         required=None,
     )
