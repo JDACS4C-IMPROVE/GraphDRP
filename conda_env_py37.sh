@@ -6,9 +6,7 @@ set -e
 # conda create -n GraphDRP_py37 python=3.7 pip --yes
 # conda activate GraphDRP_py37
 
-# conda install pytorch torchvision cudatoolkit=10.2 -c pytorch --yes
-# conda install pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 cudatoolkit=10.2 -c pytorch
-conda install pytorch==1.12.1 torchvision==0.13.1 cudatoolkit=10.2 -c pytorch
+conda install pytorch==1.12.1 cudatoolkit=10.2.89 -c pytorch
 conda install pyg=2.1.0 -c pyg -c conda-forge --yes
 
 conda install -c conda-forge matplotlib --yes
@@ -17,7 +15,8 @@ conda install -c conda-forge h5py=3.1 --yes
 conda install -c bioconda pubchempy --yes
 conda install -c rdkit rdkit --yes
 conda install -c anaconda networkx --yes
-conda install -c conda-forge pyarrow=10.0 --yes
+# conda install -c conda-forge pyarrow=10.0 --yes
+conda install -c conda-forge pyarrow=8.0 --yes
 
 conda install -c pyston psutil --yes
 
