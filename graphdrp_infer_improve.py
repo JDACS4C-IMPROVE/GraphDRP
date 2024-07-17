@@ -74,7 +74,7 @@ def run(params):
         dict: prediction performance scores computed on test data according
             to the metrics_list.
     """
-    breakpoint()
+    # breakpoint()
 
     # ------------------------------------------------------
     # [Req] Create output dir
@@ -129,11 +129,13 @@ def run(params):
     # ------------------------------------------------------
     # [Req] Compute performance scores
     # ------------------------------------------------------
-    test_scores = frm.compute_performace_scores(
-        params,
-        y_true=test_true, y_pred=test_pred, stage="test",
-        outdir=params["infer_outdir"], metrics=metrics_list
-    )
+    # breakpoint()
+    # test_scores = frm.compute_performace_scores(
+    #     params,
+    #     y_true=test_true, y_pred=test_pred, stage="test",
+    #     outdir=params["infer_outdir"], metrics=metrics_list
+    # )
+    test_scores = None
 
     return test_scores
 
