@@ -54,11 +54,12 @@ class GINConvNet(torch.nn.Module):
         self.pool_xt_3 = nn.MaxPool1d(3)
 
         # (ap) Determine in_dim
+        # breakpoint()
         # TODO:
         # Need to determine in_dim in __init__() and then use this info in forward()
         # self.in_dim = 2944 # original GraphDRP data
-        # self.in_dim = 3968 # July2020 data
-        self.in_dim = 4096 # New benchmark CSA data
+        self.in_dim = 3968 # July2020 data
+        # self.in_dim = 4096 # New benchmark CSA data
         self.fc1_xt = nn.Linear(self.in_dim, output_dim)
         # self.fc1_xt = nn.Linear(3968, output_dim)
 
@@ -107,7 +108,8 @@ class GINConvNet(torch.nn.Module):
         conv_xt = self.pool_xt_3(conv_xt)
         
         # flatten
-        # import ipdb; ipdb.set_trace()
+        # breakpoint()
+        # TODO:
         in_dim = conv_xt.shape[1] * conv_xt.shape[2]  # TODO: in_dim should be hard-coded in self.in_dim = ...
         # xt = conv_xt.view(-1, conv_xt.shape[1] * conv_xt.shape[2])
         xt = conv_xt.view(-1, in_dim)

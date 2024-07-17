@@ -133,7 +133,7 @@ def run(params):
         dict: prediction performance scores computed on validation data
             according to the metrics_list.
     """
-    # import pdb; pdb.set_trace()
+    # breakpoint()
 
     # ------------------------------------------------------
     # [Req] Create output dir and build model path
@@ -309,7 +309,8 @@ def initialize_parameters():
         # default_model="graphdrp_default_model.txt",
         # default_model="graphdrp_params.txt",
         # default_model="params_ws.txt",
-        default_model="params_cs.txt",
+        # default_model="params_cs.txt",
+        default_model="params_ovarian.txt",
         additional_definitions=additional_definitions,
         # required=req_train_args,
         required=None,

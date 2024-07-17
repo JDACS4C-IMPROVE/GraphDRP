@@ -127,7 +127,7 @@ def run(params: Dict):
         str: directory name that was used to save the preprocessed (generated)
             ML data files.
     """
-    # import pdb; pdb.set_trace()
+    # breakpoint()
 
     # ------------------------------------------------------
     # [Req] Build paths and create output dir
@@ -156,12 +156,14 @@ def run(params: Dict):
     print("\nLoads omics data.")
     omics_obj = drp.OmicsLoader(params)
     # print(omics_obj)
-    ge = omics_obj.dfs['cancer_gene_expression.tsv'] # return gene expression
+    # ge = omics_obj.dfs['cancer_gene_expression.tsv'] # return gene expression
+    ge = omics_obj.dfs['cancer_gene_expression_combined.tsv'] # return gene expression
 
     print("\nLoad drugs data.")
     drugs_obj = drp.DrugsLoader(params)
     # print(drugs_obj)
-    smi = drugs_obj.dfs['drug_SMILES.tsv']  # return SMILES data
+    # smi = drugs_obj.dfs['drug_SMILES.tsv']  # return SMILES data
+    smi = drugs_obj.dfs['drug_SMILES_combined.tsv']  # return SMILES data
 
     # ------------------------------------------------------
     # Further preprocess X data
@@ -189,10 +191,12 @@ def run(params: Dict):
     print("Create feature scaler.")
     rsp_tr = drp.DrugResponseLoader(params,
                                     split_file=params["train_split_file"],
-                                    verbose=False).dfs["response.tsv"]
+                                    # verbose=False).dfs["response.tsv"]
+                                    verbose=False).dfs["response_pdmr_combined.tsv"]
     rsp_vl = drp.DrugResponseLoader(params,
                                     split_file=params["val_split_file"],
-                                    verbose=False).dfs["response.tsv"]
+                                    # verbose=False).dfs["response.tsv"]
+                                    verbose=False).dfs["response_pdmr_combined.tsv"]
     rsp = pd.concat([rsp_tr, rsp_vl], axis=0)
 
     # Retian feature rows that are present in the y data (response dataframe)
@@ -230,7 +234,7 @@ def run(params: Dict):
         # --------------------------------
         rsp = drp.DrugResponseLoader(params,
                                      split_file=split_file,
-                                     verbose=False).dfs["response.tsv"]
+                                     verbose=False).dfs["response_pdmr_combined.tsv"]
 
         # --------------------------------
         # Data prep
@@ -300,7 +304,8 @@ def main(args):
         # default_model="graphdrp_default_model.txt",
         # default_model="graphdrp_params.txt",
         # default_model="params_ws.txt",
-        default_model="params_cs.txt",
+        # default_model="params_cs.txt",
+        default_model="params_ovarian.txt",
         additional_definitions=additional_definitions,
         required=None,
     )
