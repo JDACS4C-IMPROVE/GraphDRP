@@ -7,10 +7,19 @@ echo "PWD: $current_dir"
 # 1. Within-study
 # ---------------
 
-SPLIT=0
+# SPLIT=0
+# SPLIT=1
+# 5PLIT=2
+# SPLIT=3
+# SPLIT=4
+# SPLIT=5
+SPLIT=6
+# SPLIT=7
+# SPLIT=8
+# SPLIT=9
 
-# SOURCE=CTRPv2
-SOURCE=GDSCv2
+SOURCE=CTRPv2
+# SOURCE=GDSCv2
 
 # -----------------------
 # Single-dataset analysis
