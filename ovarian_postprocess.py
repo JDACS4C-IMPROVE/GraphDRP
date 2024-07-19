@@ -1,13 +1,34 @@
+""" Run this script to generate dataframes for plotting. Then run ovarian_postprocess.ipynb """
+import os
 from pathlib import Path
+import numpy as np
 import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
-filepath = Path(__file__).parent
+filepath = Path(__file__).parent  # py
+# filepath = Path(os.path.abspath(''))  # ipynb
+print(filepath)
 
-infer_dir = filepath / "out_infer"
+# infer_dir = filepath / "out_infer"
+models_dir = filepath / "pred_models"
+model_name  = 'DeepTTC'
+# model_name  = 'GraphDRP'
+# model_name  = 'HIDRA'
+# model_name  = 'IGTD'
+# model_name  = 'PaccMann_MCA'
+infer_dir = models_dir / model_name / "out_infer"
+
 preds_fname = "test_y_data_predicted.csv"
 
 canc_col_name = "improve_sample_id"
 drug_col_name = "improve_chem_id"
+
+source = "CTRPv2"
+# source = "GDSCv2"
+target = "PDMR"
+
+ov_drug_info = pd.read_csv(filepath / "ovarian_data/raw_data/y_data/Drugs_For_OV_Proposal_Analysis.txt", sep="\t")
 
 
 def agg_pred_files(res_dir: Path):
@@ -26,52 +47,37 @@ def agg_pred_files(res_dir: Path):
 
 
 def agg_pred_scores(df: pd.DataFrame):
-    ff = df.groupby(['improve_sample_id', 'improve_chem_id']).agg(
-        auc_pred_mean=('auc_pred', 'mean'),
-        auc_std_mean=('auc_pred', 'std'))
-    ff = ff.reset_index().sort_values(['improve_sample_id',
-                                       'improve_chem_id',
-                                       'auc_pred_mean'])
+    group_by_cols = ['improve_sample_id', 'improve_chem_id']
+    ff = df.groupby(group_by_cols).agg(
+        pred_mean=('auc_pred', 'mean'),
+        pred_std=('auc_pred', 'std'))
+    ff = ff.reset_index().sort_values(['improve_chem_id', 'improve_sample_id', 'pred_mean']).reset_index(drop=True)
+    # ff = ff.reset_index().sort_values(['pred_mean', 'improve_chem_id', 'improve_sample_id']).reset_index(drop=True)
     return ff
 
 
-# CTRP
-source = "CTRPv2"
-target = "PDMR"
+def check_dups(df):
+    tt = df[df.duplicated(keep=False)]
+    assert tt.shape[0] == 0, "found duplicates"
+
+
 res_dir = infer_dir / f"{source}-{target}"
-cc = agg_pred_files(res_dir)
-ca = agg_pred_scores(cc)
+df = agg_pred_files(res_dir)
+df["model"] = model_name
+# tt = df[df.duplicated(keep=False)]
+check_dups(df)
+agg_df = agg_pred_scores(df)
+agg_df["model"] = model_name
+check_dups(agg_df)
 
+ov_drug_info = ov_drug_info[[drug_col_name, 'drug_name']].sort_values(drug_col_name)
+# print(kk)
+agg_df = agg_df.merge(ov_drug_info, on=drug_col_name, how="inner").drop_duplicates()
+check_dups(agg_df)
 
-# GDSC
-source = "GDSCv2"
-target = "PDMR"
-res_dir = infer_dir / f"{source}-{target}"
-gg = agg_pred_files(res_dir)
-ga = agg_pred_scores(gg)
-
-
-# Plots
-import seaborn as sns
-import matplotlib.pyplot as plt
-import pandas as pd
-import numpy as np
-
-# Sample DataFrame
-data = {
-    'Category': ['A', 'A', 'A', 'B', 'B', 'B', 'C', 'C', 'C'],
-    'Values': [10, 15, 14, 22, 21, 23, 30, 31, 29]
-}
-df = pd.DataFrame(data)
-
-# Calculate mean and standard deviation
-means = df.groupby('Category')['Values'].mean()
-stds = df.groupby('Category')['Values'].std()
-
-# Create a bar plot with error bars
-means.plot(kind='bar', yerr=stds, capsize=4)
-plt.ylabel('Values')
-plt.title('Mean and Standard Deviation of Values by Category')
-plt.show()
+plots_outdir = filepath / 'plots_outdir'
+os.makedirs(plots_outdir, exist_ok=True)
+df.to_csv(plots_outdir / f"all_preds_{model_name}_{source}_{target}.tsv", sep="\t", index=False)
+agg_df.to_csv(plots_outdir / f"agg_preds_{model_name}_{source}_{target}.tsv", sep="\t", index=False)
 
 print("Finished")
