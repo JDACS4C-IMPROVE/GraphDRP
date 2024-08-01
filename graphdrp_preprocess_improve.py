@@ -27,9 +27,15 @@ import numpy as np
 import pandas as pd
 import joblib
 
-# [Req] IMPROVE/CANDLE imports
-from improve import framework as frm
-from improve import drug_resp_pred as drp
+# [Req] IMPROVE imports
+# from improve import framework as frm
+# from improve import drug_resp_pred as drp
+from improvelib.applications.drug_response_prediction.config import DRPPreprocessConfig
+from improvelib.utils import str2bool
+import improvelib.utils as frm
+import improvelib.applications.drug_response_prediction.drug_utils as drugs
+import improvelib.applications.drug_response_prediction.omics_utils as omics
+import improvelib.applications.drug_response_prediction.drp_utils as drp
 
 # Model-specific imports
 from model_utils.torch_utils import TestbedDataset
@@ -42,53 +48,7 @@ filepath = Path(__file__).resolve().parent # [Req]
 # ---------------------
 # [Req] Parameter lists
 # ---------------------
-# Two parameter lists are required:
-# 1. app_preproc_params
-# 2. model_preproc_params
-# 
-# The values for the parameters in both lists should be specified in a
-# parameter file that is passed as default_model arg in
-# frm.initialize_parameters().
-
-# 1. App-specific params (App: monotherapy drug response prediction)
-# Note! This list should not be modified (i.e., no params should added or
-# removed from the list.
-# 
-# There are two types of params in the list: default and required
-# default:   default values should be used
-# required:  these params must be specified for the model in the param file
-app_preproc_params = [
-    {"name": "y_data_files", # default
-     "type": str,
-     "help": "List of files that contain the y (prediction variable) data. \
-             Example: [['response.tsv']]",
-    },
-    {"name": "x_data_canc_files", # required
-     "type": str,
-     "help": "List of feature files including gene_system_identifer. Examples: \n\
-             1) [['cancer_gene_expression.tsv', ['Gene_Symbol']]] \n\
-             2) [['cancer_copy_number.tsv', ['Ensembl', 'Entrez']]].",
-    },
-    {"name": "x_data_drug_files", # required
-     "type": str,
-     "help": "List of feature files. Examples: \n\
-             1) [['drug_SMILES.tsv']] \n\
-             2) [['drug_SMILES.tsv'], ['drug_ecfp4_nbits512.tsv']]",
-    },
-    {"name": "canc_col_name",
-     "default": "improve_sample_id", # default
-     "type": str,
-     "help": "Column name in the y (response) data file that contains the cancer sample ids.",
-    },
-    {"name": "drug_col_name", # default
-     "default": "improve_chem_id",
-     "type": str,
-     "help": "Column name in the y (response) data file that contains the drug ids.",
-    },
-
-]
-
-# 2. Model-specific params (Model: GraphDRP)
+# Model-specific params (Model: GraphDRP)
 # All params in model_preproc_params are optional.
 # If no params are required by the model, then it should be an empty list.
 model_preproc_params = [
@@ -110,9 +70,8 @@ model_preproc_params = [
     },
 ]
 
-# Combine the two lists (the combined parameter list will be passed to
-# frm.initialize_parameters() in the main().
-preprocess_params = app_preproc_params + model_preproc_params
+# preprocess_params = app_preproc_params + model_preproc_params
+preprocess_params = model_preproc_params
 # ---------------------
 
 
@@ -128,15 +87,16 @@ def run(params: Dict):
             ML data files.
     """
     # breakpoint()
+    # from pprint import pprint; pprint(params);
 
     # ------------------------------------------------------
     # [Req] Build paths and create output dir
     # ------------------------------------------------------
     # Build paths for raw_data, x_data, y_data, splits
-    params = frm.build_paths(params)  
+    params = frm.build_paths(params) # TODO do this in improvelib (submit issue)
 
     # Create output dir for model input data (to save preprocessed ML data)
-    frm.create_outdir(outdir=params["ml_data_outdir"])
+    # frm.create_outdir(outdir=params["ml_data_outdir"]) # TODO cfg.initialize_parameters creates params['output_dir']
 
     # ------------------------------------------------------
     # [Req] Load X data (feature representations)
@@ -154,16 +114,18 @@ def run(params: Dict):
     # data, then the model must use the provided data loaders to load the data files
     # from the x_data dir.
     print("\nLoads omics data.")
-    omics_obj = drp.OmicsLoader(params)
+    # omics_obj = drp.OmicsLoader(params)
+    omics_obj = omics.OmicsLoader(params)
     # print(omics_obj)
-    # ge = omics_obj.dfs['cancer_gene_expression.tsv'] # return gene expression
-    ge = omics_obj.dfs['cancer_gene_expression_combined.tsv'] # return gene expression
+    ge = omics_obj.dfs['cancer_gene_expression.tsv'] # return gene expression
+    # ge = omics_obj.dfs['cancer_gene_expression_combined.tsv'] # return gene expression
 
     print("\nLoad drugs data.")
-    drugs_obj = drp.DrugsLoader(params)
+    # drugs_obj = drp.DrugsLoader(params)
+    drugs_obj = drugs.DrugsLoader(params)
     # print(drugs_obj)
-    # smi = drugs_obj.dfs['drug_SMILES.tsv']  # return SMILES data
-    smi = drugs_obj.dfs['drug_SMILES_combined.tsv']  # return SMILES data
+    smi = drugs_obj.dfs['drug_SMILES.tsv']  # return SMILES data
+    # smi = drugs_obj.dfs['drug_SMILES_combined.tsv']  # return SMILES data
 
     # ------------------------------------------------------
     # Further preprocess X data
@@ -191,12 +153,10 @@ def run(params: Dict):
     print("Create feature scaler.")
     rsp_tr = drp.DrugResponseLoader(params,
                                     split_file=params["train_split_file"],
-                                    # verbose=False).dfs["response.tsv"]
-                                    verbose=False).dfs["response_pdmr_combined.tsv"]
+                                    verbose=False).dfs["response.tsv"]
     rsp_vl = drp.DrugResponseLoader(params,
                                     split_file=params["val_split_file"],
-                                    # verbose=False).dfs["response.tsv"]
-                                    verbose=False).dfs["response_pdmr_combined.tsv"]
+                                    verbose=False).dfs["response.tsv"]
     rsp = pd.concat([rsp_tr, rsp_vl], axis=0)
 
     # Retian feature rows that are present in the y data (response dataframe)
@@ -205,11 +165,11 @@ def run(params: Dict):
     rsp = rsp.merge(smi[params["drug_col_name"]], on=params["drug_col_name"], how="inner")
     ge_sub = ge[ge[params["canc_col_name"]].isin(rsp[params["canc_col_name"]])].reset_index(drop=True)
     # smi_sub = smi[smi[params["drug_col_name"]].isin(rsp[params["drug_col_name"]])].reset_index(drop=True)
-    # TODO: consider keeping only smiles (smiles_graphs) in smi_sub
+    # TODO consider keeping only smiles (smiles_graphs) in smi_sub
 
     # Scale gene expression
     _, ge_scaler = scale_df(ge_sub, scaler_name=params["scaling"])
-    ge_scaler_fpath = Path(params["ml_data_outdir"]) / params["ge_scaler_fname"]
+    ge_scaler_fpath = Path(params["output_dir"]) / params["ge_scaler_fname"]
     joblib.dump(ge_scaler, ge_scaler_fpath)
     print("Scaler object for gene expression: ", ge_scaler_fpath)
 
@@ -234,7 +194,7 @@ def run(params: Dict):
         # --------------------------------
         rsp = drp.DrugResponseLoader(params,
                                      split_file=split_file,
-                                     verbose=False).dfs["response_pdmr_combined.tsv"]
+                                     verbose=False).dfs["response.tsv"]
 
         # --------------------------------
         # Data prep
@@ -282,7 +242,8 @@ def run(params: Dict):
         # inside. This results in: [root]/processed/[dataset],
         # e.g., ml_data/processed/train_data.pt
         # -----
-        TestbedDataset(root=params["ml_data_outdir"],
+        # TestbedDataset(root=params["ml_data_outdir"],
+        TestbedDataset(root=params["output_dir"],
                        dataset=data_fname,
                        xd=xd,
                        xt=xc,
@@ -292,26 +253,34 @@ def run(params: Dict):
         # [Req] Save y dataframe for the current stage
         frm.save_stage_ydf(rsp, params, stage)
 
-    return params["ml_data_outdir"]
+    return params["output_dir"]
 
 
 # [Req]
 def main(args):
     # [Req]
     additional_definitions = preprocess_params
-    params = frm.initialize_parameters(
-        filepath,
-        # default_model="graphdrp_default_model.txt",
-        # default_model="graphdrp_params.txt",
-        # default_model="params_ws.txt",
-        # default_model="params_cs.txt",
-        default_model="params_ovarian.txt",
+    # params = frm.initialize_parameters(
+    #     filepath,
+    #     # default_model="graphdrp_default_model.txt",
+    #     # default_model="graphdrp_params.txt",
+    #     # default_model="params_ws.txt",
+    #     # default_model="params_cs.txt",
+    #     default_model="params_ovarian.txt",
+    #     additional_definitions=additional_definitions,
+    #     required=None,
+    # )
+    cfg = DRPPreprocessConfig()
+    params = cfg.initialize_parameters(
+        pathToModelDir=filepath,
+        default_config="graphdrp_params.txt",
+        default_model=None,
+        additional_cli_section=None,
         additional_definitions=additional_definitions,
-        required=None,
+        required=None
     )
     ml_data_outdir = run(params)
     print("\nFinished data preprocessing.")
-
 
 # [Req]
 if __name__ == "__main__":

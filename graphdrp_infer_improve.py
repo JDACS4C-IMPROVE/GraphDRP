@@ -20,8 +20,11 @@ from typing import Dict
 
 import pandas as pd
 
-# [Req] IMPROVE/CANDLE imports
-from improve import framework as frm
+# [Req] IMPROVE imports
+# from improve import framework as frm
+from improvelib.applications.drug_response_prediction.config import DRPInferConfig
+from improvelib.utils import str2bool
+import improvelib.utils as frm
 
 # Model-specific imports
 from model_utils.torch_utils import (
@@ -40,26 +43,13 @@ filepath = Path(__file__).resolve().parent # [Req]
 # ---------------------
 # [Req] Parameter lists
 # ---------------------
-# Two parameter lists are required:
-# 1. app_infer_params
-# 2. model_infer_params
-# 
-# The values for the parameters in both lists should be specified in a
-# parameter file that is passed as default_model arg in
-# frm.initialize_parameters().
-
-# 1. App-specific params (App: monotherapy drug response prediction)
-# Currently, there are no app-specific params in this script.
-app_infer_params = []
-
-# 2. Model-specific params (Model: GraphDRP)
+# Model-specific params (Model: GraphDRP)
 # All params in model_infer_params are optional.
 # If no params are required by the model, then it should be an empty list.
 model_infer_params = []
 
-# [Req] Combine the two lists (the combined parameter list will be passed to
-# frm.initialize_parameters() in the main().
-infer_params = app_infer_params + model_infer_params
+# infer_params = app_infer_params + model_infer_params
+infer_params = model_infer_params
 # ---------------------
 
 
@@ -75,11 +65,12 @@ def run(params):
             to the metrics_list.
     """
     # breakpoint()
+    # from pprint import pprint; pprint(params);
 
     # ------------------------------------------------------
     # [Req] Create output dir
     # ------------------------------------------------------
-    frm.create_outdir(outdir=params["infer_outdir"])
+    # frm.create_outdir(outdir=params["infer_outdir"]) # TODO cfg.initialize_parameters creates params['output_dir'] where the model will be stored
 
     # ------------------------------------------------------
     # [Req] Create data names for test set
@@ -93,11 +84,15 @@ def run(params):
     # Prepare dataloaders to load model input data (ML data)
     # ------------------------------------------------------
     print("\nTest data:")
-    print(f"test_ml_data_dir: {params['test_ml_data_dir']}")
+    # print(f"test_ml_data_dir: {params['test_ml_data_dir']}")
     print(f"test_batch: {params['test_batch']}")
-    test_loader = build_GraphDRP_dataloader(params["test_ml_data_dir"],
-                                            test_data_fname,
-                                            params["test_batch"],
+    if "input_data_dir" in params:
+        data_dir = params["input_data_dir"]
+    else:
+        data_dir = params["input_dir"]
+    test_loader = build_GraphDRP_dataloader(data_dir=data_dir,
+                                            data_fname=test_data_fname,
+                                            batch_size=params["test_batch"],
                                             shuffle=False)
 
     # ------------------------------------------------------
@@ -110,7 +105,11 @@ def run(params):
     # Load best model and compute predictions
     # ------------------------------------------------------
     # Load the best saved model (as determined based on val data)
-    modelpath = frm.build_model_path(params, model_dir=params["model_dir"]) # [Req]
+    if "input_model_dir" in params:
+        model_dir = params["input_model_dir"]
+    else:
+        model_dir = params["input_dir"]
+    modelpath = frm.build_model_path(params, model_dir=model_dir) # [Req]
     model = load_GraphDRP(params, modelpath, device)
     model.eval()
 
@@ -123,19 +122,20 @@ def run(params):
     frm.store_predictions_df(
         params,
         y_true=test_true, y_pred=test_pred, stage="test",
-        outdir=params["infer_outdir"]
+        # outdir=params["infer_outdir"]
+        outdir=params["output_dir"] # TODO instead of infer_outdir
     )
 
     # ------------------------------------------------------
     # [Req] Compute performance scores
     # ------------------------------------------------------
-    # breakpoint()
-    # test_scores = frm.compute_performace_scores(
-    #     params,
-    #     y_true=test_true, y_pred=test_pred, stage="test",
-    #     outdir=params["infer_outdir"], metrics=metrics_list
-    # )
-    test_scores = None
+    test_scores = frm.compute_performace_scores(
+        params,
+        y_true=test_true, y_pred=test_pred, stage="test",
+        # outdir=params["infer_outdir"],
+        outdir=params["output_dir"], # TODO instead of infer_outdir
+        metrics=metrics_list
+    )
 
     return test_scores
 
@@ -144,17 +144,25 @@ def run(params):
 def main(args):
     # [Req]
     additional_definitions = preprocess_params + train_params + infer_params
-    params = frm.initialize_parameters(
-        filepath,
-        # default_model="graphdrp_default_model.txt",
-        # default_model="graphdrp_params.txt",
-        # default_model="params_ws.txt",
-        # default_model="params_cs.txt",
-        default_model="params_ovarian.txt",
+    # params = frm.initialize_parameters(
+    #     filepath,
+    #     # default_model="graphdrp_default_model.txt",
+    #     # default_model="graphdrp_params.txt",
+    #     # default_model="params_ws.txt",
+    #     # default_model="params_cs.txt",
+    #     default_model="params_ovarian.txt",
+    #     additional_definitions=additional_definitions,
+    #     # required=req_infer_args,
+    #     required=None,
+    # )
+    cfg = DRPInferConfig()
+    params = cfg.initialize_parameters(
+        pathToModelDir=filepath,
+        default_config="graphdrp_params.txt",
+        default_model=None,
+        additional_cli_section=None,
         additional_definitions=additional_definitions,
-        # required=req_infer_args,
-        required=None,
-    )
+        required=None)
     test_scores = run(params)
     print("\nFinished model inference.")
 

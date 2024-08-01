@@ -1,7 +1,6 @@
 #!/bin/bash --login
-# run it like this: source ./setup_improve.sh
-# TODO. Wierd behavior: only when this script is sourced, the tmux pane is automatically terminated
-#       when I get an error in other bash scripts.
+# Navigate to the dir with the cloned model repo (e.g., GraphDRP)
+# Run it like this: source ./setup_improve.sh
 
 # set -e
 
@@ -20,14 +19,19 @@ else
     echo "CSA data folder already exists"
 fi
 
-# Env var IMPROVE_DATA_DIR
-export IMPROVE_DATA_DIR="./$data_dir/"
+# # Env var IMPROVE_DATA_DIR
+# export IMPROVE_DATA_DIR="./$data_dir/"
 
-# Clone IMPROVE lib
-# echo "Clone IMPROVE lib"
+# Clone IMPROVE lib (if needed)
 cd ../
-# git clone https://github.com/JDACS4C-IMPROVE/IMPROVE
 improve_lib_path=$PWD/IMPROVE
+improve_branch="framework-api"
+if [ -d $improve_lib_path ]; then
+  echo "IMPROVE repo exists in ${improve_lib_path}"
+else
+    # git clone https://github.com/JDACS4C-IMPROVE/IMPROVE
+    git clone -b $improve_branch https://github.com/JDACS4C-IMPROVE/IMPROVE
+fi
 cd $model_name
 
 # Env var PYTHOPATH

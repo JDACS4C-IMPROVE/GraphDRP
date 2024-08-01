@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Below are two examples of how to run the end-to-end scripts:
+# Below are two examples of end-to-end csa scripts for a single [source, target, split combo]:
 # 1. Within-study analysis
 # 2. Cross-study analysis
 
-# Note! The outputs from preprocess, train, and infer are saved the same dir.
+# Note! The outputs from preprocess, train, and infer are saved into different dirs.
 
 # ======================================================================
 # To setup improve env vars, run this script first:
@@ -25,11 +25,13 @@ SPLIT=0
 # ---------------
 
 SOURCE=CCLE
-# SOURCE=gCSI
 TARGET=$SOURCE
 
-# Single dir
-MLDATA_AND_MODEL_DIR=./res_same_dir/${SOURCE}-${TARGET}/split_${SPLIT}
+# Separate dirs
+ML_DATA_DIR=./res_diff_dirs/ml_data/${SOURCE}-${TARGET}/split_${SPLIT}
+MODEL_DIR=./res_diff_dirs/models/${SOURCE}/split_${SPLIT}
+INFER_DIR=./res_diff_dirs/infer/${SOURCE}-${TARGET}/split_${SPLIT}
+
 
 # Preprocess (improvelib)
 python graphdrp_preprocess_improve.py \
@@ -37,17 +39,18 @@ python graphdrp_preprocess_improve.py \
     --val_split_file ${SOURCE}_split_${SPLIT}_val.txt \
     --test_split_file ${TARGET}_split_${SPLIT}_test.txt \
     --input_dir ./csa_data/raw_data \
-    --output_dir $MLDATA_AND_MODEL_DIR
+    --output_dir $ML_DATA_DIR
 
 # Train (improvelib)
 python graphdrp_train_improve.py \
-    --input_dir $MLDATA_AND_MODEL_DIR \
-    --output_dir $MLDATA_AND_MODEL_DIR
+    --input_dir $ML_DATA_DIR \
+    --output_dir $MODEL_DIR
 
 # Infer (improvelib)
 python graphdrp_infer_improve.py \
-    --input_dir $MLDATA_AND_MODEL_DIR \
-    --output_dir $MLDATA_AND_MODEL_DIR
+    --input_data_dir $ML_DATA_DIR\
+    --input_model_dir $MODEL_DIR\
+    --output_dir $INFER_DIR
 
 
 # ----------------------------------------
@@ -57,8 +60,10 @@ python graphdrp_infer_improve.py \
 SOURCE=GDSCv1
 TARGET=CCLE
 
-# Single dir
-MLDATA_AND_MODEL_DIR=./res_same_dir/${SOURCE}-${TARGET}/split_${SPLIT}
+# Separate dirs
+ML_DATA_DIR=./res_diff_dirs/ml_data/${SOURCE}-${TARGET}/split_${SPLIT}
+MODEL_DIR=./res_diff_dirs/models/${SOURCE}/split_${SPLIT}
+INFER_DIR=./res_diff_dirs/infer/${SOURCE}-${TARGET}/split_${SPLIT}
 
 # Preprocess (improvelib)
 python graphdrp_preprocess_improve.py \
@@ -66,14 +71,15 @@ python graphdrp_preprocess_improve.py \
     --val_split_file ${SOURCE}_split_${SPLIT}_val.txt \
     --test_split_file ${TARGET}_all.txt \
     --input_dir ./csa_data/raw_data \
-    --output_dir $MLDATA_AND_MODEL_DIR
+    --output_dir $ML_DATA_DIR
 
 # Train (improvelib)
 python graphdrp_train_improve.py \
-    --input_dir $MLDATA_AND_MODEL_DIR \
-    --output_dir $MLDATA_AND_MODEL_DIR
+    --input_dir $ML_DATA_DIR \
+    --output_dir $MODEL_DIR
 
 # Infer (improvelib)
 python graphdrp_infer_improve.py \
-    --input_dir $MLDATA_AND_MODEL_DIR \
-    --output_dir $MLDATA_AND_MODEL_DIR
+    --input_data_dir $ML_DATA_DIR\
+    --input_model_dir $MODEL_DIR\
+    --output_dir $INFER_DIR

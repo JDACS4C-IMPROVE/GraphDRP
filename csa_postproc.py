@@ -9,7 +9,8 @@ import pandas as pd
 
 # IMPROVE/CANDLE imports
 # from improve import framework as frm
-from improve.csa import cross_study_postprocess
+# from improve.csa import cross_study_postprocess
+from improvelib.workflow_utils.cross_study.csa_utils import csa_postprocess, plot_color_coded_csa_table
 
 # Imports from preprocess script
 # from graphdrp_preprocess_improve import preprocess_params
@@ -29,12 +30,12 @@ res_dir = args.res_dir
 model_name = args.model_name
 y_col_name = args.y_col_name
 
+res_dir_path = filepath / res_dir
+outdir = res_dir_path / f'../res.csa.{model_name}.{res_dir}'
+
+scores = csa_postprocess(res_dir_path,
+                         model_name,
+                         y_col_name,
+                         outdir=outdir)
 # breakpoint()
-res_dir_path = filepath/res_dir
-outdir = res_dir_path/f"../res.csa.{model_name}.{res_dir}"
-scores = cross_study_postprocess(res_dir_path,
-                                 model_name,
-                                 y_col_name,
-                                 outdir=outdir)
-# breakpoint()
-print("\nFinished cross-study post-processing.")
+print('\nFinished cross-study post-processing.')

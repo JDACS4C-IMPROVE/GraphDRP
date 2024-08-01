@@ -32,9 +32,13 @@ import torch
 # from torch_geometric.data import DataLoader
 
 # [Req] IMPROVE/CANDLE imports
-from improve import framework as frm
-from improve.metrics import compute_metrics
-from candle import CandleCkptPyTorch
+# from improve import framework as frm
+# from improve.metrics import compute_metrics
+# from candle import CandleCkptPyTorch
+from improvelib.applications.drug_response_prediction.config import DRPTrainConfig
+from improvelib.utils import str2bool
+import improvelib.utils as frm
+from improvelib.metrics import compute_metrics
 
 # Model-specific imports
 from model_utils.torch_utils import (
@@ -54,49 +58,43 @@ filepath = Path(__file__).resolve().parent # [Req]
 # ---------------------
 # [Req] Parameter lists
 # ---------------------
-# Two parameter lists are required:
-# 1. app_train_params
-# 2. model_train_params
-# 
-# The values for the parameters in both lists should be specified in a
-# parameter file that is passed as default_model arg in
-# frm.initialize_parameters().
-
-# 1. App-specific params (App: monotherapy drug response prediction)
-# Currently, there are no app-specific params for this script.
-app_train_params = []
-
-# 2. Model-specific params (Model: GraphDRP)
+# Model-specific params (Model: GraphDRP)
 # All params in model_train_params are optional.
 # If no params are required by the model, then it should be an empty list.
 model_train_params = [
     {"name": "model_arch",
+     "type": str,
      "default": "GINConvNet",
      "choices": ["GINConvNet", "GATNet", "GAT_GCN", "GCNNet"],
-     "type": str,
-     "help": "Model architecture to run."},
-    {"name": "log_interval",
-     "action": "store",
-     "type": int,
-     "help": "Interval for saving o/p"},
-    {"name": "cuda_name",
-     "action": "store",
-     "type": str,
-     "help": "Cuda device (e.g.: cuda:0, cuda:1."},
-    {"name": "learning_rate",
-     "type": float,
-     "default": 0.0001,
-     "help": "Learning rate for the optimizer."
+     "help": "Model architecture to run."
     },
+    {"name": "log_interval",
+     "type": int,
+     # "action": "store",
+     "default": 20,
+     "help": "Interval for saving o/p"
+    },
+    {"name": "cuda_name",
+     "type": str,
+     "action": "store",
+     "help": "Cuda device (e.g.: cuda:0, cuda:1)."
+    },
+    # TODO "learning_rate" is already defined in improvelib, but we can still
+    #   define it in  *train*.py and doesn't throw error or warning!
+    # {"name": "learning_rate",
+    #  "type": float,
+    #  "default": 0.0001,
+    #  "help": "Learning rate for the optimizer."
+    # },
 ]
 
-# Combine the two lists (the combined parameter list will be passed to
-# frm.initialize_parameters() in the main().
-train_params = app_train_params + model_train_params
+# train_params = app_train_params + model_train_params
+train_params = model_train_params
 # ---------------------
 
 # [Req] List of metrics names to compute prediction performance scores
 metrics_list = ["mse", "rmse", "pcc", "scc", "r2"]  
+
 
 def config_checkpointing(params: Dict, model, optimizer):
     """Configure CANDLE checkpointing. Reads last saved state if checkpoints exist.
@@ -123,7 +121,7 @@ def config_checkpointing(params: Dict, model, optimizer):
 
 
 # [Req]
-def run(params):
+def run(params: Dict):
     """ Run model training.
 
     Args:
@@ -134,16 +132,18 @@ def run(params):
             according to the metrics_list.
     """
     # breakpoint()
+    # from pprint import pprint; pprint(params);
 
     # ------------------------------------------------------
     # [Req] Create output dir and build model path
     # ------------------------------------------------------
     # Create output dir for trained model, val set predictions, val set
     # performance scores
-    frm.create_outdir(outdir=params["model_outdir"])
+    # frm.create_outdir(outdir=params["model_outdir"]) # TODO cfg.initialize_parameters creates params['output_dir'] where the model will be stored
 
     # Build model path
-    modelpath = frm.build_model_path(params, model_dir=params["model_outdir"])
+    # modelpath = frm.build_model_path(params, model_dir=params["model_outdir"])
+    modelpath = frm.build_model_path(params, model_dir=params["output_dir"]) # TODO instead of model_outdir
 
     # ------------------------------------------------------
     # [Req] Create data names for train and val sets
@@ -159,22 +159,23 @@ def run(params):
     # Prepare dataloaders to load model input data (ML data)
     # ------------------------------------------------------
     print("\nTrain data:")
-    print(f"train_ml_data_dir: {params['train_ml_data_dir']}")
+    # print(f"train_ml_data_dir: {params['train_ml_data_dir']}")
     print(f"batch_size: {params['batch_size']}")
     sys.stdout.flush()
-    train_loader = build_GraphDRP_dataloader(params["train_ml_data_dir"],
-                                             train_data_fname,
-                                             params["batch_size"],
+    # train_loader = build_GraphDRP_dataloader(params["train_ml_data_dir"],
+    train_loader = build_GraphDRP_dataloader(data_dir=params["input_dir"],
+                                             data_fname=train_data_fname,
+                                             batch_size=params["batch_size"],
                                              shuffle=True)
 
     # Don't shuffle the val_loader, otherwise results will be corrupted
     print("\nVal data:")
-    print(f"val_ml_data_dir: {params['val_ml_data_dir']}")
+    # print(f"val_ml_data_dir: {params['val_ml_data_dir']}")
     print(f"val_batch: {params['val_batch']}")
     sys.stdout.flush()
-    val_loader = build_GraphDRP_dataloader(params["val_ml_data_dir"],
-                                           val_data_fname,
-                                           params["val_batch"],
+    val_loader = build_GraphDRP_dataloader(data_dir=params["input_dir"],
+                                           data_fname=val_data_fname,
+                                           batch_size=params["val_batch"],
                                            shuffle=False)
 
     # ------------------------------------------------------
@@ -194,15 +195,15 @@ def run(params):
     # ------------------------------------------------------
     # Train settings
     # ------------------------------------------------------
-    # [Req] Set checkpointing
-    print(f"model_outdir:   {params['model_outdir']}")
-    print(f"ckpt_directory: {params['ckpt_directory']}")
-    # TODO: why nested dirs are created: params["ckpt_directory"]/params["ckpt_directory"]
-    # params["output_dir"] = params["model_outdir"]
-    if params["ckpt_directory"] is None:
-        params["ckpt_directory"] = params["model_outdir"]
-        # params["ckpt_directory"] = "ckpt_graphdrp"  # TODO: why nested dirs are created: params["ckpt_directory"]/params["ckpt_directory"]
-    # ckpt_obj, initial_epoch = config_checkpointing(params, model, optimizer)
+    # # [Req] Set checkpointing
+    # print(f"model_outdir:   {params['model_outdir']}")
+    # print(f"ckpt_directory: {params['ckpt_directory']}")
+    # # TODO: why nested dirs are created: params["ckpt_directory"]/params["ckpt_directory"]
+    # # params["output_dir"] = params["model_outdir"]
+    # if params["ckpt_directory"] is None:
+    #     params["ckpt_directory"] = params["model_outdir"]
+    #     # params["ckpt_directory"] = "ckpt_graphdrp"  # TODO: why nested dirs are created: params["ckpt_directory"]/params["ckpt_directory"]
+    # # ckpt_obj, initial_epoch = config_checkpointing(params, model, optimizer)
     initial_epoch = 0
 
     num_epoch = params["epochs"]
@@ -229,7 +230,8 @@ def run(params):
     for epoch in range(initial_epoch, num_epoch):
         print(f"Start epoch: {epoch}")
         # Train epoch and checkpoint model
-        train_loss = train_epoch(model, device, train_loader, optimizer, loss_fn, epoch + 1, log_interval)
+        train_loss = train_epoch(model, device, train_loader, optimizer,
+                                 loss_fn, epoch + 1, log_interval)
         # ckpt_obj.ckpt_epoch(epoch, train_loss) # checkpoints the best model by default
 
         # Predict with val data
@@ -252,11 +254,13 @@ def run(params):
             best_epoch = epoch + 1
             best_score = val_scores[early_stop_metric]
             print(f"{early_stop_metric} improved at epoch {best_epoch};  "\
-                  f"Best {early_stop_metric}: {best_score};  Model: {params['model_arch']}")
+                  f"Best {early_stop_metric}: {best_score};  "\
+                  f"Model: {params['model_arch']}")
             early_stop_counter = 0  # zero the early-stop counter if the model improved after the epoch
         else:
             print(f"No improvement since epoch {best_epoch};  "\
-                  f"Best {early_stop_metric}: {best_score};  Model: {params['model_arch']}")
+                  f"Best {early_stop_metric}: {best_score};  "\
+                  f"Model: {params['model_arch']}")
             early_stop_counter += 1  # increment the counter if the model was not improved after the epoch
 
         if early_stop_counter == patience:
@@ -285,7 +289,8 @@ def run(params):
     frm.store_predictions_df(
         params,
         y_true=val_true, y_pred=val_pred, stage="val",
-        outdir=params["model_outdir"]
+        # outdir=params["model_outdir"]
+        outdir=params["output_dir"] # TODO explore input_dir and output_dir
     )
 
     # ------------------------------------------------------
@@ -294,33 +299,44 @@ def run(params):
     val_scores = frm.compute_performace_scores(
         params,
         y_true=val_true, y_pred=val_pred, stage="val",
-        outdir=params["model_outdir"], metrics=metrics_list
+        # outdir=params["model_outdir"],
+        outdir=params["output_dir"], # TODO explore input_dir and output_dir
+        metrics=metrics_list
     )
 
-    history.to_csv(Path(params["model_outdir"])/"history.csv", index=False)
+    history.to_csv(Path(params["output_dir"])/"history.csv", index=False)
 
     return val_scores
 
 
 def initialize_parameters():
     additional_definitions = preprocess_params + train_params
-    params = frm.initialize_parameters(
-        filepath,
-        # default_model="graphdrp_default_model.txt",
-        # default_model="graphdrp_params.txt",
-        # default_model="params_ws.txt",
-        # default_model="params_cs.txt",
-        default_model="params_ovarian.txt",
+    # params = frm.initialize_parameters(
+    #     filepath,
+    #     # default_model="graphdrp_default_model.txt",
+    #     # default_model="graphdrp_params.txt",
+    #     # default_model="params_ws.txt",
+    #     # default_model="params_cs.txt",
+    #     default_model="params_ovarian.txt",
+    #     additional_definitions=additional_definitions,
+    #     # required=req_train_args,
+    #     required=None,
+    # )
+    cfg = DRPTrainConfig()
+    additional_definitions = preprocess_params + train_params
+    params = cfg.initialize_parameters(
+        pathToModelDir=filepath,
+        default_config="graphdrp_params.txt",
+        default_model=None,
+        additional_cli_section=None,
         additional_definitions=additional_definitions,
-        # required=req_train_args,
-        required=None,
-    )
+        required=None)
     return params
 
 
 # [Req]
 def main(args):
-# [Req]
+    # [Req]
     params = initialize_parameters()
     val_scores = run(params)
     print("\nFinished training GraphDRP model.")
