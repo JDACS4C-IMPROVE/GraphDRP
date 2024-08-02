@@ -127,7 +127,8 @@ def run(params: Dict):
         str: directory name that was used to save the preprocessed (generated)
             ML data files.
     """
-    # breakpoint()
+    breakpoint();
+    from pprint import pprint; pprint(params)
 
     # ------------------------------------------------------
     # [Req] Build paths and create output dir
@@ -192,12 +193,17 @@ def run(params: Dict):
     rsp_tr = drp.DrugResponseLoader(params,
                                     split_file=params["train_split_file"],
                                     # verbose=False).dfs["response.tsv"]
-                                    verbose=False).dfs["response_pdmr_combined.tsv"]
+                                    # verbose=False).dfs["response_pdmr_combined.tsv"]
+                                    verbose=False).dfs["combined_ccl_pdo_response.tsv"]
     rsp_vl = drp.DrugResponseLoader(params,
                                     split_file=params["val_split_file"],
                                     # verbose=False).dfs["response.tsv"]
-                                    verbose=False).dfs["response_pdmr_combined.tsv"]
+                                    # verbose=False).dfs["response_pdmr_combined.tsv"]
+                                    verbose=False).dfs["combined_ccl_pdo_response.tsv"]
     rsp = pd.concat([rsp_tr, rsp_vl], axis=0)
+    # breakpoint()
+    # jj = rsp[rsp['auc'].isna()]
+    # print(jj)
 
     # Retian feature rows that are present in the y data (response dataframe)
     # Intersection of omics features, drug features, and responses
@@ -234,7 +240,8 @@ def run(params: Dict):
         # --------------------------------
         rsp = drp.DrugResponseLoader(params,
                                      split_file=split_file,
-                                     verbose=False).dfs["response_pdmr_combined.tsv"]
+                                     # verbose=False).dfs["response_pdmr_combined.tsv"]
+                                     verbose=False).dfs["combined_ccl_pdo_response.tsv"]
 
         # --------------------------------
         # Data prep
@@ -255,11 +262,13 @@ def run(params: Dict):
         # Sub-select desired response column (y_col_name)
         # ... and reduce response df to 3 columns: drug_id, cell_id and selected drug_response
         rsp_cut = rsp[[params["drug_col_name"], params["canc_col_name"], params["y_col_name"]]].copy()
+        assert sum(np.isnan(rsp_cut['auc'].values)) == 0, f'----- found nan values in y data stage: {stage} -----'
         # Further prepare data (model-specific)
         xd, xc, y = compose_data_arrays(
             rsp_cut, smi, ge_sc, params["drug_col_name"], params["canc_col_name"]
         )
         print(stage.upper(), "data --> xd ", xd.shape, "xc ", xc.shape, "y ", y.shape)
+        assert sum(np.isnan(y)) == 0, f'----- found nan values in y data stage: {stage} -----'
 
         # -----------------------
         # [Req] Save ML data files in params["ml_data_outdir"]
@@ -305,7 +314,8 @@ def main(args):
         # default_model="graphdrp_params.txt",
         # default_model="params_ws.txt",
         # default_model="params_cs.txt",
-        default_model="params_ovarian.txt",
+        # default_model="params_ovarian.txt",
+        default_model="params_ccl_pdo.txt",
         additional_definitions=additional_definitions,
         required=None,
     )

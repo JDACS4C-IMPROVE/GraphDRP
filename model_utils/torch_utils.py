@@ -159,6 +159,15 @@ def train_epoch(model, device, train_loader, optimizer, loss_fn, epoch: int,
         data = data.to(device)
         optimizer.zero_grad()
         output, _ = model(data)
+        # breakpoint();
+        # ll = torch.nn.functional.mse_loss(input=output,
+        #                              target=data.y.view(-1, 1).float(),
+        #                              size_average=None, reduce=None,
+        #                              reduction='mean')
+        # print(np.sum(np.isnan(output.cpu().detach().numpy())))
+        # print(ll)
+        assert sum(data.y) == 0, f'----- found nan values in y data stage: {stage} -----'
+        assert sum(np.sum(np.isnan(output.cpu().detach().numpy()))) == 0, f'----- found nan values in y data stage: {stage} -----'
         loss = loss_fn(output, data.y.view(-1, 1).float().to(device))
         loss.backward()
         optimizer.step()

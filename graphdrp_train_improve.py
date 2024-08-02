@@ -133,7 +133,8 @@ def run(params):
         dict: prediction performance scores computed on validation data
             according to the metrics_list.
     """
-    # breakpoint()
+    # breakpoint();
+    # from pprint import pprint; pprint(params)
 
     # ------------------------------------------------------
     # [Req] Create output dir and build model path
@@ -226,6 +227,7 @@ def run(params):
 
     print(f"Epochs: {initial_epoch + 1} to {num_epoch}")
     sys.stdout.flush()
+    breakpoint();
     for epoch in range(initial_epoch, num_epoch):
         print(f"Start epoch: {epoch}")
         # Train epoch and checkpoint model
@@ -310,7 +312,8 @@ def initialize_parameters():
         # default_model="graphdrp_params.txt",
         # default_model="params_ws.txt",
         # default_model="params_cs.txt",
-        default_model="params_ovarian.txt",
+        # default_model="params_ovarian.txt",
+        default_model="params_ccl_pdo.txt",
         additional_definitions=additional_definitions,
         # required=req_train_args,
         required=None,
