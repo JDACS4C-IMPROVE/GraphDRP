@@ -20,11 +20,15 @@ fi
 
 SPLIT=0
 
+EPOCHS=50
+CUDA_NAME=cuda:7
+
 # ----------------------------------------
 # 1. Within-study
 # ---------------
 
-SOURCE=CCLE
+# SOURCE=CCLE
+SOURCE=gCSI
 TARGET=$SOURCE
 
 # Separate dirs
@@ -44,12 +48,15 @@ python graphdrp_preprocess_improve.py \
 # Train (improvelib)
 python graphdrp_train_improve.py \
     --input_dir $ML_DATA_DIR \
-    --output_dir $MODEL_DIR
+    --output_dir $MODEL_DIR \
+    --cuda_name $CUDA_NAME \
+    --epochs $EPOCHS
 
 # Infer (improvelib)
 python graphdrp_infer_improve.py \
     --input_data_dir $ML_DATA_DIR\
     --input_model_dir $MODEL_DIR\
+    --cuda_name $CUDA_NAME \
     --output_dir $INFER_DIR
 
 
@@ -76,10 +83,13 @@ python graphdrp_preprocess_improve.py \
 # Train (improvelib)
 python graphdrp_train_improve.py \
     --input_dir $ML_DATA_DIR \
-    --output_dir $MODEL_DIR
+    --output_dir $MODEL_DIR \
+    --cuda_name $CUDA_NAME \
+    --epochs $EPOCHS
 
 # Infer (improvelib)
 python graphdrp_infer_improve.py \
     --input_data_dir $ML_DATA_DIR\
     --input_model_dir $MODEL_DIR\
+    --cuda_name $CUDA_NAME \
     --output_dir $INFER_DIR
