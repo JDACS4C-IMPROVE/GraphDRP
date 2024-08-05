@@ -71,13 +71,15 @@ cd GraphDRP
 
 ### 2. Install dependencies
 Install dependencies (use `env_gdrp_37_improve.yml`).
+```bash
+conda env create -f env_gdrp_37_improve.yml
+```
 
 ### 3. Set PYTHONPATH and download benchmark data
 ```
 source setup_improve.sh
 ```
 This will set up `PYTHONPATH` to point the IMPROVE repo, and download cross-study benchmark data into `./csa_data/`.
-
 
 ### 4. Preprocess benchmark data (_raw data_) to construct model input data (_ML data_)
 ```bash
