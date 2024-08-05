@@ -3,7 +3,8 @@ GraphDRP model for drug response prediction (DRP).
 
 
 # Dependencies
-Check [conda_env_py37.sh](./conda_env_py37.sh)
+Create conda env using `env_gdrp_37_improve.yml`, or check [conda_env_py37.sh](./conda_env_py37.sh)
+
 
 ML framework:
 + [Torch](https://pytorch.org/)
@@ -68,19 +69,15 @@ git clone https://github.com/JDACS4C-IMPROVE/GraphDRP/tree/develop
 cd GraphDRP
 ```
 
-### 2. Download benchmark data
-```
-sh ./download_csa.sh
-```
-This will download the cross-study benchmark data into `./csa_data/`.
+### 2. Install dependencies
+Install dependencies (use `env_gdrp_37_improve.yml`).
 
-### 3. Set computational environment
-* Install dependencies (check [conda_env_py37.sh](./conda_env_py37.sh))
-* Set the required environment variables to point towards the data folder and improve lib. You need to download the improve lib repo (follow this repo for more info `https://github.com/JDACS4C-IMPROVE/IMPROVE`).
-```bash
-export IMPROVE_DATA_DIR="./csa_data/"
-export PYTHONPATH=$PYTHONPATH:/lambda_stor/data/apartin/projects/IMPROVE/pan-models/IMPROVE
+### 3. Set PYTHONPATH and download benchmark data
 ```
+source setup_improve.sh
+```
+This will set up `PYTHONPATH` to point the IMPROVE repo, and download cross-study benchmark data into `./csa_data/`.
+
 
 ### 4. Preprocess benchmark data (_raw data_) to construct model input data (_ML data_)
 ```bash
