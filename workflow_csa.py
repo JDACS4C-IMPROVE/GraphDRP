@@ -320,6 +320,15 @@ params['preprocess_python_script'] = f"{params['model_name']}_preprocess_improve
 params['train_python_script'] = f"{params['model_name']}_train_improve.py"
 params['infer_python_script'] = f"{params['model_name']}_infer_improve.py"
 
+### Initialize params reads as strings. So adding non str params here:
+params['use_singularity'] = False
+params['model_specific_data'] = False
+params['source_datasets'] = ['CCLE', 'gCSI']
+params['target_datasets'] = ["CCLE", "gCSI"]
+params['split'] = ['0']
+params['only_cross_study'] = False
+params['epochs'] = 1
+
 ##TODO: Also download benchmark data here
 
 ## Download Author specific data
