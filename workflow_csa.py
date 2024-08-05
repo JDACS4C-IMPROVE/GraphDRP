@@ -315,9 +315,9 @@ params['model_outdir'] = MAIN_CSA_OUTDIR / 'models'
 params['infer_outdir'] = MAIN_CSA_OUTDIR / 'infer'
 #params['model_specific_outdir'] = MAIN_CSA_OUTDIR/params['model_specific_outdir']
 #Model scripts
-params['preprocess_python_script'] = f'{params['model_name']}_preprocess_improve.py'
-params['train_python_script'] = f'{params['model_name']}_train_improve.py'
-params['infer_python_script'] = f'{params['model_name']}_infer_improve.py'
+params['preprocess_python_script'] = f"{params['model_name']}_preprocess_improve.py"
+params['train_python_script'] = f"{params['model_name']}_train_improve.py"
+params['infer_python_script'] = f"{params['model_name']}_infer_improve.py"
 
 ##TODO: Also download benchmark data here
 
