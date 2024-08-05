@@ -296,7 +296,7 @@ params = cfg.initialize_parameters(
     default_config="csa_params.txt",
     default_model=None,
     additional_cli_section=None,
-    additional_definitions=None,
+    additional_definitions=additional_definitions,
     required=None
 )
 
