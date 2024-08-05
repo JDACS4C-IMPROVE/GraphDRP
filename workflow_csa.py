@@ -80,6 +80,7 @@ def preprocess(params, source_data_name, split): #
         return f"{source_data_name}_split_{split}_{phase}.txt"
 
     split_nums=params['split']
+    print(' ****** INSIDE PREPROCESS *****')
     # Get the split file paths
     # This parsing assumes splits file names are: SOURCE_split_NUM_[train/val/test].txt
     if len(split_nums) == 0:
