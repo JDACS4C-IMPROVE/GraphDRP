@@ -63,8 +63,13 @@ additional_definitions = [
     },
     {"name": "model_name",
      "type": str,
-     "default": 'graphdpr', ## Change the default to LGBM??
+     "default": 'graphdrp', ## Change the default to LGBM??
      "help": "Name of the deep learning model"
+    },
+    {"name": "model_specific_data",
+     "type": bool,
+     "default": False, ## Change the default to LGBM??
+     "help": "Use model specific data?"
     },
     {"name": "epochs",
      "type": int,
@@ -88,7 +93,7 @@ additional_definitions = [
     },
     {"name": "singularity_image",
      "type": str,
-     "default": 'Paccmann_MCA.sif',
+     "default": '',
      "help": "Singularity image file of the model"
     }
     ]
