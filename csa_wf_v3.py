@@ -89,6 +89,8 @@ MAIN_ML_DATA_DIR = MAIN_CSA_OUTDIR / 'ml_data' # output_dir_pp, input_dir_train,
 MAIN_MODEL_DIR = MAIN_CSA_OUTDIR / 'models' # output_dir_train, input_dir_infer
 MAIN_INFER_DIR = MAIN_CSA_OUTDIR / 'infer' # output_dir infer
 
+# Note! Here input_dir is the location of benchmark data
+# TODO Should we set input_dir (and output_dir) for each models scrit?
 splits_dir = Path(params['input_dir']) / params['splits_dir']
 
 ### Source and target data sources
@@ -214,7 +216,7 @@ for source_data_name in source_datasets:
                   "--train_split_file", str(train_split_file),
                   "--val_split_file", str(val_split_file),
                   "--test_split_file", str(test_split_file),
-                  "--input_dir", str("./csa_data/raw_data"),
+                  "--input_dir", params['input_dir'], # str("./csa_data/raw_data"),
                   "--output_dir", str(ml_data_dir),
                   "--y_col_name", str(y_col_name)
             ]
