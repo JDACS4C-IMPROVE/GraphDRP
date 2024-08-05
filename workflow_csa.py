@@ -300,6 +300,7 @@ params = cfg.initialize_parameters(
     required=None
 )
 
+print(params)
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 fdir = Path(__file__).resolve().parent

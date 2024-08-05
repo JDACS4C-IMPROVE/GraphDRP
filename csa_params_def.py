@@ -63,7 +63,7 @@ additional_definitions = [
     },
     {"name": "model_name",
      "type": str,
-     "default": 'Paccmann_MCA', ## Change the default to LGBM??
+     "default": 'graphdpr', ## Change the default to LGBM??
      "help": "Name of the deep learning model"
     },
     {"name": "epochs",
