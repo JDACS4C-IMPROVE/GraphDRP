@@ -83,7 +83,7 @@ This will set up `PYTHONPATH` to point the IMPROVE repo, and download cross-stud
 
 ### 4. Preprocess benchmark data (_raw data_) to construct model input data (_ML data_)
 ```bash
-python graphdrp_preprocess_improve.py
+python graphdrp_preprocess_improve.py --input_dir ./csa_data/raw_data --output_dir ./res_dir
 ```
 Generates:
 * three model input data files: `train_data.pt`, `val_data.pt`, `test_data.pt`
@@ -105,7 +105,7 @@ ml_data
 
 ### 5. Train GraphDRP model
 ```bash
-python graphdrp_train_improve.py
+python graphdrp_train_improve.py --input_dir ./res_dir --output_dir ./res_dir
 ```
 Trains GraphDRP using the processed data: `train_data.pt` (training), `val_data.pt` (for early stopping).
 
@@ -136,7 +136,9 @@ out_models
 ```
 
 ### 6. Run the trained model in inference mode on test data
-```python graphdrp_infer_improve.py```
+```bash
+python graphdrp_infer_improve.py --input_dir ./res_dir --output_dir ./res_dir
+```
 This script uses the processed data and the trained model to evaluate performance.
 
 Generates:
