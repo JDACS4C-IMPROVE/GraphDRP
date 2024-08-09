@@ -64,6 +64,7 @@ config_lambda = Config(
             ),
         )
     ],
+    strategy='none',
 )
 
 parsl.clear()
