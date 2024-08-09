@@ -82,7 +82,7 @@ local_config = Config(
     strategy='none',
 )
 parsl.clear()
-parsl.load(config_lambda)
+parsl.load()
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 fdir = Path(__file__).resolve().parent
@@ -126,7 +126,7 @@ def preprocess(inputs=[]): #
     params=inputs[0]
     source_data_name=inputs[1]
     split=inputs[2]
-    
+
     split_nums=params['split']
     print(' ****** INSIDE PREPROCESS *****')
     # Get the split file paths
