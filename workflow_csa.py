@@ -107,7 +107,8 @@ def preprocess(params, source_data_name, split): #
             continue
 
     for target_data_name in params['target_datasets']:
-        ml_data_dir = params['ml_data_dir']/f"{source_data_name}-{target_data_name}"
+        ml_data_dir = params['ml_data_dir']/f"{source_data_name}-{target_data_name}"/ \
+                f"split_{split}"
         if ml_data_dir.exists() is True:
             continue
         if params['only_cross_study'] and (source_data_name == target_data_name):
@@ -467,7 +468,7 @@ config_polaris = Config(
 train_futures=[]
 
 #parsl.load(local_config)
-parsl.load(config_lambda)
+parsl.load()
 for source_data_name in params['source_datasets']:
     for split in params['split']:
         for target_data_name in params['target_datasets']:
