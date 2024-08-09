@@ -67,7 +67,7 @@ config_lambda = Config(
 )
 
 parsl.clear()
-parsl.load(config_lambda)
+parsl.load()
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 fdir = Path(__file__).resolve().parent
