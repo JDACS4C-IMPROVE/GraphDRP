@@ -51,7 +51,7 @@ config_lambda = Config(
     retries=retries,
     executors=[
         HighThroughputExecutor(
-            #address="127.0.0.1",
+            address='127.0.0.1',
             label="htex",
             cpu_affinity="block",
             #max_workers_per_node=2,
