@@ -38,6 +38,36 @@ import sys
 ############
 ############
 
+##### CONFIG FOR LAMBDA ######
+# Adjust your user-specific options here:
+run_dir="~/tmp"
+print(parsl.__version__)
+
+available_accelerators: Union[int, Sequence[str]] = 2
+worker_port_range: Tuple[int, int] = (10000, 20000)
+retries: int = 1
+
+config_lambda = Config(
+    retries=retries,
+    executors=[
+        HighThroughputExecutor(
+            address="127.0.0.1",
+            label="htex",
+            cpu_affinity="block",
+            #max_workers_per_node=2,
+            #worker_debug=True,
+            available_accelerators=available_accelerators,
+            worker_port_range=worker_port_range,
+            provider=LocalProvider(
+                init_blocks=1,
+                max_blocks=1,
+            ),
+        )
+    ],
+)
+
+parsl.clear()
+parsl.load(config_lambda)
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 fdir = Path(__file__).resolve().parent
@@ -344,33 +374,7 @@ if params['model_specific_data']:
                             text=True, check=True)
 
 
-##### CONFIG FOR LAMBDA ######
-# Adjust your user-specific options here:
-run_dir="~/tmp"
-print(parsl.__version__)
 
-available_accelerators: Union[int, Sequence[str]] = 2
-worker_port_range: Tuple[int, int] = (10000, 20000)
-retries: int = 1
-
-config_lambda = Config(
-    retries=retries,
-    executors=[
-        HighThroughputExecutor(
-            address="127.0.0.1",
-            label="htex",
-            cpu_affinity="block",
-            #max_workers_per_node=2,
-            #worker_debug=True,
-            available_accelerators=available_accelerators,
-            worker_port_range=worker_port_range,
-            provider=LocalProvider(
-                init_blocks=1,
-                max_blocks=1,
-            ),
-        )
-    ],
-)
 """ user_opts = {
     "worker_init":      f"source ~/.venv/parsl/bin/activate; cd {run_dir}", # load the environment where parsl is installed
     "scheduler_options":"#PBS -l filesystems=home:eagle:grand -l singularity_fakeroot=true" , # specify any PBS options here, like filesystems
@@ -468,7 +472,7 @@ config_polaris = Config(
 train_futures=[]
 
 #parsl.load(local_config)
-parsl.load(config_lambda)
+#parsl.load(config_lambda)
 for source_data_name in params['source_datasets']:
     for split in params['split']:
         #for target_data_name in params['target_datasets']:
@@ -481,6 +485,6 @@ for source_data_name in params['source_datasets']:
 #for target_data_name in params['target_datasets']:
 #    infer_futures = [infer(params, tf.result()['source_data_name'], target_data_name, tf.result()['split']) for tf in train_futures]
 
-parsl.clear()
+#parsl.clear()
 
 ### module load apptainer
