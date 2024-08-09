@@ -113,7 +113,7 @@ def build_split_fname(source_data_name, split, phase):
     return f"{source_data_name}_split_{split}_{phase}.txt"
 
 @python_app  ## May be implemented separately outside this script or does not need parallelization
-def preprocess(params, source_data_name, split): # 
+def preprocess(inputs=[]): # 
     import warnings
     import os
     import subprocess
@@ -123,7 +123,10 @@ def preprocess(params, source_data_name, split): #
         if split=='all':
             return f"{source_data_name}_{split}.txt"
         return f"{source_data_name}_split_{split}_{phase}.txt"
-
+    params=inputs[0]
+    source_data_name=inputs[1]
+    split=inputs[2]
+    
     split_nums=params['split']
     print(' ****** INSIDE PREPROCESS *****')
     # Get the split file paths
@@ -491,7 +494,7 @@ train_futures=[]
 for source_data_name in params['source_datasets']:
     for split in params['split']:
         #for target_data_name in params['target_datasets']:
-        preprocess_futures = preprocess(params, source_data_name, split)  ## MODIFY TO INCLUDE SPLITS IN PARALLEL?
+        preprocess_futures=preprocess(inputs=[params, source_data_name, split])  ## MODIFY TO INCLUDE SPLITS IN PARALLEL?
             #train_futures.append(train(params, preprocess_futures.result()['source_data_name'], preprocess_futures.result()['split']))
             #train_future = train(params, preprocess_futures.result()['source_data_name'], preprocess_futures.result()['split'])
             #infer_futures = infer(params, train_future.result()['source_data_name'], target_data_name, train_future.result()['split'])
