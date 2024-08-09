@@ -82,7 +82,7 @@ local_config = Config(
     strategy='none',
 )
 parsl.clear()
-parsl.load()
+parsl.load(config_lambda)
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 fdir = Path(__file__).resolve().parent
