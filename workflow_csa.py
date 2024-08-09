@@ -51,7 +51,7 @@ config_lambda = Config(
     retries=retries,
     executors=[
         HighThroughputExecutor(
-            address="127.0.0.1",
+            #address="127.0.0.1",
             label="htex",
             cpu_affinity="block",
             #max_workers_per_node=2,
@@ -71,7 +71,6 @@ local_config = Config(
         HighThroughputExecutor(
             label="htex_Local",
             worker_debug=True,
-            max_workers_per_node=2,
             cpu_affinity='alternating',
             provider=LocalProvider(
                 channel=LocalChannel(),
@@ -83,7 +82,7 @@ local_config = Config(
     strategy='none',
 )
 parsl.clear()
-parsl.load(local_config)
+parsl.load(config_lambda)
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 fdir = Path(__file__).resolve().parent
