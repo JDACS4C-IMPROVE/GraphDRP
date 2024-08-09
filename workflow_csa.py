@@ -66,9 +66,23 @@ config_lambda = Config(
     ],
     strategy='none',
 )
-
+local_config = Config(
+    executors=[
+        HighThroughputExecutor(
+            label="htex_Local",
+            worker_debug=True,
+            available_accelerators=2,
+            provider=LocalProvider(
+                channel=LocalChannel(),
+                init_blocks=1,
+                max_blocks=1,
+            ),
+        )
+    ],
+    strategy='none',
+)
 parsl.clear()
-parsl.load(config_lambda)
+parsl.load(local_config)
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 fdir = Path(__file__).resolve().parent
