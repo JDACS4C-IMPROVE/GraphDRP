@@ -71,6 +71,7 @@ local_config = Config(
         HighThroughputExecutor(
             label="htex_Local",
             worker_debug=True,
+            max_workers_per_node=2,
             cpu_affinity='alternating',
             provider=LocalProvider(
                 channel=LocalChannel(),
