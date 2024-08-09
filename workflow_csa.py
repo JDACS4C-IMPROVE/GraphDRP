@@ -471,8 +471,8 @@ train_futures=[]
 parsl.load(config_lambda)
 for source_data_name in params['source_datasets']:
     for split in params['split']:
-        for target_data_name in params['target_datasets']:
-            preprocess_futures = preprocess(params, source_data_name, split)  ## MODIFY TO INCLUDE SPLITS IN PARALLEL?
+        #for target_data_name in params['target_datasets']:
+        preprocess_futures = preprocess(params, source_data_name, split)  ## MODIFY TO INCLUDE SPLITS IN PARALLEL?
             #train_futures.append(train(params, preprocess_futures.result()['source_data_name'], preprocess_futures.result()['split']))
             #train_future = train(params, preprocess_futures.result()['source_data_name'], preprocess_futures.result()['split'])
             #infer_futures = infer(params, train_future.result()['source_data_name'], target_data_name, train_future.result()['split'])
