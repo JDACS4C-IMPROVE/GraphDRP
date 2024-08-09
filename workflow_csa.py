@@ -358,7 +358,7 @@ config_lambda = Config(
     executors=[
         HighThroughputExecutor(
             address="127.0.0.1",
-            label="htex_Local",
+            label="htex",
             cpu_affinity="block",
             #max_workers_per_node=2,
             #worker_debug=True,
