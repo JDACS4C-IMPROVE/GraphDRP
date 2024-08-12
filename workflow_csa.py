@@ -253,45 +253,27 @@ def infer(params, source_data_name, target_data_name, split): #
     import os
     import warnings
     import subprocess
-    def build_split_fname(source_data_name, split, phase):
-        """ Build split file name. If file does not exist continue """
-        if split=='all':
-            return f"{source_data_name}_{split}.txt"
-        return f"{source_data_name}_split_{split}_{phase}.txt"
-    #for split in params['split']:
-    ml_data_outdir = params['ml_data_dir']/f"{source_data_name}-{target_data_name}"/f"split_{split}"
-    model_outdir = params['model_outdir']/f"{source_data_name}"/f"split_{split}"
-    test_ml_data_dir = ml_data_outdir
-    infer_outdir = params['infer_outdir']/f"{source_data_name}-{target_data_name}"/f"split_{split}"
+    model_dir = params['model_outdir'] / f"{source_data_name}" / f"split_{split}"
+    ml_data_dir = params['ml_data_dir']/f"{source_data_name}-{params['target_datasets'][0]}"/ \
+                f"split_{split}"
+    infer_dir = params['infer_dir']/f"{source_data_name}-{target_data_name}"/f"split_{split}"
     #timer_infer = Timer()
 
     print("\nInfer")
     print(f"test_ml_data_dir: {test_ml_data_dir}")
     print(f"infer_outdir:     {infer_outdir}")
     if params['use_singularity']:
-        infer_run = ["singularity", "exec", "--nv",
-                params['singularity_image'], "infer.sh",'$CUDA_VISIBLE_DEVICES',
-                os.getenv("IMPROVE_DATA_DIR"),
-                str("--test_ml_data_dir "+ str(test_ml_data_dir)),
-                str("--model_dir " + str(model_outdir)),
-                str("--infer_outdir " + str(infer_outdir)),
-                str("--model_specific_outdir " + str(params['model_specific_outdir'])),
-                str("--y_col_name " + params['y_col_name']),
-                str("--model_outdir " + str(model_outdir)),
-                str("--ml_data_outdir " + str(ml_data_outdir))
-        ]
-        result = subprocess.run(infer_run, capture_output=True,
-                                text=True, check=True)
+        print('Functionality using singularity is work in progress. Please use the Python version to call train, set use_singularity=False')
+
     else:
-        infer_run = ["python",
-                "infer.py",
-                "--test_ml_data_dir", str(test_ml_data_dir),
-                "--model_dir", str(model_outdir),
-                "--infer_outdir", str(infer_outdir),
-                "--y_col_name", params['y_col_name'],
-                "--model_outdir", str(model_outdir),
-                "--model_specific_outdir", str(params['model_specific_outdir']),
-                "--ml_data_outdir", str(ml_data_outdir)
+        timer_infer = Timer()
+        print("\nInfer")
+        infer_run = ["python", params['infer_python_script'],
+                "--input_data_dir", str(ml_data_dir),
+                "--input_model_dir", str(model_dir),
+                "--output_dir", str(infer_dir),
+                #"--cuda_name", cuda_name, # DL-specific
+                "--y_col_name", y_col_name
         ]
         result = subprocess.run(infer_run, capture_output=True,
                                 text=True, check=True)
@@ -336,7 +318,7 @@ params = frm.build_paths(params)  # paths to raw data
 MAIN_CSA_OUTDIR = Path(f"./0_{y_col_name}_improvelib_small")
 params['ml_data_dir'] = MAIN_CSA_OUTDIR / 'ml_data'  ### May be add to frm.build_paths()??
 params['model_outdir'] = MAIN_CSA_OUTDIR / 'models'
-params['infer_outdir'] = MAIN_CSA_OUTDIR / 'infer'
+params['infer_dir'] = MAIN_CSA_OUTDIR / 'infer'
 #params['model_specific_outdir'] = MAIN_CSA_OUTDIR/params['model_specific_outdir']
 #Model scripts
 params['preprocess_python_script'] = f"{params['model_name']}_preprocess_improve.py"
@@ -466,11 +448,11 @@ train_futures=[]
 #parsl.load(config_lambda)
 for source_data_name in params['source_datasets']:
     for split in params['split']:
-        #for target_data_name in params['target_datasets']:
-        preprocess_futures=preprocess(inputs=[params, source_data_name, split])  ## MODIFY TO INCLUDE SPLITS IN PARALLEL?
+        for target_data_name in params['target_datasets']:
+            preprocess_futures=preprocess(inputs=[params, source_data_name, split])  ## MODIFY TO INCLUDE SPLITS IN PARALLEL?
             #train_futures.append(train(params, preprocess_futures.result()['source_data_name'], preprocess_futures.result()['split']))
-            #train_future = train(params, preprocess_futures.result()['source_data_name'], preprocess_futures.result()['split'])
-            #infer_futures = infer(params, train_future.result()['source_data_name'], target_data_name, train_future.result()['split'])
+            train_future = train(params, preprocess_futures.result()['source_data_name'], preprocess_futures.result()['split'])
+            infer_futures = infer(params, train_future.result()['source_data_name'], target_data_name, train_future.result()['split'])
 
 
 #for target_data_name in params['target_datasets']:
