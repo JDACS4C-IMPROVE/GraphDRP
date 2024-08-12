@@ -236,7 +236,7 @@ def train(params, source_data_name, split):
         if params['use_singularity']:
             print('Functionality using singularity is work in progress. Please use the Python version to call train, set use_singularity=False')
         else:
-            train_run = ["CUDA_VISIBLE_DEVICES=", "$CUDA_VISIBLE_DEVICES","python", 
+            train_run = ["python", 
                          params['train_python_script'],
                         "--input_dir", str(ml_data_dir),
                         "--output_dir", str(model_dir),
