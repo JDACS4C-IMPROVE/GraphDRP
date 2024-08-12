@@ -92,7 +92,13 @@ source setup_improve.sh
 This will set up `PYTHONPATH` to point the IMPROVE repo, and download cross-study benchmark data into `./csa_data/`.
 
 
-### 4. Preprocess benchmark data (_raw data_) to construct model input data (_ML data_)
+## TO RUN CROSS STUDY ANALYSIS USING PARSL ON LAMBDA MACHINE:
+```
+python workflow_csa.py
+```
+## For separate execution of preprocess, train and infer scripts:
+
+### 1. Preprocess benchmark data (_raw data_) to construct model input data (_ML data_)
 ```bash
 python graphdrp_preprocess_improve.py
 ```
@@ -114,7 +120,7 @@ ml_data
         └── x_data_gene_expression_scaler.gz
 ```
 
-### 5. Train GraphDRP model
+### 2. Train GraphDRP model
 ```bash
 python graphdrp_train_improve.py
 ```
@@ -146,7 +152,7 @@ out_models
         └── val_y_data_predicted.csv
 ```
 
-### 6. Run the trained model in inference mode on test data
+### 3. Run the trained model in inference mode on test data
 ```python graphdrp_infer_improve.py```
 This script uses the processed data and the trained model to evaluate performance.
 
@@ -162,7 +168,3 @@ out_infer
 ```
 
 
-### TO RUN CROSS STUDY ANALYSIS USING PARSL ON LAMBDA:
-```
-python workflow_csa.py
-```
