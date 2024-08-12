@@ -9,7 +9,7 @@ Activate environment:
 conda activate graphdrp_py37_improve
 ```
 
-# Install Parsl:
+### Install Parsl:
 ```
 pip install parsl 
 ```
