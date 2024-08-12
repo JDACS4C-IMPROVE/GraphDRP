@@ -92,7 +92,7 @@ source setup_improve.sh
 This will set up `PYTHONPATH` to point the IMPROVE repo, and download cross-study benchmark data into `./csa_data/`.
 
 
-## TO RUN CROSS STUDY ANALYSIS USING PARSL ON LAMBDA MACHINE:
+## To run cross study analysus using PARSL on Lambda machine:
 ```
 python workflow_csa.py
 ```
