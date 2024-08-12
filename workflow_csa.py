@@ -229,7 +229,7 @@ def train(params, source_data_name, split):
     ml_data_dir = params['ml_data_dir']/f"{source_data_name}-{params['target_datasets'][0]}"/ \
                 f"split_{split}"
     if model_dir.exists() is False:
-        timer_train = Timer()
+        #timer_train = Timer()
         print("\nTrain")
         print(f"ml_data_dir: {ml_data_dir}")
         print(f"model_dir:   {model_dir}")
@@ -262,7 +262,7 @@ def infer(params, source_data_name, target_data_name, split): #
         print('Functionality using singularity is work in progress. Please use the Python version to call train, set use_singularity=False')
 
     else:
-        timer_infer = Timer()
+        #timer_infer = Timer()
         print("\nInfer")
         infer_run = ["python", params['infer_python_script'],
                 "--input_data_dir", str(ml_data_dir),
