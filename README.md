@@ -4,6 +4,9 @@ GraphDRP model for drug response prediction (DRP).
 
 # Dependencies
 Create conda env using `env_gdrp_37_improve.yml`, or check [conda_env_py37.sh](./conda_env_py37.sh)
+```
+conda env create -f env_gdrp_37_improve.yml
+```
 Activate environment:
 ```
 conda activate graphdrp_py37_improve
