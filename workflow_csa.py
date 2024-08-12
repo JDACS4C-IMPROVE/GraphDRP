@@ -244,7 +244,7 @@ params['preprocess_python_script'] = f"{params['model_name']}_preprocess_improve
 params['train_python_script'] = f"{params['model_name']}_train_improve.py"
 params['infer_python_script'] = f"{params['model_name']}_infer_improve.py"
 
-### Initialize params reads as strings. So adding non str params here:
+### Initialize params reads as strings. So adding non str params here:  IS THERE A FIX FOR THIS?????
 params['use_singularity'] = False
 params['model_specific_data'] = False
 params['source_datasets'] = ['CCLE', 'gCSI']
