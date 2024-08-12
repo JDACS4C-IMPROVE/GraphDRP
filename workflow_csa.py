@@ -258,10 +258,6 @@ def infer(params, source_data_name, target_data_name, split): #
                 f"split_{split}"
     infer_dir = params['infer_dir']/f"{source_data_name}-{target_data_name}"/f"split_{split}"
     #timer_infer = Timer()
-
-    print("\nInfer")
-    print(f"test_ml_data_dir: {test_ml_data_dir}")
-    print(f"infer_outdir:     {infer_outdir}")
     if params['use_singularity']:
         print('Functionality using singularity is work in progress. Please use the Python version to call train, set use_singularity=False')
 
@@ -332,7 +328,7 @@ params['source_datasets'] = ['CCLE', 'gCSI']
 params['target_datasets'] = ["CCLE", "gCSI"]
 params['split'] = ['0']
 params['only_cross_study'] = False
-params['epochs'] = 1
+params['epochs'] = 10
 
 ##TODO: Also download benchmark data here
 
