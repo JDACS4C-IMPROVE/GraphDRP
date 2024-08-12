@@ -22,11 +22,6 @@ from parsl.config import Config
 from time import time
 from typing import Sequence, Tuple, Union
 
-
-
-
-#from parsl_apps import preprocess, train, infer
-#from IMPROVE.Config.Parsl import Config as Parsl
 import csa_params_def as CSA
 import improvelib.utils as frm
 from improvelib.applications.drug_response_prediction.config import DRPPreprocessConfig
@@ -35,12 +30,7 @@ from pathlib import Path
 import logging
 import sys
 
-############
-############
-
 ##### CONFIG FOR LAMBDA ######
-# Adjust your user-specific options here:
-run_dir="~/tmp"
 print(parsl.__version__)
 
 available_accelerators: Union[int, Sequence[str]] = 2
@@ -54,7 +44,7 @@ config_lambda = Config(
             address='127.0.0.1',
             label="htex",
             cpu_affinity="block",
-            #max_workers_per_node=2,
+            #max_workers_per_node=2, ## IS NOT SUPPORTED IN  Parsl version: 2023.06.19. CHECK HOW TO USE THIS???
             worker_debug=True,
             available_accelerators=2,
             worker_port_range=worker_port_range,
@@ -66,21 +56,7 @@ config_lambda = Config(
     ],
     strategy='simple',
 )
-local_config = Config(
-    executors=[
-        HighThroughputExecutor(
-            label="htex_Local",
-            worker_debug=True,
-            cpu_affinity='alternating',
-            provider=LocalProvider(
-                channel=LocalChannel(),
-                init_blocks=1,
-                max_blocks=1,
-            ),
-        )
-    ],
-    strategy='none',
-)
+
 parsl.clear()
 parsl.load(config_lambda)
 
@@ -90,29 +66,11 @@ y_col_name = "auc"
 
 logger = logging.getLogger(f'Start workflow')
 
-class Timer:
-  """ Measure time. """
-  def __init__(self):
-    self.start = time()
+##############################################################################
+################################ PARSL APPS ##################################
+##############################################################################
 
-  def timer_end(self):
-    self.end = time()
-    return self.end - self.start
-
-  def display_timer(self, print_fn=print):
-    time_diff = self.timer_end()
-    if time_diff // 3600 > 0:
-        print_fn("Runtime: {:.1f} hrs".format( (time_diff)/3600) )
-    else:
-        print_fn("Runtime: {:.1f} mins".format( (time_diff)/60) )
-
-def build_split_fname(source_data_name, split, phase):
-    """ Build split file name. If file does not exist continue """
-    if split=='all':
-        return f"{source_data_name}_{split}.txt"
-    return f"{source_data_name}_split_{split}_{phase}.txt"
-
-@python_app  ## May be implemented separately outside this script or does not need parallelization
+@python_app  
 def preprocess(inputs=[]): # 
     import warnings
     import os
@@ -130,24 +88,19 @@ def preprocess(inputs=[]): #
     split_nums=params['split']
     print(' ****** INSIDE PREPROCESS *****')
     # Get the split file paths
-    # This parsing assumes splits file names are: SOURCE_split_NUM_[train/val/test].txt
     if len(split_nums) == 0:
         # Get all splits
         split_files = list((params['splits_path']).glob(f"{source_data_name}_split_*.txt"))
         split_nums = [str(s).split("split_")[1].split("_")[0] for s in split_files]
         split_nums = sorted(set(split_nums))
-        # num_splits = 1
     else:
-        # Use the specified splits
         split_files = []
         for s in split_nums:
             split_files.extend(list((params['splits_path']).glob(f"{source_data_name}_split_{s}_*.txt")))
     files_joined = [str(s) for s in split_files]
 
-    #for split in split_nums:
     print(f"Split id {split} out of {len(split_nums)} splits.")
     # Check that train, val, and test are available. Otherwise, continue to the next split.
-    # TODO: check this!
     for phase in ["train", "val", "test"]:
         fname = build_split_fname(source_data_name, split, phase)
         if fname not in "\t".join(files_joined):
@@ -173,7 +126,6 @@ def preprocess(inputs=[]): #
             # If source and target are different, then infer on the entire target dataset
             test_split_file = f"{target_data_name}_all.txt"
         
-        #timer_preprocess = Timer()
 
         # p1 (none): Preprocess train data
         print("\nPreprocessing")
@@ -184,28 +136,11 @@ def preprocess(inputs=[]): #
         print(f"test_split_file:  {test_split_file}")
         print(f"ml_data_outdir:   {params['ml_data_outdir']}")
         if params['use_singularity']:
-            preprocess_run = ["singularity", "exec", "--nv",
-                params['singularity_image'], "preprocess.sh",
-                os.getenv("IMPROVE_DATA_DIR"),
-                #str("--x_data_path " + str(params['x_data_path'])),
-                #str("--y_data_path " + str(params['y_data_path'])),
-                #str("--splits_path " + str(params['splits_path'])),
-                #str("--model_specific_outdir " + str(params['model_specific_outdir'])),
-                str("--train_split_file " + str(train_split_file)),
-                str("--val_split_file " + str(val_split_file)),
-                str("--test_split_file " + str(test_split_file)),
-                "--input_dir", params['input_dir'], # str("./csa_data/raw_data"),
-                "--output_dir", str(ml_data_dir),
-                str("--y_col_name " + str(params['y_col_name']))
-            ]
-            result = subprocess.run(preprocess_run, capture_output=True,
-                                    text=True, check=True)
+            print('Functionality using singularity is work in progress. Please use the Python version to call preprocess, set use_singularity=False')
+
         else:
             preprocess_run = ["python",
                 params['preprocess_python_script'],
-                #"--x_data_path", str(params['x_data_path']),
-                #"--y_data_path", str(params['y_data_path']),
-                #"--splits_path", str(params['splits_path']),
                 #"--model_specific_outdir", str(params['model_specific_outdir']),
                 "--train_split_file", str(train_split_file),
                 "--val_split_file", str(val_split_file),
@@ -216,7 +151,6 @@ def preprocess(inputs=[]): #
             ]
             result = subprocess.run(preprocess_run, capture_output=True,
                                     text=True, check=True)
-        #timer_preprocess.display_timer(print)
     return {'source_data_name':source_data_name, 'split':split}
 
 
@@ -229,7 +163,6 @@ def train(params, source_data_name, split):
     ml_data_dir = params['ml_data_dir']/f"{source_data_name}-{params['target_datasets'][0]}"/ \
                 f"split_{split}"
     if model_dir.exists() is False:
-        #timer_train = Timer()
         print("\nTrain")
         print(f"ml_data_dir: {ml_data_dir}")
         print(f"model_dir:   {model_dir}")
@@ -257,12 +190,10 @@ def infer(params, source_data_name, target_data_name, split): #
     ml_data_dir = params['ml_data_dir']/f"{source_data_name}-{params['target_datasets'][0]}"/ \
                 f"split_{split}"
     infer_dir = params['infer_dir']/f"{source_data_name}-{target_data_name}"/f"split_{split}"
-    #timer_infer = Timer()
     if params['use_singularity']:
-        print('Functionality using singularity is work in progress. Please use the Python version to call train, set use_singularity=False')
+        print('Functionality using singularity is work in progress. Please use the Python version to call infer, set use_singularity=False')
 
     else:
-        #timer_infer = Timer()
         print("\nInfer")
         infer_run = ["python", params['infer_python_script'],
                 "--input_data_dir", str(ml_data_dir),
@@ -273,22 +204,14 @@ def infer(params, source_data_name, target_data_name, split): #
         ]
         result = subprocess.run(infer_run, capture_output=True,
                                 text=True, check=True)
-    #timer_infer.display_timer(print)
     return True
 
-############
-############
-
-def build_split_fname(source_data_name, split, phase):
-    """ Build split file name. If file does not exist continue """
-    if split=='all':
-        return f"{source_data_name}_{split}.txt"
-    return f"{source_data_name}_split_{split}_{phase}.txt"
-
+###############################
+####### CSA PARAMETERS ########
+###############################
 
 additional_definitions = CSA.additional_definitions
 filepath = Path(__file__).resolve().parent
-
 
 ## Should we combine csa config and parsl config and use just one initialize_parameter??
 cfg = DRPPreprocessConfig() # TODO submit github issue; too many logs printed; is it necessary?
@@ -342,8 +265,19 @@ if params['model_specific_data']:
     result = subprocess.run(auth_data_download, capture_output=True,
                             text=True, check=True)
 
+##########################################################################
+##################### START PARSL PARALLEL EXECUTION #####################
+##########################################################################
+
+for source_data_name in params['source_datasets']:
+    for split in params['split']:
+        for target_data_name in params['target_datasets']:
+            preprocess_futures=preprocess(inputs=[params, source_data_name, split])  ## MODIFY TO INCLUDE SPLITS IN PARALLEL?
+            train_future = train(params, preprocess_futures.result()['source_data_name'], preprocess_futures.result()['split'])
+            infer_futures = infer(params, train_future.result()['source_data_name'], target_data_name, train_future.result()['split'])
 
 
+## TODO: PARSL CONFIG FOR POLARIS
 """ user_opts = {
     "worker_init":      f"source ~/.venv/parsl/bin/activate; cd {run_dir}", # load the environment where parsl is installed
     "scheduler_options":"#PBS -l filesystems=home:eagle:grand -l singularity_fakeroot=true" , # specify any PBS options here, like filesystems
@@ -351,7 +285,7 @@ if params['model_specific_data']:
     "queue":            "R1819593",
     "walltime":         "1:00:00",
     "nodes_per_block":  10, # think of a block as one job on polaris, so to run on the main queues, set this >= 10
-} """
+} 
 
 user_opts = {
     "worker_init":      f". ~/.bashrc ; conda activate parsl; export PYTHONPATH=$PYTHONPATH:/IMPROVE; export IMPROVE_DATA_DIR=./improve_dir; module use /soft/spack/gcc/0.6.1/install/modulefiles/Core; module load apptainer; cd {run_dir}", # load the environment where parsl is installed
@@ -361,7 +295,7 @@ user_opts = {
     "walltime":         "1:00:00",
     "nodes_per_block":  3,# think of a block as one job on polaris, so to run on the main queues, set this >= 10
 }
-
+"""
 
 """ 
 ####### CONFIG FOR POLARIS ######
@@ -436,24 +370,3 @@ config_polaris = Config(
         retries=2,
         app_cache=True,
 ) """
-
-##################### START PARSL PARALLEL EXECUTION #####################
-train_futures=[]
-
-#parsl.load(local_config)
-#parsl.load(config_lambda)
-for source_data_name in params['source_datasets']:
-    for split in params['split']:
-        for target_data_name in params['target_datasets']:
-            preprocess_futures=preprocess(inputs=[params, source_data_name, split])  ## MODIFY TO INCLUDE SPLITS IN PARALLEL?
-            #train_futures.append(train(params, preprocess_futures.result()['source_data_name'], preprocess_futures.result()['split']))
-            train_future = train(params, preprocess_futures.result()['source_data_name'], preprocess_futures.result()['split'])
-            infer_futures = infer(params, train_future.result()['source_data_name'], target_data_name, train_future.result()['split'])
-
-
-#for target_data_name in params['target_datasets']:
-#    infer_futures = [infer(params, tf.result()['source_data_name'], target_data_name, tf.result()['split']) for tf in train_futures]
-
-#parsl.clear()
-
-### module load apptainer
