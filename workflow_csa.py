@@ -269,7 +269,7 @@ def infer(params, source_data_name, target_data_name, split): #
                 "--input_model_dir", str(model_dir),
                 "--output_dir", str(infer_dir),
                 #"--cuda_name", cuda_name, # DL-specific
-                "--y_col_name", y_col_name
+                "--y_col_name", str(params['y_col_name'])
         ]
         result = subprocess.run(infer_run, capture_output=True,
                                 text=True, check=True)
