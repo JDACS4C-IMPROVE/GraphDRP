@@ -4,6 +4,19 @@ GraphDRP model for drug response prediction (DRP).
 
 # Dependencies
 Create conda env using `env_gdrp_37_improve.yml`, or check [conda_env_py37.sh](./conda_env_py37.sh)
+Activate environment:
+```
+conda activate graphdrp_py37_improve
+```
+
+# Install Parsl:
+```
+pip install parsl 
+```
+If you see an error during execution you may have to do this:
+```
+export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libffi.so.7
+```
 
 
 ML framework:
@@ -146,4 +159,10 @@ out_infer
     └── split_0
         ├── test_scores.json
         └── test_y_data_predicted.csv
+```
+
+
+### TO RUN CROSS STUDY ANALYSIS USING PARSL ON LAMBDA:
+```
+python workflow_csa.py
 ```
