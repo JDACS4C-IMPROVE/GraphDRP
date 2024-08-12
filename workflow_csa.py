@@ -225,52 +225,25 @@ def train(params, source_data_name, split):
     import os
     import warnings
     import subprocess
-    def build_split_fname(source_data_name, split, phase):
-        """ Build split file name. If file does not exist continue """
-        if split=='all':
-            return f"{source_data_name}_{split}.txt"
-        return f"{source_data_name}_split_{split}_{phase}.txt"
-    model_outdir = params['model_outdir']/f"{source_data_name}"/f"split_{split}"
-    #frm.create_outdir(outdir=model_outdir)
-    #for target_data_name in params['target_datasets']:
-    ml_data_outdir = params['ml_data_dir']/f"{source_data_name}-{params['target_datasets'][0]}"/f"split_{split}"  #### We cannot have target data name here ??????
-    if model_outdir.exists() is False:
-        os.makedirs(os.path.join(model_outdir, 'ckpts'), exist_ok=True) # For storing checkpoints
-        train_ml_data_dir = ml_data_outdir
-        val_ml_data_dir = ml_data_outdir
-        #timer_train = Timer()
+    model_dir = params['model_outdir'] / f"{source_data_name}" / f"split_{split}"
+    ml_data_dir = params['ml_data_dir']/f"{source_data_name}-{params['target_datasets'][0]}"/ \
+                f"split_{split}"
+    if model_dir.exists() is False:
+        timer_train = Timer()
         print("\nTrain")
-        print(f"train_ml_data_dir: {train_ml_data_dir}")
-        print(f"val_ml_data_dir:   {val_ml_data_dir}")
-        print(f"model_outdir:      {model_outdir}")
+        print(f"ml_data_dir: {ml_data_dir}")
+        print(f"model_dir:   {model_dir}")
         if params['use_singularity']:
-            train_run = ["singularity", "exec", "--nv",
-                    params['singularity_image'], "train.sh", '$CUDA_VISIBLE_DEVICES',
-                    os.getenv("IMPROVE_DATA_DIR"),
-                    str("--train_ml_data_dir " + str(train_ml_data_dir)),
-                    str("--val_ml_data_dir " + str(val_ml_data_dir)),
-                    str("--ml_data_outdir " + str(ml_data_outdir)),
-                    str("--model_specific_outdir " + str(params['model_specific_outdir'])),
-                    str("--model_outdir " + str(model_outdir)),
-                    str("--epochs " + str(params['epochs'])),
-                    str("--y_col_name " + params['y_col_name']),
-                    str("--ckpt_directory " + os.path.join(model_outdir, 'ckpts'))
-            ]
-            result = subprocess.run(train_run, capture_output=True,
-                                    text=True, check=True)
+            print('Functionality using singularity is work in progress. Please use the Python version to call train, set use_singularity=False')
         else:
-            train_run = ["CUDA_VISIBLE_DEVICES=", "$CUDA_VISIBLE_DEVICES", "python",
-                "train.py",
-                "--train_ml_data_dir", str(train_ml_data_dir),
-                "--val_ml_data_dir", str(val_ml_data_dir),
-                "--ml_data_outdir", str(ml_data_outdir),
-                "--model_specific_outdir", str(params['model_specific_outdir']),
- 
-                "--model_outdir", str(model_outdir),
-                "--epochs", str(params['epochs']),
-                "--y_col_name", params['y_col_name'],
-                "--ckpt_directory", os.path.join(model_outdir, 'ckpts')
-            ]
+            train_run = ["CUDA_VISIBLE_DEVICES=", "$CUDA_VISIBLE_DEVICES","python", 
+                         params['train_python_script'],
+                        "--input_dir", str(ml_data_dir),
+                        "--output_dir", str(model_dir),
+                        "--epochs", str(params['epochs']),  # DL-specific
+                        #"--cuda_name", cuda_name, # DL-specific
+                        "--y_col_name", str(params['y_col_name'])
+                    ]
             result = subprocess.run(train_run, capture_output=True,
                                     text=True, check=True)
     return {'source_data_name':source_data_name, 'split':split}
