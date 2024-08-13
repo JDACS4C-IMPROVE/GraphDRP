@@ -247,8 +247,8 @@ params['infer_python_script'] = f"{params['model_name']}_infer_improve.py"
 ### Initialize params reads as strings. So adding non str params here:  IS THERE A FIX FOR THIS?????
 params['use_singularity'] = False
 params['model_specific_data'] = False
-params['source_datasets'] = ['CCLE', 'gCSI']
-params['target_datasets'] = ["CCLE", "gCSI"]
+params['source_datasets'] = ['CCLE', 'gCSI', 'CTRP']
+params['target_datasets'] = ["CCLE", "gCSI", "CTRP"]
 params['split'] = ['0','1','2','3','4']
 params['only_cross_study'] = False
 params['epochs'] = 100
