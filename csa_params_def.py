@@ -11,29 +11,12 @@ additional_definitions = [
     {"name": "input_dir",
      "type": str,
      "default": 'input',
-     "help": "Input directory"
+     "help": "Input directory containing the raw data"
     },
-    {"name": "model_outdir",
+    {"name": "main_csa_outdir",
      "type": str,
      "default": 'model',
-     "help": "Output directory for trained model and checkpoints"
-    },
-    {"name": "infer_outdir",
-     "type": str,
-     "default": 'infer',
-     "help": "Output directory for inference results"
-    },
-    {"name": "parsl_config_file", # workflow
-     "default": "parsl_config.ini",
-     "type": str,
-     "required": True,
-     "help": "Config file for Parsl",
-    },
-    {"name": "csa_config_file", # workflow
-     "default": "csa_config.ini",
-     "type": str,
-     "required": True,
-     "help": "Config file for CSA workflow",
+     "help": "Parent output directory containing the preprocessed data, trained models and inference results"
     },
     {"name": "source_datasets",
      "type": list,
@@ -73,23 +56,13 @@ additional_definitions = [
     },
     {"name": "epochs",
      "type": int,
-     "default": 3,
+     "default": 10,
      "help": "Number of epochs"
-    },
-    {"name": "learning_rate",
-     "type": float,
-     "default": 0.001,
-     "help": "Learning rate"
-    },
-    {"name": "batch_size",
-     "type": int,
-     "default": 32,
-     "help": "Batch size"
     },
     {"name": "use_singularity",
      "type": bool,
      "default": True,
-     "help": "Use singularity image for model?"
+     "help": "Do you want to use singularity image for running the model?"
     },
     {"name": "singularity_image",
      "type": str,

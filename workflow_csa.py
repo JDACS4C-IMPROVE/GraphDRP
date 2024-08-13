@@ -220,10 +220,10 @@ logger = logging.getLogger(f"{params['model_name']}")
 
 params = frm.build_paths(params)  # paths to raw data
 
-MAIN_CSA_OUTDIR = Path(f"./0_{y_col_name}_improvelib_small") ## CHANGE THIS PREENT OUTPUT DIRECTORY IF NEEDED
-params['ml_data_dir'] = MAIN_CSA_OUTDIR / 'ml_data' 
-params['model_outdir'] = MAIN_CSA_OUTDIR / 'models'
-params['infer_dir'] = MAIN_CSA_OUTDIR / 'infer'
+#MAIN_CSA_OUTDIR = Path(f"./0_{y_col_name}_improvelib_small") ## CHANGE THIS PREENT OUTPUT DIRECTORY IF NEEDED
+params['ml_data_dir'] = params['main_csa_outdir'] / 'ml_data' 
+params['model_outdir'] = params['main_csa_outdir'] / 'models'
+params['infer_dir'] = params['main_csa_outdir'] / 'infer'
 #params['model_specific_outdir'] = MAIN_CSA_OUTDIR/params['model_specific_outdir']
 #Model scripts
 params['preprocess_python_script'] = f"{params['model_name']}_preprocess_improve.py"
