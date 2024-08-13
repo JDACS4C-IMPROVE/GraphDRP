@@ -87,13 +87,15 @@ cd GraphDRP
 
 ### 2. Install dependencies
 Install dependencies (use `env_gdrp_37_improve.yml`).
+```bash
+conda env create -f env_gdrp_37_improve.yml
+```
 
 ### 3. Set PYTHONPATH and download benchmark data
 ```
 source setup_improve.sh
 ```
 This will set up `PYTHONPATH` to point the IMPROVE repo, and download cross-study benchmark data into `./csa_data/`.
-
 
 ## To run cross study analysus using PARSL on Lambda machine:
 ```
@@ -102,8 +104,9 @@ python workflow_csa.py
 ## For separate execution of preprocess, train and infer scripts:
 
 ### 1. Preprocess benchmark data (_raw data_) to construct model input data (_ML data_)
+
 ```bash
-python graphdrp_preprocess_improve.py
+python graphdrp_preprocess_improve.py --input_dir ./csa_data/raw_data --output_dir ./res_dir
 ```
 Generates:
 * three model input data files: `train_data.pt`, `val_data.pt`, `test_data.pt`
@@ -125,7 +128,7 @@ ml_data
 
 ### 2. Train GraphDRP model
 ```bash
-python graphdrp_train_improve.py
+python graphdrp_train_improve.py --input_dir ./res_dir --output_dir ./res_dir
 ```
 Trains GraphDRP using the processed data: `train_data.pt` (training), `val_data.pt` (for early stopping).
 
@@ -156,7 +159,9 @@ out_models
 ```
 
 ### 3. Run the trained model in inference mode on test data
-```python graphdrp_infer_improve.py```
+```bash
+python graphdrp_infer_improve.py --input_dir ./res_dir --output_dir ./res_dir
+```
 This script uses the processed data and the trained model to evaluate performance.
 
 Generates:

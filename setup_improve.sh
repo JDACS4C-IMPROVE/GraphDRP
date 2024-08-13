@@ -25,7 +25,8 @@ fi
 # Clone IMPROVE lib (if needed)
 cd ../
 improve_lib_path=$PWD/IMPROVE
-improve_branch="framework-api"
+# improve_branch="framework-api"
+improve_branch="apartin/framework-api"
 if [ -d $improve_lib_path ]; then
   echo "IMPROVE repo exists in ${improve_lib_path}"
 else
