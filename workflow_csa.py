@@ -1,9 +1,7 @@
 import parsl
 from parsl import python_app , bash_app
 import subprocess
-
 from parsl.config import Config
-
 # PBSPro is the right provider for Polaris:
 from parsl.providers import PBSProProvider
 # The high throughput executor is for scaling to HPC systems:
@@ -31,9 +29,7 @@ import logging
 import sys
 
 ##### CONFIG FOR LAMBDA ######
-print(parsl.__version__)
-
-available_accelerators: Union[int, Sequence[str]] = 6
+available_accelerators: Union[int, Sequence[str]] = 8
 worker_port_range: Tuple[int, int] = (10000, 20000)
 retries: int = 1
 
@@ -46,7 +42,7 @@ config_lambda = Config(
             cpu_affinity="block",
             #max_workers_per_node=2, ## IS NOT SUPPORTED IN  Parsl version: 2023.06.19. CHECK HOW TO USE THIS???
             worker_debug=True,
-            available_accelerators=7,
+            available_accelerators=8,  ## CHANGE THIS AS REQUIRED BY THE MACHINE
             worker_port_range=worker_port_range,
             provider=LocalProvider(
                 init_blocks=1,
@@ -62,8 +58,6 @@ parsl.load(config_lambda)
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 fdir = Path(__file__).resolve().parent
-y_col_name = "auc"
-
 logger = logging.getLogger(f'Start workflow')
 
 ##############################################################################
@@ -86,7 +80,6 @@ def preprocess(inputs=[]): #
     split=inputs[2]
 
     split_nums=params['split']
-    print(' ****** INSIDE PREPROCESS *****')
     # Get the split file paths
     if len(split_nums) == 0:
         # Get all splits
@@ -125,9 +118,8 @@ def preprocess(inputs=[]): #
         else:
             # If source and target are different, then infer on the entire target dataset
             test_split_file = f"{target_data_name}_all.txt"
-        
 
-        # p1 (none): Preprocess train data
+        # Preprocess  data
         print("\nPreprocessing")
         train_split_file = f"{source_data_name}_split_{split}_train.txt"
         val_split_file = f"{source_data_name}_split_{split}_val.txt"
@@ -145,7 +137,7 @@ def preprocess(inputs=[]): #
                 "--train_split_file", str(train_split_file),
                 "--val_split_file", str(val_split_file),
                 "--test_split_file", str(test_split_file),
-                "--input_dir", params['input_dir'], # str("./csa_data/raw_data"),
+                "--input_dir", params['input_dir'], 
                 "--output_dir", str(ml_data_dir),
                 "--y_col_name", str(params['y_col_name'])
             ]
@@ -174,7 +166,6 @@ def train(params, source_data_name, split):
                         "--input_dir", str(ml_data_dir),
                         "--output_dir", str(model_dir),
                         "--epochs", str(params['epochs']),  # DL-specific
-                        #"--cuda_name", cuda_name, # DL-specific
                         "--y_col_name", str(params['y_col_name'])
                     ]
             result = subprocess.run(train_run, capture_output=True,
@@ -199,7 +190,6 @@ def infer(params, source_data_name, target_data_name, split): #
                 "--input_data_dir", str(ml_data_dir),
                 "--input_model_dir", str(model_dir),
                 "--output_dir", str(infer_dir),
-                #"--cuda_name", cuda_name, # DL-specific
                 "--y_col_name", str(params['y_col_name'])
         ]
         result = subprocess.run(infer_run, capture_output=True,
@@ -213,7 +203,6 @@ def infer(params, source_data_name, target_data_name, split): #
 additional_definitions = CSA.additional_definitions
 filepath = Path(__file__).resolve().parent
 
-## Should we combine csa config and parsl config and use just one initialize_parameter??
 cfg = DRPPreprocessConfig() # TODO submit github issue; too many logs printed; is it necessary?
 params = cfg.initialize_parameters(
     pathToModelDir=filepath,
@@ -224,18 +213,15 @@ params = cfg.initialize_parameters(
     required=None
 )
 
-print(params)
-
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 fdir = Path(__file__).resolve().parent
 y_col_name = params['y_col_name']
-
-
 logger = logging.getLogger(f"{params['model_name']}")
 
 params = frm.build_paths(params)  # paths to raw data
-MAIN_CSA_OUTDIR = Path(f"./0_{y_col_name}_improvelib_small")
-params['ml_data_dir'] = MAIN_CSA_OUTDIR / 'ml_data'  ### May be add to frm.build_paths()??
+
+MAIN_CSA_OUTDIR = Path(f"./0_{y_col_name}_improvelib_small") ## CHANGE THIS PREENT OUTPUT DIRECTORY IF NEEDED
+params['ml_data_dir'] = MAIN_CSA_OUTDIR / 'ml_data' 
 params['model_outdir'] = MAIN_CSA_OUTDIR / 'models'
 params['infer_dir'] = MAIN_CSA_OUTDIR / 'infer'
 #params['model_specific_outdir'] = MAIN_CSA_OUTDIR/params['model_specific_outdir']
@@ -247,15 +233,13 @@ params['infer_python_script'] = f"{params['model_name']}_infer_improve.py"
 ### Initialize params reads as strings. So adding non str params here:  IS THERE A FIX FOR THIS?????
 params['use_singularity'] = False
 params['model_specific_data'] = False
-params['source_datasets'] = ['CCLE', 'gCSI', 'CTRPv2']
-params['target_datasets'] = ["CCLE", "gCSI", "CTRPv2"]
-params['split'] = ['0','1','2','3','4']
+params['source_datasets'] = ['CCLE', 'gCSI'] #['CCLE', 'gCSI', 'CTRPv2', 'GDSCv1', 'GDSCv2']
+params['target_datasets'] = ["CCLE", "gCSI"] #['CCLE', 'gCSI', 'CTRPv2', 'GDSCv1', 'GDSCv2']
+params['split'] = ['0','1','2','3','4'] # ['0','1','2','3','4','5','6','7','8','9']
 params['only_cross_study'] = False
 params['epochs'] = 100
 
-##TODO: Also download benchmark data here
-
-## Download Author specific data
+## Download Author specific data ----> MOVE IT TO setup_improve.sh
 if params['model_specific_data']:
     auth_data_download = ["bash",
         "model_specific_data_download.sh",
@@ -269,23 +253,18 @@ if params['model_specific_data']:
 ##################### START PARSL PARALLEL EXECUTION #####################
 ##########################################################################
 
-""" for source_data_name in params['source_datasets']:
-    for split in params['split']:
-        for target_data_name in params['target_datasets']:
-            preprocess_futures=preprocess(inputs=[params, source_data_name, split])  ## MODIFY TO INCLUDE SPLITS IN PARALLEL?
-            train_future = train(params, preprocess_futures.result()['source_data_name'], preprocess_futures.result()['split'])
-            infer_futures = infer(params, train_future.result()['source_data_name'], target_data_name, train_future.result()['split'])
- """
-
+##Preprocess execution with Parsl
 preprocess_futures=[]
 for source_data_name in params['source_datasets']:
     for split in params['split']:
             preprocess_futures.append(preprocess(inputs=[params, source_data_name, split]))  ## MODIFY TO INCLUDE SPLITS IN PARALLEL?
 
+##Train execution with Parsl
 train_futures=[]
 for future_p in preprocess_futures:
     train_futures.append(train(params, future_p.result()['source_data_name'], future_p.result()['split']))
 
+##Infer execution with Parsl
 for future_t in train_futures:
     for target_data_name in params['target_datasets']:
         infer_futures = infer(params, future_t.result()['source_data_name'], target_data_name, future_t.result()['split'])
