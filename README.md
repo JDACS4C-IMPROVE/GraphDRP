@@ -4,6 +4,22 @@ GraphDRP model for drug response prediction (DRP).
 
 # Dependencies
 Create conda env using `env_gdrp_37_improve.yml`, or check [conda_env_py37.sh](./conda_env_py37.sh)
+```
+conda env create -f env_gdrp_37_improve.yml
+```
+Activate environment:
+```
+conda activate graphdrp_py37_improve
+```
+
+### Install Parsl:
+```
+pip install parsl 
+```
+If you see an error during execution you may have to do this:
+```
+export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libffi.so.7
+```
 
 
 ML framework:
@@ -81,7 +97,14 @@ source setup_improve.sh
 ```
 This will set up `PYTHONPATH` to point the IMPROVE repo, and download cross-study benchmark data into `./csa_data/`.
 
-### 4. Preprocess benchmark data (_raw data_) to construct model input data (_ML data_)
+## To run cross study analysus using PARSL on Lambda machine:
+```
+python workflow_csa.py
+```
+## For separate execution of preprocess, train and infer scripts:
+
+### 1. Preprocess benchmark data (_raw data_) to construct model input data (_ML data_)
+
 ```bash
 python graphdrp_preprocess_improve.py --input_dir ./csa_data/raw_data --output_dir ./res_dir
 ```
@@ -103,7 +126,7 @@ ml_data
         └── x_data_gene_expression_scaler.gz
 ```
 
-### 5. Train GraphDRP model
+### 2. Train GraphDRP model
 ```bash
 python graphdrp_train_improve.py --input_dir ./res_dir --output_dir ./res_dir
 ```
@@ -135,7 +158,7 @@ out_models
         └── val_y_data_predicted.csv
 ```
 
-### 6. Run the trained model in inference mode on test data
+### 3. Run the trained model in inference mode on test data
 ```bash
 python graphdrp_infer_improve.py --input_dir ./res_dir --output_dir ./res_dir
 ```
@@ -151,3 +174,5 @@ out_infer
         ├── test_scores.json
         └── test_y_data_predicted.csv
 ```
+
+
