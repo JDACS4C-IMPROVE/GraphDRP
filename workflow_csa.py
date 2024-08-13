@@ -247,8 +247,8 @@ params['infer_python_script'] = f"{params['model_name']}_infer_improve.py"
 ### Initialize params reads as strings. So adding non str params here:  IS THERE A FIX FOR THIS?????
 params['use_singularity'] = False
 params['model_specific_data'] = False
-params['source_datasets'] = ['CCLE', 'gCSI', 'CTRPv2']
-params['target_datasets'] = ["CCLE", "gCSI","CTRPv2"]
+params['source_datasets'] = ['CCLE', 'gCSI']
+params['target_datasets'] = ["CCLE", "gCSI"]
 params['split'] = ['0','1','2','3','4']
 params['only_cross_study'] = False
 params['epochs'] = 100
@@ -269,13 +269,26 @@ if params['model_specific_data']:
 ##################### START PARSL PARALLEL EXECUTION #####################
 ##########################################################################
 
-for source_data_name in params['source_datasets']:
+""" for source_data_name in params['source_datasets']:
     for split in params['split']:
         for target_data_name in params['target_datasets']:
             preprocess_futures=preprocess(inputs=[params, source_data_name, split])  ## MODIFY TO INCLUDE SPLITS IN PARALLEL?
             train_future = train(params, preprocess_futures.result()['source_data_name'], preprocess_futures.result()['split'])
             infer_futures = infer(params, train_future.result()['source_data_name'], target_data_name, train_future.result()['split'])
+ """
 
+preprocess_futures=[]
+for source_data_name in params['source_datasets']:
+    for split in params['split']:
+            preprocess_futures.append(preprocess(inputs=[params, source_data_name, split]))  ## MODIFY TO INCLUDE SPLITS IN PARALLEL?
+
+train_futures=[]
+for future_p in preprocess_futures:
+    train_futures.append(train(params, future_p.result()['source_data_name'], future_p.result()['split']))
+
+for future_t in train_futures:
+    for target_data_name in params['target_datasets']:
+        infer_futures = infer(params, future_t.result()['source_data_name'], target_data_name, future_t.result()['split'])
 
 ## TODO: PARSL CONFIG FOR POLARIS
 """ user_opts = {
