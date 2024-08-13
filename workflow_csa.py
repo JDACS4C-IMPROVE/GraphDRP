@@ -257,7 +257,7 @@ if params['model_specific_data']:
 preprocess_futures=[]
 for source_data_name in params['source_datasets']:
     for split in params['split']:
-            preprocess_futures.append(preprocess(inputs=[params, source_data_name, split]))  ## MODIFY TO INCLUDE SPLITS IN PARALLEL?
+            preprocess_futures.append(preprocess(inputs=[params, source_data_name, split])) 
 
 ##Train execution with Parsl
 train_futures=[]
