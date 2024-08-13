@@ -235,7 +235,7 @@ params['use_singularity'] = False
 params['model_specific_data'] = False
 params['source_datasets'] = ['CCLE', 'gCSI'] #['CCLE', 'gCSI', 'CTRPv2', 'GDSCv1', 'GDSCv2']
 params['target_datasets'] = ["CCLE", "gCSI"] #['CCLE', 'gCSI', 'CTRPv2', 'GDSCv1', 'GDSCv2']
-params['split'] = ['0','1','2','3','4'] # ['0','1','2','3','4','5','6','7','8','9']
+params['split'] = ['0','1'] # ['0','1','2','3','4','5','6','7','8','9']
 params['only_cross_study'] = False
 params['epochs'] = 100
 
