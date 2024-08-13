@@ -33,7 +33,7 @@ import sys
 ##### CONFIG FOR LAMBDA ######
 print(parsl.__version__)
 
-available_accelerators: Union[int, Sequence[str]] = 2
+available_accelerators: Union[int, Sequence[str]] = 6
 worker_port_range: Tuple[int, int] = (10000, 20000)
 retries: int = 1
 
@@ -247,11 +247,11 @@ params['infer_python_script'] = f"{params['model_name']}_infer_improve.py"
 ### Initialize params reads as strings. So adding non str params here:  IS THERE A FIX FOR THIS?????
 params['use_singularity'] = False
 params['model_specific_data'] = False
-params['source_datasets'] = ['CCLE', 'gCSI']
-params['target_datasets'] = ["CCLE", "gCSI"]
-params['split'] = ['0']
+params['source_datasets'] = ['CCLE', 'gCSI', 'CTRPv2']
+params['target_datasets'] = ["CCLE", "gCSI","CTRPv2"]
+params['split'] = ['0','1','2','3','4']
 params['only_cross_study'] = False
-params['epochs'] = 10
+params['epochs'] = 100
 
 ##TODO: Also download benchmark data here
 
