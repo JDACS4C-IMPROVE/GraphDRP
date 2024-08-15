@@ -23,6 +23,9 @@ from typing import Sequence, Tuple, Union
 import csa_params_def as CSA
 import improvelib.utils as frm
 from improvelib.applications.drug_response_prediction.config import DRPPreprocessConfig
+from improvelib.initializer.cli import CLI
+from improvelib.initializer.config import Config as Common_config
+
 import os
 from pathlib import Path
 import logging
@@ -203,6 +206,19 @@ def infer(params, source_data_name, target_data_name, split): #
 additional_definitions = CSA.additional_definitions
 filepath = Path(__file__).resolve().parent
 
+#Load CLI parameters
+cli = CLI()
+cli.set_command_line_options(options=additional_definitions)
+cli.get_command_line_options()
+
+common_cfg  = Common_config()
+params = common_cfg.initialize_parameters(
+                              section='Global_Params',
+                              config_file=cli.params['csa_config_file'],
+                              additional_definitions=None,
+                              required=None)
+
+'''''
 cfg = DRPPreprocessConfig() # TODO submit github issue; too many logs printed; is it necessary?
 params = cfg.initialize_parameters(
     pathToModelDir=filepath,
@@ -212,7 +228,7 @@ params = cfg.initialize_parameters(
     additional_definitions=additional_definitions,
     required=None
 )
-
+'''''
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 fdir = Path(__file__).resolve().parent
 y_col_name = params['y_col_name']
