@@ -8,11 +8,6 @@ from pathlib import Path
 fdir = Path(__file__).resolve().parent
 required = None
 additional_definitions = [
-    {"name": "csa_config_file", # workflow
-     "default": "csa_config.ini",
-     "type": str,
-     "help": "Config file for CSA workflow",
-    },
     {"name": "input_dir",
      "type": str,
      "default": 'input',

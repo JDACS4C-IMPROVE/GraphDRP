@@ -205,25 +205,7 @@ def infer(params, source_data_name, target_data_name, split): #
 
 additional_definitions = CSA.additional_definitions
 filepath = Path(__file__).resolve().parent
-'''''
-#Load CLI parameters
-cli = CLI()
-cli.set_command_line_options(options=additional_definitions)
-cli_params=cli.get_command_line_options()
-print(cli_params)
-'''''
 
-common_cfg  = DRPPreprocessConfig()
-params = common_cfg.initialize_parameters(
-    pathToModelDir=filepath,
-    default_config=None,
-    default_model=None,
-    additional_cli_section=None,
-    additional_definitions=additional_definitions,
-    required=None
-)
-
-'''''
 cfg = DRPPreprocessConfig() # TODO submit github issue; too many logs printed; is it necessary?
 params = cfg.initialize_parameters(
     pathToModelDir=filepath,
@@ -233,7 +215,7 @@ params = cfg.initialize_parameters(
     additional_definitions=additional_definitions,
     required=None
 )
-'''''
+
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 fdir = Path(__file__).resolve().parent
 y_col_name = params['y_col_name']
