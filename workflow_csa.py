@@ -209,12 +209,12 @@ filepath = Path(__file__).resolve().parent
 #Load CLI parameters
 cli = CLI()
 cli.set_command_line_options(options=additional_definitions)
-cli.get_command_line_options()
+cli_params=cli.get_command_line_options()
 
 common_cfg  = Common_config()
 params = common_cfg.initialize_parameters(
                               section='Global_Params',
-                              config_file=cli.params['csa_config_file'],
+                              config_file=cli_params['csa_config_file'],
                               additional_definitions=None,
                               required=None)
 
