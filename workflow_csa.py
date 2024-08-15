@@ -210,7 +210,7 @@ filepath = Path(__file__).resolve().parent
 cli = CLI()
 cli.set_command_line_options(options=additional_definitions)
 cli_params=cli.get_command_line_options()
-
+print(cli_params)
 common_cfg  = Common_config()
 
 params = common_cfg.initialize_parameters(
