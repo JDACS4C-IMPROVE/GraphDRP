@@ -11,7 +11,6 @@ additional_definitions = [
     {"name": "csa_config_file", # workflow
      "default": "csa_config.ini",
      "type": str,
-     "required": True,
      "help": "Config file for CSA workflow",
     },
     {"name": "input_dir",
