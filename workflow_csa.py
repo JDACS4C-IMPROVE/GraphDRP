@@ -216,7 +216,8 @@ params = common_cfg.initialize_parameters(
                               section='Global_Params',
                               config_file=cli_params['csa_config_file'],
                               additional_definitions=None,
-                              required=None)
+                              required=None,
+                              )
 
 '''''
 cfg = DRPPreprocessConfig() # TODO submit github issue; too many logs printed; is it necessary?
