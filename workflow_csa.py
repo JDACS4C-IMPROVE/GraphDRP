@@ -212,12 +212,15 @@ cli.set_command_line_options(options=additional_definitions)
 cli_params=cli.get_command_line_options()
 
 common_cfg  = Common_config()
+
 params = common_cfg.initialize_parameters(
-                              section='Global_Params',
-                              config_file=cli_params['csa_config_file'],
-                              additional_definitions=None,
-                              required=None,
-                              )
+    pathToModelDir=filepath,
+    default_config=cli_params['csa_config_file'],
+    default_model=None,
+    additional_cli_section=None,
+    additional_definitions=additional_definitions,
+    required=None
+)
 
 '''''
 cfg = DRPPreprocessConfig() # TODO submit github issue; too many logs printed; is it necessary?
