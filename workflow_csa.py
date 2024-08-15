@@ -215,8 +215,6 @@ params = cfg.initialize_parameters(
     additional_definitions=additional_definitions,
     required=None
 )
-print('\n SOURCE DATASETS')
-print(params["source_datasets"])
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 fdir = Path(__file__).resolve().parent
