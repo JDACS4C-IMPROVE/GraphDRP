@@ -217,6 +217,7 @@ params = common_cfg.initialize_parameters(
     pathToModelDir=filepath,
     default_config=cli_params['csa_config_file'],
     default_model=None,
+    additional_cli_section=None,
     additional_definitions=additional_definitions,
     required=None
 )
