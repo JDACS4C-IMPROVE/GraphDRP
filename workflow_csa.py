@@ -205,17 +205,18 @@ def infer(params, source_data_name, target_data_name, split): #
 
 additional_definitions = CSA.additional_definitions
 filepath = Path(__file__).resolve().parent
-
+'''''
 #Load CLI parameters
 cli = CLI()
 cli.set_command_line_options(options=additional_definitions)
 cli_params=cli.get_command_line_options()
 print(cli_params)
-common_cfg  = DRPPreprocessConfig()
+''''
 
+common_cfg  = DRPPreprocessConfig()
 params = common_cfg.initialize_parameters(
     pathToModelDir=filepath,
-    default_config=cli_params['csa_config_file'],
+    default_config=None,
     default_model=None,
     additional_cli_section=None,
     additional_definitions=additional_definitions,
