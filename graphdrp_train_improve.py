@@ -227,7 +227,6 @@ def run(params):
 
     print(f"Epochs: {initial_epoch + 1} to {num_epoch}")
     sys.stdout.flush()
-    breakpoint();
     for epoch in range(initial_epoch, num_epoch):
         print(f"Start epoch: {epoch}")
         # Train epoch and checkpoint model

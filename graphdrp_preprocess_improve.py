@@ -127,8 +127,8 @@ def run(params: Dict):
         str: directory name that was used to save the preprocessed (generated)
             ML data files.
     """
-    breakpoint();
-    from pprint import pprint; pprint(params)
+    # breakpoint();
+    # from pprint import pprint; pprint(params)
 
     # ------------------------------------------------------
     # [Req] Build paths and create output dir
@@ -155,10 +155,18 @@ def run(params: Dict):
     # data, then the model must use the provided data loaders to load the data files
     # from the x_data dir.
     print("\nLoads omics data.")
-    omics_obj = drp.OmicsLoader(params)
+    # omics_obj = drp.OmicsLoader(params)
     # print(omics_obj)
     # ge = omics_obj.dfs['cancer_gene_expression.tsv'] # return gene expression
-    ge = omics_obj.dfs['cancer_gene_expression_combined.tsv'] # return gene expression
+    # ge = omics_obj.dfs['cancer_gene_expression_combined.tsv'] # return gene expression
+    # breakpoint()
+    fpath = params['x_data_path'] / 'cancer_gene_expression_combined.tsv'
+    df = pd.read_csv(fpath, sep='\t', index_col=0, header=[0,1,2])
+    df.columns = df.columns.get_level_values(2)
+    df.index.name = params["canc_col_name"]  # assign index name
+    ge = df.reset_index()
+    print(ge.isna().sum())
+    ge.fillna(0, inplace=True)
 
     print("\nLoad drugs data.")
     drugs_obj = drp.DrugsLoader(params)
