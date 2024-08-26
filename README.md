@@ -1,23 +1,32 @@
 # GraphDRP
-GraphDRP model for drug response prediction (DRP).
+
+This repository demonstrates how to use the [IMPROVE library](https://github.com/JDACS4C-IMPROVE/IMPROVE) for building a drug response prediction (DRP) model using GraphDRP, and provides examples with the benchmark [cross-study analysis (CSA) dataset](https://web.cels.anl.gov/projects/IMPROVE_FTP/candle/public/improve/benchmarks/single_drug_drp/benchmark-data-pilot1/csa_data/).
+
+This version, tagged as `v0.0.3-beta`, is the final release before transitioning to `v0.1.0-alpha`, which introduces a new API. Version `v0.0.3-beta` and all previous releases have served as the foundation for developing essential components of the [IMPROVE library](https://github.com/JDACS4C-IMPROVE/IMPROVE). The `v0.1.0-alpha` release builds on this legacy with an updated API, designed to encourage broader adoption of IMPROVE and its curated models by the research community.
+
+A more detailed tutorial can be found [here](https://jdacs4c-improve.github.io/docs/content/unified_interface.html). 
+`TODO`: update with the new docs!
 
 
-# Dependencies
-Check [conda_env_py37.sh](./conda_env_py37.sh)
+## Dependencies
+Installation instuctions are detialed below in [Step-by-step instructions](#step-by-step-instructions).
+
+Conda yml file [conda_env_py37.sh](./conda_env_py37.sh)
 
 ML framework:
-+ [Torch](https://pytorch.org/)
-+ [Pytorch_geometric](https://github.com/rusty1s/pytorch_geometric) -- for graph neural network (GNN)
++ [Torch](https://pytorch.org/) -- deep learning framework for building the prediction model
++ [Pytorch_geometric](https://github.com/rusty1s/pytorch_geometric) -- graph neural networks (GNN)
 
-IMPROVE lib:
-+ [improve_lib](https://github.com/JDACS4C-IMPROVE/IMPROVE)
-+ [candle_lib](https://github.com/ECP-CANDLE/candle_lib) -- improve lib dependency
+IMPROVE dependencies:
++ [IMPROVE v0.0.3-beta](https://github.com/JDACS4C-IMPROVE/IMPROVE/tree/v0.0.3-beta)
++ [candle_lib](https://github.com/ECP-CANDLE/candle_lib) - IMPROVE dependency (enables various hyperparameter optimization on HPC machines) `TODO`: need to fork into iIMPROVE and tag
 
 
-# Dataset
+
+## Dataset
 Benchmark data for cross-study analysis (CSA) can be downloaded from this [site](https://web.cels.anl.gov/projects/IMPROVE_FTP/candle/public/improve/benchmarks/single_drug_drp/benchmark-data-pilot1/csa_data/).
-The required data tree is shown below:
 
+The data tree is shown below:
 ```
 csa_data/raw_data/
 ├── splits
@@ -50,19 +59,20 @@ csa_data/raw_data/
     └── response.tsv
 ```
 
-Note! `./data` contains data files that were used to train and evaluate the GraphDRP for the original paper.
+Note that `./_original_data` contains data files that were used to train and evaluate the GraphDRP for the original paper.
 
 
 ## Model scripts and param file
-+ `graphdrp_preprocess_improve.py`: creates data files for drug resposne prediction (DRP)
-+ `graphdrp_train_improve.py`: trains the GraphDRP model
-+ `graphdrp_infer_improve.py`: runs inference with the trained GraphDRP model
-+ `graphdrp_params.txt`: parameter file
++ `graphdrp_preprocess_improve.py` - takes benchmark data files and transforms into files for trianing and inference
++ `graphdrp_train_improve.py` - trains the GraphDRP model
++ `graphdrp_infer_improve.py` - runs inference with the trained GraphDRP model
++ `graphdrp_params.txt` - default parameter file
 
 
-# Step-by-step running
 
-### 1. Clone the repo
+# Step-by-step instructions
+
+### 1. Clone the model repository
 ```
 git clone git@github.com:JDACS4C-IMPROVE/GraphDRP.git
 cd GraphDRP
