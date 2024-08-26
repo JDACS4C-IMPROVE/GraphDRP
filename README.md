@@ -62,7 +62,7 @@ csa_data/raw_data/
 Note that `./_original_data` contains data files that were used to train and evaluate the GraphDRP for the original paper.
 
 
-## Model scripts and param file
+## Model scripts and parameter file
 + `graphdrp_preprocess_improve.py` - takes benchmark data files and transforms into files for trianing and inference
 + `graphdrp_train_improve.py` - trains the GraphDRP model
 + `graphdrp_infer_improve.py` - runs inference with the trained GraphDRP model
@@ -76,6 +76,7 @@ Note that `./_original_data` contains data files that were used to train and eva
 ```
 git clone git@github.com:JDACS4C-IMPROVE/GraphDRP.git
 cd GraphDRP
+git checkout develop
 ```
 
 ### 2. Set conda environment
