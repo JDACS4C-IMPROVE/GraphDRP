@@ -18,7 +18,7 @@ git checkout framework-api
 ```
 
 ### 3. Install Dependencies
-Create conda env using `env_gdrp_37_improve.yml`, or check [conda_env_py37.sh](./conda_env_py37.sh)
+Create conda env using `env_gdrp_37_improve.yml`
 ```
 conda env create -f env_gdrp_37_improve.yml
 ```
