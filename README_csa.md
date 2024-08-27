@@ -3,7 +3,7 @@
 
 ### 1. Clone the GraphDRP repo
 ```
-git clone https://github.com/JDACS4C-IMPROVE/GraphDRP/tree/develop
+git clone https://github.com/JDACS4C-IMPROVE/GraphDRP.git
 cd GraphDRP
 git checkout framework-api
 ```
