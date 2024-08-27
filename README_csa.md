@@ -1,37 +1,5 @@
-# GraphDRP
-GraphDRP model for drug response prediction (DRP).
 
-
-# Dependencies
-Create conda env using `env_gdrp_37_improve.yml`, or check [conda_env_py37.sh](./conda_env_py37.sh)
-```
-conda env create -f env_gdrp_37_improve.yml
-```
-Activate environment:
-```
-conda activate graphdrp_py37_improve
-```
-
-### Install Parsl (2023.6.19):
-```
-pip install parsl 
-```
-If you see an error during execution you may have to do this:
-```
-export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libffi.so.7
-```
-
-
-ML framework:
-+ [Torch](https://pytorch.org/)
-+ [Pytorch_geometric](https://github.com/rusty1s/pytorch_geometric) -- for graph neural network (GNN)
-
-IMPROVE lib:
-+ [improve_lib](https://github.com/JDACS4C-IMPROVE/IMPROVE)
-+ [candle_lib](https://github.com/ECP-CANDLE/candle_lib) -- improve lib dependency
-
-
-# Step-by-step running
+# Step-by-step instructions to run cross study analysis using PARSL on Lambda machine
 
 ### 1. Clone the GraphDRP repo
 ```
