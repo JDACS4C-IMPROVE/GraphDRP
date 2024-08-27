@@ -127,7 +127,6 @@ def run(params: Dict):
         str: directory name that was used to save the preprocessed (generated)
             ML data files.
     """
-    # import pdb; pdb.set_trace()
 
     # ------------------------------------------------------
     # [Req] Build paths and create output dir
@@ -155,12 +154,10 @@ def run(params: Dict):
     # from the x_data dir.
     print("\nLoads omics data.")
     omics_obj = drp.OmicsLoader(params)
-    # print(omics_obj)
     ge = omics_obj.dfs['cancer_gene_expression.tsv'] # return gene expression
 
     print("\nLoad drugs data.")
     drugs_obj = drp.DrugsLoader(params)
-    # print(drugs_obj)
     smi = drugs_obj.dfs['drug_SMILES.tsv']  # return SMILES data
 
     # ------------------------------------------------------
@@ -297,10 +294,7 @@ def main(args):
     additional_definitions = preprocess_params
     params = frm.initialize_parameters(
         filepath,
-        # default_model="graphdrp_default_model.txt",
-        # default_model="graphdrp_params.txt",
-        default_model="params_ws.txt",
-        # default_model="params_cs.txt",
+        default_model="graphdrp_params.txt",
         additional_definitions=additional_definitions,
         required=None,
     )

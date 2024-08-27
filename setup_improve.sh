@@ -1,16 +1,10 @@
 #!/bin/bash --login
-
-# This script
-# Download csa data
-# Sets up env vars: IMPROVE_DATA_DIR and PYTHONPATH
-
-# run it like this: source ./setup_improve.sh
-# TODO. Wierd behavior: only when this script is sourced, the tmux pane is automatically terminated
-#       when I get an error in other bash scripts.
+# Navigate to the dir with the cloned model repo
+# Run it like this: source ./setup_improve.sh
 
 # set -e
 
-# Get modelpath and modeldir
+# Get current dir and model dir
 model_path=$PWD
 echo "Model path: $model_path"
 model_name=$(echo "$model_path" | awk -F '/' '{print $NF}')
@@ -25,18 +19,22 @@ else
     echo "CSA data folder already exists"
 fi
 
-# Set env var IMPROVE_DATA_DIR
+# Env var IMPROVE_DATA_DIR
 export IMPROVE_DATA_DIR="./$data_dir/"
 
-# Clone IMPROVE lib
-# echo "Clone IMPROVE lib"
+# Clone IMPROVE lib (if needed)
 pushd ../
-# git clone https://github.com/JDACS4C-IMPROVE/IMPROVE
-git clone git@github.com:JDACS4C-IMPROVE/IMPROVE.git
 improve_lib_path=$PWD/IMPROVE
+improve_branch="v0.0.3-beta"
+if [ -d $improve_lib_path ]; then
+  echo "IMPROVE repo exists in ${improve_lib_path}"
+else
+    # git clone https://github.com/JDACS4C-IMPROVE/IMPROVE
+    git clone -b $improve_branch https://github.com/JDACS4C-IMPROVE/IMPROVE
+fi
 pushd $model_name
 
-# Set env var PYTHOPATH
+# Env var PYTHOPATH
 export PYTHONPATH=$PYTHONPATH:$improve_lib_path
 
 echo
