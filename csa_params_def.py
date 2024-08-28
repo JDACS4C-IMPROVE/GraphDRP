@@ -8,21 +8,10 @@ from pathlib import Path
 fdir = Path(__file__).resolve().parent
 required = None
 additional_definitions = [
-    # {"name": "input_dir",
-    #  "type": str,
-    #  "default": './',
-    #  "help": "Input directory containing the raw data"
-    # },
     {"name": "main_csa_outdir",
      "type": str,
      "default": 'model',
      "help": "Parent output directory containing the preprocessed data, trained models and inference results"
-    },
-    {
-    "name" : "andreas",
-    "type" : str,
-    "default" : "me" ,
-    "help" : "None"
     },
     {"name": "source_datasets",
      "nargs" : "+",
@@ -47,12 +36,6 @@ additional_definitions = [
      "default": False,
      "help": "If only cross study analysis is needed"
     },
-    # {"name": "log_level",
-    #  "type": str,
-    #  "default": os.getenv("IMPROVE_LOG_LEVEL", "WARNING"),
-    #  "help": "Set log levels. Default is WARNING. Levels are:\
-    #                                   DEBUG, INFO, WARNING, ERROR, CRITICAL, NOTSET"
-    # },
     {"name": "model_name",
      "type": str,
      "default": 'graphdrp', ## Change the default to LGBM??
