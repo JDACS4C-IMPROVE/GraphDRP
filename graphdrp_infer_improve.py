@@ -46,7 +46,13 @@ filepath = Path(__file__).resolve().parent # [Req]
 # Model-specific params (Model: GraphDRP)
 # All params in model_infer_params are optional.
 # If no params are required by the model, then it should be an empty list.
-model_infer_params = [    
+model_infer_params = [   
+    {"name": "model_arch",
+     "type": str,
+     "default": "GINConvNet",
+     "choices": ["GINConvNet", "GATNet", "GAT_GCN", "GCNNet"],
+     "help": "Model architecture to run."
+    }, 
     {"name": "cuda_name",
      "type": str,
      # "action": "store",
