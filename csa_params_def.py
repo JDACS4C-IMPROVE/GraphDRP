@@ -19,17 +19,20 @@ additional_definitions = [
      "help": "Parent output directory containing the preprocessed data, trained models and inference results"
     },
     {"name": "source_datasets",
-     "type": list,
+     "nargs" : "+",
+     "type": str,
      "default": ['CCLE'],
      "help": "source_datasets for cross study analysis"
     },
     {"name": "target_datasets",
-     "type": list,
+     "nargs" : "+",
+     "type": str,
      "default": ["CCLE", "gCSI"],
      "help": "target_datasets for cross study analysis"
     },
     {"name": "split",
-     "type": list,
+     "nargs" : "+",
+     "type": str,
      "default": ['0'],
      "help": "Split number for preprocessing"
     },
