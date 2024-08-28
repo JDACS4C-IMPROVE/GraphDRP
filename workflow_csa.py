@@ -241,6 +241,8 @@ params['model_specific_data'] = False
 #params['split'] = ['0','1'] # ['0','1','2','3','4','5','6','7','8','9']
 params['only_cross_study'] = False
 #params['epochs'] = 10
+print("SOUECE DATASET_1")
+print(params['source_datasets'][0])
 
 ## Download Author specific data ----> MOVE IT TO setup_improve.sh
 if params['model_specific_data']:
