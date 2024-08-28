@@ -215,6 +215,8 @@ params = cfg.initialize_parameters(
     additional_definitions=additional_definitions,
     required=None
 )
+print(params)
+breakpoint
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 fdir = Path(__file__).resolve().parent
