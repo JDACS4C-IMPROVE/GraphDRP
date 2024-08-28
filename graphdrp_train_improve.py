@@ -311,7 +311,6 @@ def run(params: Dict):
 
 
 def initialize_parameters():
-    additional_definitions = preprocess_params + train_params
     # params = frm.initialize_parameters(
     #     filepath,
     #     # default_model="graphdrp_default_model.txt",
@@ -324,7 +323,8 @@ def initialize_parameters():
     #     required=None,
     # )
     cfg = DRPTrainConfig()
-    additional_definitions = preprocess_params + train_params
+    #additional_definitions = preprocess_params + train_params
+    additional_definitions = train_params
     params = cfg.initialize_parameters(
         pathToModelDir=filepath,
         default_config="graphdrp_params.txt",

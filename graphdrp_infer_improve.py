@@ -143,7 +143,8 @@ def run(params):
 # [Req]
 def main(args):
     # [Req]
-    additional_definitions = preprocess_params + train_params + infer_params
+    #additional_definitions = preprocess_params + train_params + infer_params
+    additional_definitions = infer_params
     # params = frm.initialize_parameters(
     #     filepath,
     #     # default_model="graphdrp_default_model.txt",
