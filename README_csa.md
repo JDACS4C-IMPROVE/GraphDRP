@@ -57,7 +57,11 @@ csa_params.ini contains parameters necessary for the workflow. The user can chan
  - only_cross_study: True, if only cross study analysis is needed without within study inferences
 
 
- Run this for cross study analysis:
+ To run cross study analysis with default configuration file (csa_params.ini):
 ```
 python workflow_csa.py
+```
+ To run cross study analysis with a different configuration file:
+```
+python workflow_csa.py --config_file <CONFIG_FILE>
 ```
