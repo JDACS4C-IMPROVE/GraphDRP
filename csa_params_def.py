@@ -29,7 +29,7 @@ additional_definitions = [
      "nargs" : "+",
      "type": str,
      "default": ['0'],
-     "help": "Split number for preprocessing"
+     "help": "Split of the source datasets for CSA"
     },
     {"name": "only_cross_study",
      "type": bool,
