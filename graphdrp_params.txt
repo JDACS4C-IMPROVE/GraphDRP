@@ -30,5 +30,5 @@ cuda_name = cuda:7
 [Infer]
 model_file_name = model
 model_file_format = .pt
-test_batch = 256
+infer_batch = 256
 cuda_name = cuda:7

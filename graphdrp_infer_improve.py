@@ -85,14 +85,14 @@ def run(params):
     # ------------------------------------------------------
     print("\nTest data:")
     # print(f"test_ml_data_dir: {params['test_ml_data_dir']}")
-    print(f"test_batch: {params['test_batch']}")
+    print(f"Infer_batch: {params['infer_batch']}")
     if "input_data_dir" in params:
         data_dir = params["input_data_dir"]
     else:
         data_dir = params["input_dir"]
     test_loader = build_GraphDRP_dataloader(data_dir=data_dir,
                                             data_fname=test_data_fname,
-                                            batch_size=params["test_batch"],
+                                            batch_size=params["infer_batch"],
                                             shuffle=False)
 
     # ------------------------------------------------------
