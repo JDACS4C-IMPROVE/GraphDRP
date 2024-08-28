@@ -8,15 +8,21 @@ from pathlib import Path
 fdir = Path(__file__).resolve().parent
 required = None
 additional_definitions = [
-    {"name": "input_dir",
-     "type": str,
-     "default": 'input',
-     "help": "Input directory containing the raw data"
-    },
+    # {"name": "input_dir",
+    #  "type": str,
+    #  "default": './',
+    #  "help": "Input directory containing the raw data"
+    # },
     {"name": "main_csa_outdir",
      "type": str,
      "default": 'model',
      "help": "Parent output directory containing the preprocessed data, trained models and inference results"
+    },
+    {
+    "name" : "andreas",
+    "type" : str,
+    "default" : "me" ,
+    "help" : "None"
     },
     {"name": "source_datasets",
      "nargs" : "+",
