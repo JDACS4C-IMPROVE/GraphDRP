@@ -216,7 +216,6 @@ params = cfg.initialize_parameters(
     required=None
 )
 print(params)
-sys.exit(1)
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 fdir = Path(__file__).resolve().parent
