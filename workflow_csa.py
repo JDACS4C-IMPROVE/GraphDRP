@@ -221,7 +221,6 @@ y_col_name = params['y_col_name']
 logger = logging.getLogger(f"{params['model_name']}")
 params = frm.build_paths(params)  # paths to raw data
 
-#MAIN_CSA_OUTDIR = Path(f"./0_{y_col_name}_improvelib_small") ## CHANGE THIS PREENT OUTPUT DIRECTORY IF NEEDED
 params['ml_data_dir'] = Path(params['main_csa_outdir']) / 'ml_data' 
 params['model_outdir'] = Path(params['main_csa_outdir']) / 'models'
 params['infer_dir'] = Path(params['main_csa_outdir']) / 'infer'
@@ -232,12 +231,12 @@ params['train_python_script'] = f"{params['model_name']}_train_improve.py"
 params['infer_python_script'] = f"{params['model_name']}_infer_improve.py"
 
 ### Initialize params reads as strings. So adding non str params here:  IS THERE A FIX FOR THIS?????
-params['use_singularity'] = False
-params['model_specific_data'] = False
+#params['use_singularity'] = False
+#params['model_specific_data'] = False
 #params['source_datasets'] = ['CCLE', 'gCSI'] #['CCLE', 'gCSI', 'CTRPv2', 'GDSCv1', 'GDSCv2']
 #params['target_datasets'] = ['CCLE', 'gCSI'] #['CCLE', 'gCSI', 'CTRPv2', 'GDSCv1', 'GDSCv2']
 #params['split'] = ['0','1'] # ['0','1','2','3','4','5','6','7','8','9']
-params['only_cross_study'] = False
+#params['only_cross_study'] = False
 #params['epochs'] = 10
 
 ## Download Author specific data ----> MOVE IT TO setup_improve.sh
