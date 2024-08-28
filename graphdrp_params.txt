@@ -31,4 +31,4 @@ cuda_name = cuda:0
 model_file_name = model
 model_file_format = .pt
 infer_batch = 256
-cuda_name = cuda:7
+cuda_name = cuda:0
