@@ -100,7 +100,8 @@ def run(params):
     # ------------------------------------------------------
     # Determine CUDA/CPU device and configure CUDA device if available
     device = determine_device(params["cuda_name"])
-
+    breakpoint()
+    print(device)
     # ------------------------------------------------------
     # Load best model and compute predictions
     # ------------------------------------------------------
