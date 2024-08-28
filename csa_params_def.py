@@ -47,12 +47,12 @@ additional_definitions = [
      "default": False,
      "help": "If only cross study analysis is needed"
     },
-    {"name": "log_level",
-     "type": str,
-     "default": os.getenv("IMPROVE_LOG_LEVEL", "WARNING"),
-     "help": "Set log levels. Default is WARNING. Levels are:\
-                                      DEBUG, INFO, WARNING, ERROR, CRITICAL, NOTSET"
-    },
+    # {"name": "log_level",
+    #  "type": str,
+    #  "default": os.getenv("IMPROVE_LOG_LEVEL", "WARNING"),
+    #  "help": "Set log levels. Default is WARNING. Levels are:\
+    #                                   DEBUG, INFO, WARNING, ERROR, CRITICAL, NOTSET"
+    # },
     {"name": "model_name",
      "type": str,
      "default": 'graphdrp', ## Change the default to LGBM??
