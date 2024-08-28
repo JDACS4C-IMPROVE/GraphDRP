@@ -205,7 +205,6 @@ def infer(params, source_data_name, target_data_name, split): #
 
 additional_definitions = CSA.additional_definitions
 filepath = Path(__file__).resolve().parent
-print ('***** HELLOO *****')
 cfg = DRPPreprocessConfig() # TODO submit github issue; too many logs printed; is it necessary?
 params = cfg.initialize_parameters(
     pathToModelDir=filepath,
@@ -215,13 +214,11 @@ params = cfg.initialize_parameters(
     additional_definitions=additional_definitions,
     required=None
 )
-print(params)
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 fdir = Path(__file__).resolve().parent
 y_col_name = params['y_col_name']
 logger = logging.getLogger(f"{params['model_name']}")
-
 params = frm.build_paths(params)  # paths to raw data
 
 #MAIN_CSA_OUTDIR = Path(f"./0_{y_col_name}_improvelib_small") ## CHANGE THIS PREENT OUTPUT DIRECTORY IF NEEDED
@@ -242,8 +239,6 @@ params['model_specific_data'] = False
 #params['split'] = ['0','1'] # ['0','1','2','3','4','5','6','7','8','9']
 params['only_cross_study'] = False
 #params['epochs'] = 10
-print(" ********* SOUECE DATASET_1 *********")
-print(params['source_datasets'][0])
 
 ## Download Author specific data ----> MOVE IT TO setup_improve.sh
 if params['model_specific_data']:

@@ -77,7 +77,7 @@ model_train_params = [
     {"name": "cuda_name",
      "type": str,
      # "action": "store",
-     "default": "cuda:7",
+     "default": "cuda:0",
      "help": "Cuda device (e.g.: cuda:0, cuda:1)."
     },
     # TODO "learning_rate" is already defined in improvelib, but we can still
