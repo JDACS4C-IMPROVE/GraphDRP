@@ -46,7 +46,14 @@ filepath = Path(__file__).resolve().parent # [Req]
 # Model-specific params (Model: GraphDRP)
 # All params in model_infer_params are optional.
 # If no params are required by the model, then it should be an empty list.
-model_infer_params = []
+model_infer_params = [    
+    {"name": "cuda_name",
+     "type": str,
+     # "action": "store",
+     "default": "cuda:0",
+     "help": "Cuda device (e.g.: cuda:0, cuda:1)."
+    }
+    ]
 
 # infer_params = app_infer_params + model_infer_params
 infer_params = model_infer_params
