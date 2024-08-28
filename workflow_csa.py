@@ -168,7 +168,7 @@ def train(params, source_data_name, split):
                          params['train_python_script'],
                         "--input_dir", str(ml_data_dir),
                         "--output_dir", str(model_dir),
-                        "--epochs", str(params['epochs'])  # DL-specific
+                        "--epochs", str(params['epochs']),  # DL-specific
                         "--y_col_name", str(params['y_col_name'])
                     ]
             result = subprocess.run(train_run, capture_output=True,
