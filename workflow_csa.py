@@ -1,35 +1,20 @@
 import parsl
-from parsl import python_app , bash_app
+from parsl import python_app
 import subprocess
 from parsl.config import Config
-# PBSPro is the right provider for Polaris:
-from parsl.providers import PBSProProvider
-# The high throughput executor is for scaling to HPC systems:
 from parsl.executors import HighThroughputExecutor
-# You can use the MPI launcher, but may want the Gnu Parallel launcher, see below
-from parsl.launchers import MpiExecLauncher # USE the MPIExecLauncher
-# address_by_interface is needed for the HighThroughputExecutor:
-from parsl.addresses import address_by_interface
-# For checkpointing:
-from parsl.utils import get_all_checkpoints
-
 from parsl.providers import LocalProvider
-from parsl.channels import LocalChannel
-from parsl.executors import HighThroughputExecutor
-from parsl.config import Config
 from time import time
 from typing import Sequence, Tuple, Union
+from pathlib import Path
+import logging
+import sys
 
 import csa_params_def as CSA
 import improvelib.utils as frm
 from improvelib.applications.drug_response_prediction.config import DRPPreprocessConfig
-from improvelib.initializer.cli import CLI
-from improvelib.initializer.config import Config as Common_config
 
-import os
-from pathlib import Path
-import logging
-import sys
+
 
 ##### CONFIG FOR LAMBDA ######
 available_accelerators: Union[int, Sequence[str]] = 8
