@@ -154,7 +154,7 @@ def train(params, hp_model, source_data_name, split):
                         "--input_dir", str(ml_data_dir),
                         "--output_dir", str(model_dir),
                         "--epochs", str(params['epochs']),  # DL-specific
-                        "--y_col_name", str(params['y_col_name'])
+                        "--y_col_name", str(params['y_col_name']),
                         "--learning_rate", str(hp_model[source_data_name]['learning_rate']),
                         "--batch_size", str(hp_model[source_data_name]['batch_size'])
                     ]
