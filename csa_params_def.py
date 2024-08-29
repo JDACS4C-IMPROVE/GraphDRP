@@ -32,10 +32,10 @@ additional_definitions = [
      "default": 'graphdrp', ## Change the default to LGBM??
      "help": "Name of the deep learning model"
     },
-    {"name": "model_specific_data",
-     "type": bool,
-     "default": False, ## Change the default to LGBM??
-     "help": "Use model specific data?"
+    {"name": "hyperparameters_file",
+     "type": str,
+     "default": 'hyperparameters.json',
+     "help": "json file containing optimized hyperparameters per dataset"
     },
     {"name": "epochs",
      "type": int,

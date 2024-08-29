@@ -9,6 +9,7 @@ from typing import Sequence, Tuple, Union
 from pathlib import Path
 import logging
 import sys
+import json
 
 import csa_params_def as CSA
 import improvelib.utils as frm
@@ -121,7 +122,6 @@ def preprocess(inputs=[]): #
         else:
             preprocess_run = ["python",
                 params['preprocess_python_script'],
-                #"--model_specific_outdir", str(params['model_specific_outdir']),
                 "--train_split_file", str(train_split_file),
                 "--val_split_file", str(val_split_file),
                 "--test_split_file", str(test_split_file),
@@ -135,7 +135,7 @@ def preprocess(inputs=[]): #
 
 
 @python_app 
-def train(params, source_data_name, split): 
+def train(params, hp, source_data_name, split): 
     import os
     import warnings
     import subprocess
@@ -154,7 +154,8 @@ def train(params, source_data_name, split):
                         "--input_dir", str(ml_data_dir),
                         "--output_dir", str(model_dir),
                         "--epochs", str(params['epochs']),  # DL-specific
-                        "--y_col_name", str(params['y_col_name'])
+                        "--y_col_name", str(params['y_col_name']),
+                        "--learning_rate", str()
                     ]
             result = subprocess.run(train_run, capture_output=True,
                                     text=True, check=True)
@@ -166,7 +167,7 @@ def infer(params, source_data_name, target_data_name, split): #
     import warnings
     import subprocess
     model_dir = params['model_outdir'] / f"{source_data_name}" / f"split_{split}"
-    ml_data_dir = params['ml_data_dir']/f"{source_data_name}-{params['target_datasets'][0]}"/ \
+    ml_data_dir = params['ml_data_dir']/f"{source_data_name}-{target_data_name}"/ \
                 f"split_{split}"
     infer_dir = params['infer_dir']/f"{source_data_name}-{target_data_name}"/f"split_{split}"
     if params['use_singularity']:
@@ -210,22 +211,14 @@ params = frm.build_paths(params)  # paths to raw data
 params['ml_data_dir'] = Path(params['output_dir']) / 'ml_data' 
 params['model_outdir'] = Path(params['output_dir']) / 'models'
 params['infer_dir'] = Path(params['output_dir']) / 'infer'
-#params['model_specific_outdir'] = Path(params['output_dir']) / params['model_specific_outdir'] # CHANGE THIS
 
 #Model scripts
 params['preprocess_python_script'] = f"{params['model_name']}_preprocess_improve.py"
 params['train_python_script'] = f"{params['model_name']}_train_improve.py"
 params['infer_python_script'] = f"{params['model_name']}_infer_improve.py"
 
-## Download Author specific data ----> MOVE IT TO setup_improve.sh
-if params['model_specific_data']:
-    auth_data_download = ["bash",
-        "model_specific_data_download.sh",
-        str(params['model_specific_data_url']),
-        str(params['model_specific_outdir'])
-    ]
-    result = subprocess.run(auth_data_download, capture_output=True,
-                            text=True, check=True)
+#Read Hyperparameters
+hp = json.load(params['hyperparameters_file'])[params['model_name']]
 
 ##########################################################################
 ##################### START PARSL PARALLEL EXECUTION #####################
@@ -240,13 +233,13 @@ for source_data_name in params['source_datasets']:
 ##Train execution with Parsl
 train_futures=[]
 for future_p in preprocess_futures:
-    train_futures.append(train(params, future_p.result()['source_data_name'], future_p.result()['split']))
+    train_futures.append(train(params, hp, future_p.result()['source_data_name'], future_p.result()['split']))
 
 ##Infer execution with Parsl
 infer_futures =[]
 for future_t in train_futures:
     for target_data_name in params['target_datasets']:
-        infer_futures.append(infer(params, future_t.result()['source_data_name'], target_data_name, future_t.result()['split']))
+        infer_futures.append(infer(params,future_t.result()['source_data_name'], target_data_name, future_t.result()['split']))
 
 for future_i in infer_futures:
     print(future_i.result())
