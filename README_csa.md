@@ -14,7 +14,7 @@ Clone the `IMPROVE library` repository to a directory of your preference (outsid
 ```bash
 git clone https://github.com/JDACS4C-IMPROVE/IMPROVE
 cd IMPROVE
-git checkout framework-api
+git checkout develop
 ```
 
 ### 3. Install Dependencies
