@@ -218,10 +218,17 @@ params['preprocess_python_script'] = f"{params['model_name']}_preprocess_improve
 params['train_python_script'] = f"{params['model_name']}_train_improve.py"
 params['infer_python_script'] = f"{params['model_name']}_infer_improve.py"
 
-#Read Hyperparameters
+#Read Hyperparameters file
 with open(params['hyperparameters_file']) as f:
     hp = json.load(f)
 hp_model = hp[params['model_name']]
+print("hp_model")
+print(hp_model)
+print("hp_model['CCLE']")
+print(hp_model['CCLE'])
+print("hp_model['CCLE']['batch_size']")
+print(hp_model['CCLE']['batch_size'])
+
 
 ##########################################################################
 ##################### START PARSL PARALLEL EXECUTION #####################
