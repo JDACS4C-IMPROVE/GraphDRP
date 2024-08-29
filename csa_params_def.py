@@ -4,11 +4,6 @@ from pathlib import Path
 fdir = Path(__file__).resolve().parent
 required = None
 additional_definitions = [
-    {"name": "main_csa_outdir",
-     "type": str,
-     "default": 'model',
-     "help": "Parent output directory containing the preprocessed data, trained models and inference results"
-    },
     {"name": "source_datasets",
      "nargs" : "+",
      "type": str,
