@@ -135,7 +135,7 @@ def preprocess(inputs=[]): #
 
 
 @python_app 
-def train(params, hp, source_data_name, split): 
+def train(params, source_data_name, split): 
     import os
     import warnings
     import subprocess
@@ -218,7 +218,7 @@ params['train_python_script'] = f"{params['model_name']}_train_improve.py"
 params['infer_python_script'] = f"{params['model_name']}_infer_improve.py"
 
 #Read Hyperparameters
-hp = json.load(params['hyperparameters_file'])[params['model_name']]
+#hp = json.load(params['hyperparameters_file'])[params['model_name']]
 
 ##########################################################################
 ##################### START PARSL PARALLEL EXECUTION #####################
@@ -233,7 +233,7 @@ for source_data_name in params['source_datasets']:
 ##Train execution with Parsl
 train_futures=[]
 for future_p in preprocess_futures:
-    train_futures.append(train(params, hp, future_p.result()['source_data_name'], future_p.result()['split']))
+    train_futures.append(train(params, future_p.result()['source_data_name'], future_p.result()['split']))
 
 ##Infer execution with Parsl
 infer_futures =[]
