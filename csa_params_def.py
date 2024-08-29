@@ -1,9 +1,5 @@
 import os
 from pathlib import Path
-#import model_specific_config - To import model specific parameters
-
-
-##TODO Replace CANDLE initialize_parameter()
 
 fdir = Path(__file__).resolve().parent
 required = None
