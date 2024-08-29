@@ -258,9 +258,13 @@ for future_p in preprocess_futures:
     train_futures.append(train(params, future_p.result()['source_data_name'], future_p.result()['split']))
 
 ##Infer execution with Parsl
+infer_futures =[]
 for future_t in train_futures:
     for target_data_name in params['target_datasets']:
-        infer_futures = infer(params, future_t.result()['source_data_name'], target_data_name, future_t.result()['split'])
+        infer_futures.append(infer(params, future_t.result()['source_data_name'], target_data_name, future_t.result()['split']))
+
+for future_i in infer_futures:
+    print(future_i.result())
 
 ## TODO: PARSL CONFIG FOR POLARIS
 """ user_opts = {
