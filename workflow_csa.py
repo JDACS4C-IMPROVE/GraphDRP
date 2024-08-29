@@ -154,8 +154,8 @@ def train(params, source_data_name, split):
                         "--input_dir", str(ml_data_dir),
                         "--output_dir", str(model_dir),
                         "--epochs", str(params['epochs']),  # DL-specific
-                        "--y_col_name", str(params['y_col_name']),
-                        "--learning_rate", str()
+                        "--y_col_name", str(params['y_col_name'])
+                        #"--learning_rate", str()
                     ]
             result = subprocess.run(train_run, capture_output=True,
                                     text=True, check=True)
@@ -218,9 +218,9 @@ params['train_python_script'] = f"{params['model_name']}_train_improve.py"
 params['infer_python_script'] = f"{params['model_name']}_infer_improve.py"
 
 #Read Hyperparameters
-with open(params['hyperparameters_file']) as f:
-    hp = json.load(f)
-print(hp)
+# with open(params['hyperparameters_file']) as f:
+#     hp = json.load(f)
+# print(hp)
 ##########################################################################
 ##################### START PARSL PARALLEL EXECUTION #####################
 ##########################################################################
