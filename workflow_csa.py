@@ -218,7 +218,7 @@ params['train_python_script'] = f"{params['model_name']}_train_improve.py"
 params['infer_python_script'] = f"{params['model_name']}_infer_improve.py"
 
 #Read Hyperparameters
-#hp = json.load(params['hyperparameters_file'])[params['model_name']]
+hp = json.load(params['hyperparameters_file'])[params['model_name']]
 
 ##########################################################################
 ##################### START PARSL PARALLEL EXECUTION #####################
