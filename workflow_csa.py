@@ -31,7 +31,7 @@ config_lambda = Config(
             cpu_affinity="block",
             #max_workers_per_node=2, ## IS NOT SUPPORTED IN  Parsl version: 2023.06.19. CHECK HOW TO USE THIS???
             worker_debug=True,
-            available_accelerators=4,  ## CHANGE THIS AS REQUIRED BY THE MACHINE
+            available_accelerators=8,  ## CHANGE THIS AS REQUIRED BY THE MACHINE
             worker_port_range=worker_port_range,
             provider=LocalProvider(
                 init_blocks=1,
@@ -223,13 +223,6 @@ params['infer_python_script'] = f"{params['model_name']}_infer_improve.py"
 with open(params['hyperparameters_file']) as f:
     hp = json.load(f)
 hp_model = hp[params['model_name']]
-print("hp_model")
-print(hp_model)
-print("hp_model['CCLE']")
-print(hp_model['CCLE'])
-print("hp_model['CCLE']['batch_size']")
-print(hp_model['CCLE']['batch_size'])
-
 
 ##########################################################################
 ##################### START PARSL PARALLEL EXECUTION #####################

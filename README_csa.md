@@ -43,19 +43,25 @@ source setup_improve.sh
 This will set up `PYTHONPATH` to point the IMPROVE repo, and download cross-study benchmark data into `./csa_data/`.
 
 ## To run cross study analysus using PARSL on Lambda machine:
-csa_params.ini contains parameters necessary for the workflow. The user can change the parameters inside this configuration file.
+**csa_params.ini** contains parameters necessary for the workflow. The user can change the parameters inside this configuration file.
 
  - input_dir : Location of raw data for cross study analysis. 
- - output_dir : Location of the inference results
+ - output_dir : Location of the output. The subdirectories in the output_dir are organized as:
+    - ml_data: Contains pre-processed data.
+    - models: Contains trained models.
+    - infer: Contains inference retults
  - source_datasets : List of source_datasets for cross study analysis. With the current benchmark datasets this can be a subset of CCLE, gCSI, GDSCv1, GDSCv2 and CTRPv2
  - target_datasets : List of source_datasets for cross study analysis. With the current benchmark datasets this can be a subset of CCLE, gCSI, GDSCv1, GDSCv2 and CTRPv2
  - split: Splits of the source datasets for cross study analysis.
  - model_name: Name of the model for cross study analysis
  - epochs: Number of epochs for the model
+ - hyperparameters_file: json file containing optimized hyperparameters per dataset
  - y_col_name: Response variable used in the model. eg: auc
  - use_singularity: True, if the model files are available in a singularity container
  - only_cross_study: True, if only cross study analysis is needed without within study inferences
 
+**hyperparameters.json** contains a dictionary of optimized hyperparameters for the models. The key to the dictionary is the model name, which contains another dictionary with source dataset names as keys. The two hyperparameters considered for this analysis are: batch_size and learning_rate. 
+The hyperparameters are optimized using [Supervisor](https://github.com/JDACS4C-IMPROVE/HPO).
 
  To run cross study analysis with default configuration file (csa_params.ini):
 ```
@@ -65,3 +71,6 @@ python workflow_csa.py
 ```
 python workflow_csa.py --config_file <CONFIG_FILE>
 ```
+
+### Reference
+1.	Yadu Babuji, Anna Woodard, Zhuozhao Li, Daniel S. Katz, Ben Clifford, Rohan Kumar, Luksaz Lacinski, Ryan Chard, Justin M. Wozniak, Ian Foster, Michael Wilde and Kyle Chard. "Parsl: Pervasive Parallel Programming in Python." 28th ACM International Symposium on High-Performance Parallel and Distributed Computing (HPDC). 2019. 10.1145/3307681.3325400

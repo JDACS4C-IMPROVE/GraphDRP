@@ -12,16 +12,6 @@ Activate environment:
 conda activate graphdrp_py37_improve
 ```
 
-### Install Parsl (2023.6.19):
-```
-pip install parsl 
-```
-If you see an error during execution you may have to do this:
-```
-export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libffi.so.7
-```
-
-
 ML framework:
 + [Torch](https://pytorch.org/)
 + [Pytorch_geometric](https://github.com/rusty1s/pytorch_geometric) -- for graph neural network (GNN)
@@ -98,10 +88,9 @@ source setup_improve.sh
 This will set up `PYTHONPATH` to point the IMPROVE repo, and download cross-study benchmark data into `./csa_data/`.
 
 ## To run cross study analysus using PARSL on Lambda machine:
-csa_params.ini contains parameters necessary for the workflow. However, please change the source_datasets, target_datasets, split, epochs within workflow_csa.py script. Run this for cross study analysis:
-```
-python workflow_csa.py
-```
+
+Follow the instructions in Readme_CSA.md in this repo.
+
 ## For separate execution of preprocess, train and infer scripts:
 
 ### 1. Preprocess benchmark data (_raw data_) to construct model input data (_ML data_)
