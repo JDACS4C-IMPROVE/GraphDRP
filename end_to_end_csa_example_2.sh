@@ -20,7 +20,7 @@ fi
 
 SPLIT=0
 
-EPOCHS=50
+EPOCHS=150
 CUDA_NAME=cuda:7
 
 # ----------------------------------------

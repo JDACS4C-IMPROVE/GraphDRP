@@ -64,7 +64,8 @@ print_fn(f"File path: {filepath}")
 cfg = DRPPreprocessConfig() # TODO submit github issue; too many logs printed; is it necessary?
 params = cfg.initialize_parameters(
     pathToModelDir=filepath,
-    default_config="csa_params.txt",
+    # default_config="csa_params.txt",
+    default_config="csa_params.ini",
     default_model=None,
     additional_cli_section=None,
     additional_definitions=None,
@@ -128,10 +129,10 @@ split_nums = [4, 7]
 ## Parameters of the experiment/run/workflow
 # epochs = 2
 # epochs = 30
-epochs = 50
+# epochs = 50
 # epochs = 70
 # epochs = 100
-# epochs = 150
+epochs = 150
 
 
 # ===============================================================
