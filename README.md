@@ -75,7 +75,7 @@ Note that `./_original_data` contains data files that were used to train and eva
 ```
 git clone git@github.com:JDACS4C-IMPROVE/GraphDRP.git
 cd GraphDRP
-git checkout develop
+git checkout v0.0.3-beta
 ```
 
 
