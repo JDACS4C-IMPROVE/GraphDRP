@@ -37,7 +37,6 @@ ML_DATA_DIR=./res_diff_dirs/ml_data/${SOURCE}-${TARGET}/split_${SPLIT}
 MODEL_DIR=./res_diff_dirs/models/${SOURCE}/split_${SPLIT}
 INFER_DIR=./res_diff_dirs/infer/${SOURCE}-${TARGET}/split_${SPLIT}
 
-
 # Preprocess (improvelib)
 python graphdrp_preprocess_improve.py \
     --train_split_file ${SOURCE}_split_${SPLIT}_train.txt \
