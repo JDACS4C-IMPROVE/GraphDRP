@@ -52,7 +52,7 @@ def run(params: Dict):
     """ Run data preprocessing.
 
     Args:
-        params (dict): dict of CANDLE/IMPROVE parameters and parsed values.
+        params (dict): dict of IMPROVE parameters and parsed values.
 
     Returns:
         str: directory name that was used to save the preprocessed (generated)
@@ -64,7 +64,7 @@ def run(params: Dict):
     # ------------------------------------------------------
     # [Req] Load X data (feature representations)
     # ------------------------------------------------------
-    # Use the provided data loaders to load data that is required by the model.
+    # Use the provided data loaders to load data required by the model.
     #
     # Benchmark data includes three dirs: x_data, y_data, splits.
     # The x_data contains files that represent feature information such as

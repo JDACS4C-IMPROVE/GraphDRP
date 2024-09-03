@@ -56,36 +56,12 @@ filepath = Path(__file__).resolve().parent # [Req]
 metrics_list = ["mse", "rmse", "pcc", "scc", "r2"]  
 
 
-def config_checkpointing(params: Dict, model, optimizer):
-    """Configure CANDLE checkpointing. Reads last saved state if checkpoints exist.
-
-    Args:
-        ckpt_directory (str): String with path to directory for storing the
-            CANDLE checkpointing for the model being trained.
-
-    Returns:
-        Number of training iterations already run (this may be > 0 if reading
-            from checkpointing).
-    """
-    # params["ckpt_directory"] = ckpt_directory
-    initial_epoch = 0
-    # TODO. This creates directory self.params["ckpt_directory"]
-    # import pdb; pdb.set_trace()
-    ckpt = CandleCkptPyTorch(params)
-    ckpt.set_model({"model": model, "optimizer": optimizer})
-    J = ckpt.restart(model)
-    if J is not None:
-        initial_epoch = J["epoch"]
-        print("restarting from ckpt: initial_epoch: %i" % initial_epoch)
-    return ckpt, initial_epoch
-
-
 # [Req]
 def run(params: Dict):
     """ Run model training.
 
     Args:
-        params (dict): dict of CANDLE/IMPROVE parameters and parsed values.
+        params (dict): dict of IMPROVE parameters and parsed values.
 
     Returns:
         dict: prediction performance scores computed on validation data
@@ -95,9 +71,8 @@ def run(params: Dict):
     # from pprint import pprint; pprint(params);
 
     # ------------------------------------------------------
-    # [Req] Create output dir and build model path
+    # [Req] Build model path
     # ------------------------------------------------------
-    # Build model path
     modelpath = frm.build_model_path(params, model_dir=params["output_dir"])
 
     # ------------------------------------------------------
@@ -147,17 +122,7 @@ def run(params: Dict):
     # ------------------------------------------------------
     # Train settings
     # ------------------------------------------------------
-    # # [Req] Set checkpointing
-    # print(f"model_outdir:   {params['model_outdir']}")
-    # print(f"ckpt_directory: {params['ckpt_directory']}")
-    # # TODO: why nested dirs are created: params["ckpt_directory"]/params["ckpt_directory"]
-    # # params["output_dir"] = params["model_outdir"]
-    # if params["ckpt_directory"] is None:
-    #     params["ckpt_directory"] = params["model_outdir"]
-    #     # params["ckpt_directory"] = "ckpt_graphdrp"  # TODO: why nested dirs are created: params["ckpt_directory"]/params["ckpt_directory"]
-    # # ckpt_obj, initial_epoch = config_checkpointing(params, model, optimizer)
     initial_epoch = 0
-
     num_epoch = params["epochs"]
     log_interval = params["log_interval"]
     patience = params["patience"]
@@ -174,7 +139,6 @@ def run(params: Dict):
     epoch_list = []
     val_loss_list = []
     train_loss_list = []
-    # log_interval_epoch = 1
     log_interval_epoch = 5
 
     print(f"Epochs: {initial_epoch + 1} to {num_epoch}")
@@ -208,7 +172,7 @@ def run(params: Dict):
             print(f"{early_stop_metric} improved at epoch {best_epoch};  "\
                   f"Best {early_stop_metric}: {best_score};  "\
                   f"Model: {params['model_arch']}")
-            early_stop_counter = 0  # zero the early-stop counter if the model improved after the epoch
+            early_stop_counter = 0  # reset early-stop counter if model improved after the epoch
         else:
             print(f"No improvement since epoch {best_epoch};  "\
                   f"Best {early_stop_metric}: {best_score};  "\
@@ -263,6 +227,9 @@ def run(params: Dict):
 def initialize_parameters():
     """This initialize_parameters() is define this way to support Supervisor
     workflows such as HPO.
+
+    Returns:
+        dict: dict of IMPROVE/CANDLE parameters and parsed values.
     """
     additional_definitions = train_params
     cfg = DRPTrainConfig()
@@ -281,7 +248,7 @@ def main(args):
     # [Req]
     params = initialize_parameters()
     val_scores = run(params)
-    print("\nFinished training GraphDRP model.")
+    print("\nFinished training model.")
 
 
 # [Req]
