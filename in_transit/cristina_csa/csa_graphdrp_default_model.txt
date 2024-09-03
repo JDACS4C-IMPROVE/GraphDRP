@@ -1,7 +1,0 @@
-[Global_Params]
-model_name = "CSA_GraphDRP"
-source_data = ["gCSI"]
-target_data = ["gCSI"]
-split_ids = [3, 7]
-model_config = "graphdrp_default_model.txt"
-
