@@ -129,19 +129,10 @@ dmypy.json
 .pyre/
 
 # IMPROVE
-data_processed/
-datasplit/
-lc_data/
-lc_out/
-results/
 .vscode/
-cell_blind_test
-drug_blind_test
-list_cell_mix_test
-list_drug_mix_test
-drug_dict
-mut_dict
-Output/
+_misc/*data*
+_misc/*res*
+res*
 out*
 csa_data*
 ml_data/
