@@ -75,7 +75,7 @@ Note that `./_original_data` contains data files that were used to train and eva
 ```
 git clone git@github.com:JDACS4C-IMPROVE/GraphDRP.git
 cd GraphDRP
-git checkout v0.0.3-beta
+git checkout v0.1.0-alpha
 ```
 
 
@@ -95,7 +95,7 @@ source setup_improve.sh
 
 This will:
 1. Download cross-study analysis (CSA) benchmark data into `./csa_data/`.
-2. Clone IMPROVE repo (checkout tag `v0.0.3-beta`) outside the GraphDRP model repo
+2. Clone IMPROVE repo (checkout tag `v0.1.0-alpha`) outside the GraphDRP model repo
 3. Set up env variables: `IMPROVE_DATA_DIR` (to `./csa_data/`) and `PYTHONPATH` (adds IMPROVE repo).
 
 
