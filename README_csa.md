@@ -55,8 +55,9 @@ This will set up `PYTHONPATH` to point the IMPROVE repo, and download cross-stud
  - split: Splits of the source datasets for cross study analysis.
  - model_name: Name of the model for cross study analysis
  - epochs: Number of epochs for the model
- - hyperparameters_file: json file containing optimized hyperparameters per dataset. Also contains default values.
- - use_hpo: Do you want to use hyper-parameter optimized learning rate and batch size? If False, default values will be used.
+ - hyperparameters_file: Name of the json file containing hyperparameters per dataset. In this template two hyperparameter files are given:
+    - hyperparameters_hpo.json : Contains hyperparameters optimized separately on all source datasets.
+    - hyperparameters_default.json : Contains default values of the hyperparameters for the model.
  - y_col_name: Response variable used in the model. eg: auc
  - use_singularity: True, if the model files are available in a singularity container
  - only_cross_study: True, if only cross study analysis is needed without within study inferences
