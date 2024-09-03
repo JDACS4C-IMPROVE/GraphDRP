@@ -52,4 +52,4 @@ additional_definitions = [
      "default": '',
      "help": "Singularity image file of the model"
     }
-    ]
+]

@@ -20,6 +20,7 @@ fi
 
 SPLIT=0
 
+# EPOCHS=2
 EPOCHS=150
 CUDA_NAME=cuda:7
 
@@ -27,8 +28,8 @@ CUDA_NAME=cuda:7
 # 1. Within-study
 # ---------------
 
-# SOURCE=CCLE
-SOURCE=gCSI
+SOURCE=CCLE
+# SOURCE=gCSI
 TARGET=$SOURCE
 
 # Separate dirs

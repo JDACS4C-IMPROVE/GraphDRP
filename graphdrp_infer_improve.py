@@ -2,7 +2,7 @@
 
 Required outputs
 ----------------
-All the outputs from this infer script are saved in params["infer_outdir"].
+All the outputs from this infer script are saved in params["output_dir"].
 
 1. Predictions on test data.
    Raw model predictions calcualted using the trained model on test data. The
@@ -21,12 +21,12 @@ from typing import Dict
 import pandas as pd
 
 # [Req] IMPROVE imports
-# from improve import framework as frm
 from improvelib.applications.drug_response_prediction.config import DRPInferConfig
 from improvelib.utils import str2bool
 import improvelib.utils as frm
 
 # Model-specific imports
+from model_params_def import infer_params
 from model_utils.torch_utils import (
     build_GraphDRP_dataloader,
     determine_device,
@@ -39,31 +39,6 @@ from graphdrp_preprocess_improve import preprocess_params
 from graphdrp_train_improve import metrics_list, train_params
 
 filepath = Path(__file__).resolve().parent # [Req]
-
-# ---------------------
-# [Req] Parameter lists
-# ---------------------
-# Model-specific params (Model: GraphDRP)
-# All params in model_infer_params are optional.
-# If no params are required by the model, then it should be an empty list.
-model_infer_params = [   
-    {"name": "model_arch",
-     "type": str,
-     "default": "GINConvNet",
-     "choices": ["GINConvNet", "GATNet", "GAT_GCN", "GCNNet"],
-     "help": "Model architecture to run."
-    }, 
-    {"name": "cuda_name",
-     "type": str,
-     # "action": "store",
-     "default": "cuda:0",
-     "help": "Cuda device (e.g.: cuda:0, cuda:1)."
-    }
-    ]
-
-# infer_params = app_infer_params + model_infer_params
-infer_params = model_infer_params
-# ---------------------
 
 
 # [Req]
@@ -81,11 +56,6 @@ def run(params):
     # from pprint import pprint; pprint(params);
 
     # ------------------------------------------------------
-    # [Req] Create output dir
-    # ------------------------------------------------------
-    # frm.create_outdir(outdir=params["infer_outdir"]) # TODO cfg.initialize_parameters creates params['output_dir'] where the model will be stored
-
-    # ------------------------------------------------------
     # [Req] Create data names for test set
     # ------------------------------------------------------
     test_data_fname = frm.build_ml_data_name(params, stage="test")
@@ -97,13 +67,8 @@ def run(params):
     # Prepare dataloaders to load model input data (ML data)
     # ------------------------------------------------------
     print("\nTest data:")
-    # print(f"test_ml_data_dir: {params['test_ml_data_dir']}")
     print(f"Infer_batch: {params['infer_batch']}")
-    if "input_data_dir" in params:
-        data_dir = params["input_data_dir"]
-    else:
-        data_dir = params["input_dir"]
-    test_loader = build_GraphDRP_dataloader(data_dir=data_dir,
+    test_loader = build_GraphDRP_dataloader(data_dir=params["input_data_dir"],
                                             data_fname=test_data_fname,
                                             batch_size=params["infer_batch"],
                                             shuffle=False)
@@ -114,15 +79,12 @@ def run(params):
     # Determine CUDA/CPU device and configure CUDA device if available
     device = determine_device(params["cuda_name"])
     print(device)
+
     # ------------------------------------------------------
     # Load best model and compute predictions
     # ------------------------------------------------------
     # Load the best saved model (as determined based on val data)
-    if "input_model_dir" in params:
-        model_dir = params["input_model_dir"]
-    else:
-        model_dir = params["input_dir"]
-    modelpath = frm.build_model_path(params, model_dir=model_dir) # [Req]
+    modelpath = frm.build_model_path(params, model_dir=params["input_model_dir"]) # [Req]
     model = load_GraphDRP(params, modelpath, device)
     model.eval()
 
@@ -135,8 +97,7 @@ def run(params):
     frm.store_predictions_df(
         params,
         y_true=test_true, y_pred=test_pred, stage="test",
-        # outdir=params["infer_outdir"]
-        outdir=params["output_dir"] # TODO instead of infer_outdir
+        outdir=params["output_dir"]
     )
 
     # ------------------------------------------------------
@@ -145,8 +106,7 @@ def run(params):
     test_scores = frm.compute_performace_scores(
         params,
         y_true=test_true, y_pred=test_pred, stage="test",
-        # outdir=params["infer_outdir"],
-        outdir=params["output_dir"], # TODO instead of infer_outdir
+        outdir=params["output_dir"],
         metrics=metrics_list
     )
 
@@ -156,19 +116,7 @@ def run(params):
 # [Req]
 def main(args):
     # [Req]
-    #additional_definitions = preprocess_params + train_params + infer_params
     additional_definitions = infer_params
-    # params = frm.initialize_parameters(
-    #     filepath,
-    #     # default_model="graphdrp_default_model.txt",
-    #     # default_model="graphdrp_params.txt",
-    #     # default_model="params_ws.txt",
-    #     # default_model="params_cs.txt",
-    #     default_model="params_ovarian.txt",
-    #     additional_definitions=additional_definitions,
-    #     # required=req_infer_args,
-    #     required=None,
-    # )
     cfg = DRPInferConfig()
     params = cfg.initialize_parameters(
         pathToModelDir=filepath,

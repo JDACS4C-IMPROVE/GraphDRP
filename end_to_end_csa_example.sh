@@ -20,8 +20,8 @@ fi
 
 SPLIT=0
 
-EPOCHS=50
-CUDA_NAME=cuda:7
+EPOCHS=150
+CUDA_NAME=cuda:6
 
 # ----------------------------------------
 # 1. Within-study
@@ -51,7 +51,8 @@ python graphdrp_train_improve.py \
 
 # Infer (improvelib)
 python graphdrp_infer_improve.py \
-    --input_dir $MLDATA_AND_MODEL_DIR \
+    --input_data_dir $MLDATA_AND_MODEL_DIR\
+    --input_model_dir $MLDATA_AND_MODEL_DIR\
     --output_dir $MLDATA_AND_MODEL_DIR \
     --cuda_name $CUDA_NAME
 
@@ -83,6 +84,7 @@ python graphdrp_train_improve.py \
 
 # Infer (improvelib)
 python graphdrp_infer_improve.py \
-    --input_dir $MLDATA_AND_MODEL_DIR \
+    --input_data_dir $MLDATA_AND_MODEL_DIR\
+    --input_model_dir $MLDATA_AND_MODEL_DIR\
     --output_dir $MLDATA_AND_MODEL_DIR \
     --cuda_name $CUDA_NAME

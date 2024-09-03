@@ -3,7 +3,7 @@ GraphDRP prediction model.
 
 Required outputs
 ----------------
-All the outputs from this preprocessing script are saved in params["ml_data_outdir"].
+All the outputs from this preprocessing script are saved in params["output_dir"].
 
 1. Model input data files.
    This script creates three data files corresponding to train, validation,
@@ -28,51 +28,23 @@ import pandas as pd
 import joblib
 
 # [Req] IMPROVE imports
-# from improve import framework as frm
-# from improve import drug_resp_pred as drp
+# Core improvelib imports
 from improvelib.applications.drug_response_prediction.config import DRPPreprocessConfig
 from improvelib.utils import str2bool
 import improvelib.utils as frm
-import improvelib.applications.drug_response_prediction.drug_utils as drugs
-import improvelib.applications.drug_response_prediction.omics_utils as omics
+# Application-specific (DRP) imports
+import improvelib.applications.drug_response_prediction.drug_utils as drugs_utils
+import improvelib.applications.drug_response_prediction.omics_utils as omics_utils
 import improvelib.applications.drug_response_prediction.drp_utils as drp
 
 # Model-specific imports
+from model_params_def import preprocess_params # [Req]
 from model_utils.torch_utils import TestbedDataset
 from model_utils.utils import gene_selection, scale_df
 from model_utils.rdkit_utils import build_graph_dict_from_smiles_collection
 from model_utils.np_utils import compose_data_arrays
 
 filepath = Path(__file__).resolve().parent # [Req]
-
-# ---------------------
-# [Req] Parameter lists
-# ---------------------
-# Model-specific params (Model: GraphDRP)
-# All params in model_preproc_params are optional.
-# If no params are required by the model, then it should be an empty list.
-model_preproc_params = [
-    {"name": "use_lincs",
-     "type": frm.str2bool,
-     "default": True,
-     "help": "Flag to indicate if landmark genes are used for gene selection.",
-    },
-    {"name": "scaling",
-     "type": str,
-     "default": "std",
-     "choice": ["std", "minmax", "miabs", "robust"],
-     "help": "Scaler for gene expression data.",
-    },
-    {"name": "ge_scaler_fname",
-     "type": str,
-     "default": "x_data_gene_expression_scaler.gz",
-     "help": "File name to save the gene expression scaler object.",
-    },
-]
-
-# preprocess_params = app_preproc_params + model_preproc_params
-preprocess_params = model_preproc_params
-# ---------------------
 
 
 # [Req]
@@ -90,15 +62,6 @@ def run(params: Dict):
     # from pprint import pprint; pprint(params);
 
     # ------------------------------------------------------
-    # [Req] Build paths and create output dir
-    # ------------------------------------------------------
-    # Build paths for raw_data, x_data, y_data, splits
-    params = frm.build_paths(params) # TODO do this in improvelib (submit issue)
-
-    # Create output dir for model input data (to save preprocessed ML data)
-    # frm.create_outdir(outdir=params["ml_data_outdir"]) # TODO cfg.initialize_parameters creates params['output_dir']
-
-    # ------------------------------------------------------
     # [Req] Load X data (feature representations)
     # ------------------------------------------------------
     # Use the provided data loaders to load data that is required by the model.
@@ -114,18 +77,12 @@ def run(params: Dict):
     # data, then the model must use the provided data loaders to load the data files
     # from the x_data dir.
     print("\nLoads omics data.")
-    # omics_obj = drp.OmicsLoader(params)
-    omics_obj = omics.OmicsLoader(params)
-    # print(omics_obj)
+    omics_obj = omics_utils.OmicsLoader(params)
     ge = omics_obj.dfs['cancer_gene_expression.tsv'] # return gene expression
-    # ge = omics_obj.dfs['cancer_gene_expression_combined.tsv'] # return gene expression
 
     print("\nLoad drugs data.")
-    # drugs_obj = drp.DrugsLoader(params)
-    drugs_obj = drugs.DrugsLoader(params)
-    # print(drugs_obj)
+    drugs_obj = drugs_utils.DrugsLoader(params)
     smi = drugs_obj.dfs['drug_SMILES.tsv']  # return SMILES data
-    # smi = drugs_obj.dfs['drug_SMILES_combined.tsv']  # return SMILES data
 
     # ------------------------------------------------------
     # Further preprocess X data
@@ -222,7 +179,7 @@ def run(params: Dict):
         print(stage.upper(), "data --> xd ", xd.shape, "xc ", xc.shape, "y ", y.shape)
 
         # -----------------------
-        # [Req] Save ML data files in params["ml_data_outdir"]
+        # [Req] Save ML data files in params["output_dir"]
         # The implementation of this step depends on the model.
         # -----------------------
         # [Req] Create data name
@@ -232,7 +189,7 @@ def run(params: Dict):
         # file name automatically. This is unique for GraphDRP.
         data_fname = data_fname.split(params["data_format"])[0]
 
-        # Create the ml data and save it as data_fname in params["ml_data_outdir"]
+        # Create the ml data and save it as data_fname in params["output_dir"]
         # Note! In the *train*.py and *infer*.py scripts, functionality should
         # be implemented to load the saved data.
         # -----
@@ -242,7 +199,6 @@ def run(params: Dict):
         # inside. This results in: [root]/processed/[dataset],
         # e.g., ml_data/processed/train_data.pt
         # -----
-        # TestbedDataset(root=params["ml_data_outdir"],
         TestbedDataset(root=params["output_dir"],
                        dataset=data_fname,
                        xd=xd,
@@ -260,16 +216,6 @@ def run(params: Dict):
 def main(args):
     # [Req]
     additional_definitions = preprocess_params
-    # params = frm.initialize_parameters(
-    #     filepath,
-    #     # default_model="graphdrp_default_model.txt",
-    #     # default_model="graphdrp_params.txt",
-    #     # default_model="params_ws.txt",
-    #     # default_model="params_cs.txt",
-    #     default_model="params_ovarian.txt",
-    #     additional_definitions=additional_definitions,
-    #     required=None,
-    # )
     cfg = DRPPreprocessConfig()
     params = cfg.initialize_parameters(
         pathToModelDir=filepath,
