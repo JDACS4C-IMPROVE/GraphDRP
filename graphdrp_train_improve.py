@@ -47,9 +47,6 @@ from model_utils.torch_utils import (
     train_epoch,
 )
 
-# [Req] Imports from preprocess script
-from graphdrp_preprocess_improve import preprocess_params
-
 filepath = Path(__file__).resolve().parent # [Req]
 
 # [Req] List of metrics names to compute prediction performance scores
@@ -148,7 +145,6 @@ def run(params: Dict):
         # Train epoch and checkpoint model
         train_loss = train_epoch(model, device, train_loader, optimizer,
                                  loss_fn, epoch + 1, log_interval)
-        # ckpt_obj.ckpt_epoch(epoch, train_loss) # checkpoints the best model by default
 
         # Predict with val data
         val_true, val_pred = predicting(model, device, val_loader)

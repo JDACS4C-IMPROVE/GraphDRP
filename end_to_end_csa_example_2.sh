@@ -28,8 +28,9 @@ CUDA_NAME=cuda:7
 # 1. Within-study
 # ---------------
 
-SOURCE=CCLE
+# SOURCE=CCLE
 # SOURCE=gCSI
+SOURCE=GDSCv1
 TARGET=$SOURCE
 
 # Separate dirs
@@ -56,8 +57,9 @@ python graphdrp_train_improve.py \
 python graphdrp_infer_improve.py \
     --input_data_dir $ML_DATA_DIR\
     --input_model_dir $MODEL_DIR\
-    --cuda_name $CUDA_NAME \
-    --output_dir $INFER_DIR
+    --output_dir $INFER_DIR \
+    --calc_infer_score true \
+    --cuda_name $CUDA_NAME
 
 
 # ----------------------------------------
@@ -91,5 +93,6 @@ python graphdrp_train_improve.py \
 python graphdrp_infer_improve.py \
     --input_data_dir $ML_DATA_DIR\
     --input_model_dir $MODEL_DIR\
-    --cuda_name $CUDA_NAME \
-    --output_dir $INFER_DIR
+    --output_dir $INFER_DIR \
+    --calc_infer_score true \
+    --cuda_name $CUDA_NAME

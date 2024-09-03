@@ -10,9 +10,10 @@ y_data_files = [["response.tsv"]]
 x_data_canc_files = [["cancer_gene_expression.tsv", ["Gene_Symbol"]]]
 x_data_drug_files = [["drug_SMILES.tsv"]]
 use_lincs = True
-scaling = "std"
+scaling = std
 
 [Train]
+data_format = .pt
 model_file_name = model
 model_file_format = .pt
 epochs = 50
@@ -28,6 +29,7 @@ log_interval = 30
 cuda_name = cuda:0
 
 [Infer]
+data_format = .pt
 model_file_name = model
 model_file_format = .pt
 infer_batch = 256

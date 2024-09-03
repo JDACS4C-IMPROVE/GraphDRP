@@ -121,8 +121,7 @@ def run(params: Dict):
     rsp = rsp.merge( ge[params["canc_col_name"]], on=params["canc_col_name"], how="inner")
     rsp = rsp.merge(smi[params["drug_col_name"]], on=params["drug_col_name"], how="inner")
     ge_sub = ge[ge[params["canc_col_name"]].isin(rsp[params["canc_col_name"]])].reset_index(drop=True)
-    # smi_sub = smi[smi[params["drug_col_name"]].isin(rsp[params["drug_col_name"]])].reset_index(drop=True)
-    # TODO consider keeping only smiles (smiles_graphs) in smi_sub
+    # TODO consider computing smi_sub
 
     # Scale gene expression
     _, ge_scaler = scale_df(ge_sub, scaler_name=params["scaling"])

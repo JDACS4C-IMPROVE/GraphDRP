@@ -26,7 +26,7 @@ from improvelib.utils import str2bool
 import improvelib.utils as frm
 
 # Model-specific imports
-from model_params_def import infer_params
+from model_params_def import infer_params # [Req]
 from model_utils.torch_utils import (
     build_GraphDRP_dataloader,
     determine_device,
@@ -34,9 +34,8 @@ from model_utils.torch_utils import (
     predicting,
 )
 
-# [Req] Imports from preprocess and train scripts
-from graphdrp_preprocess_improve import preprocess_params
-from graphdrp_train_improve import metrics_list, train_params
+# [Req] Imports metrics_list
+from graphdrp_train_improve import metrics_list
 
 filepath = Path(__file__).resolve().parent # [Req]
 
@@ -46,7 +45,7 @@ def run(params):
     """ Run model inference.
 
     Args:
-        params (dict): dict of CANDLE/IMPROVE parameters and parsed values.
+        params (dict): dict of IMPROVE parameters and parsed values.
 
     Returns:
         dict: prediction performance scores computed on test data according
@@ -103,14 +102,15 @@ def run(params):
     # ------------------------------------------------------
     # [Req] Compute performance scores
     # ------------------------------------------------------
-    test_scores = frm.compute_performace_scores(
-        params,
-        y_true=test_true, y_pred=test_pred, stage="test",
-        outdir=params["output_dir"],
-        metrics=metrics_list
-    )
+    if params["calc_infer_scores"]:
+        test_scores = frm.compute_performace_scores(
+            params,
+            y_true=test_true, y_pred=test_pred, stage="test",
+            outdir=params["output_dir"],
+            metrics=metrics_list
+        )
 
-    return test_scores
+    return True
 
 
 # [Req]
@@ -124,8 +124,9 @@ def main(args):
         default_model=None,
         additional_cli_section=None,
         additional_definitions=additional_definitions,
-        required=None)
-    test_scores = run(params)
+        required=None
+    )
+    status = run(params)
     print("\nFinished model inference.")
 
 

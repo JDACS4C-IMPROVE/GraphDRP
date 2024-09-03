@@ -28,8 +28,9 @@ CUDA_NAME=cuda:6
 # 1. Within-study
 # ---------------
 
-SOURCE=CCLE
+# SOURCE=CCLE
 # SOURCE=gCSI
+SOURCE=GDSCv1
 TARGET=$SOURCE
 
 # Single dir
