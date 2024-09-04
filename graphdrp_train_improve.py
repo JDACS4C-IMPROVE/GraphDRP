@@ -49,10 +49,6 @@ from model_utils.torch_utils import (
 
 filepath = Path(__file__).resolve().parent # [Req]
 
-# [Req] List of metrics names to compute prediction performance scores
-metrics_list = ["mse", "rmse", "pcc", "scc", "r2"]  
-
-
 # [Req]
 def run(params: Dict):
     """ Run model training.
@@ -199,19 +195,22 @@ def run(params: Dict):
     # [Req] Save raw predictions in dataframe
     # ------------------------------------------------------
     frm.store_predictions_df(
-        params,
-        y_true=val_true, y_pred=val_pred, stage="val",
-        outdir=params["output_dir"]
+        y_true=val_true, 
+        y_pred=val_pred, 
+        stage="val",
+        y_col_name=params["y_col_name"],
+        output_dir=params["output_dir"]
     )
 
     # ------------------------------------------------------
     # [Req] Compute performance scores
     # ------------------------------------------------------
-    val_scores = frm.compute_performace_scores(
-        params,
-        y_true=val_true, y_pred=val_pred, stage="val",
-        outdir=params["output_dir"],
-        metrics=metrics_list
+    val_scores = frm.compute_performance_scores(
+        y_true=val_true, 
+        y_pred=val_pred, 
+        stage="val",
+        metric_type=params["metric_type"],
+        output_dir=params["output_dir"]
     )
 
     history.to_csv(Path(params["output_dir"])/"history.csv", index=False)
