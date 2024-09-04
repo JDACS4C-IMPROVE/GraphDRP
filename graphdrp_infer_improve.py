@@ -109,7 +109,7 @@ def run(params):
             y_pred=test_pred, 
             stage="test",
             metric_type=params["metric_type"],
-            outdir=params["output_dir"]
+            output_dir=params["output_dir"]
         )
 
     return True
