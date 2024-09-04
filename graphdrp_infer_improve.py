@@ -34,8 +34,7 @@ from model_utils.torch_utils import (
     predicting,
 )
 
-# [Req] Imports metrics_list
-from graphdrp_train_improve import metrics_list
+
 
 filepath = Path(__file__).resolve().parent # [Req]
 

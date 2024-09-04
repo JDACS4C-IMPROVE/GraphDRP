@@ -144,14 +144,14 @@ def run(params: Dict):
 
         # Predict with val data
         val_true, val_pred = predicting(model, device, val_loader)
-        val_scores = compute_metrics(val_true, val_pred, metrics_list)
+        val_scores = compute_metrics(val_true, val_pred, params["metric_type"])
 
         if epoch % log_interval_epoch == 0:
             epoch_list.append(epoch)
             val_loss_list.append(val_scores[early_stop_metric])
 
             train_true, train_pred = predicting(model, device, train_loader)
-            train_scores = compute_metrics(train_true, train_pred, metrics_list)
+            train_scores = compute_metrics(train_true, train_pred, params["metric_type"])
             train_loss_list.append(train_scores[early_stop_metric])
 
         # For early stop
