@@ -13,8 +13,8 @@ Installation instuctions are detialed below in [Step-by-step instructions](#step
 Conda `yml` file [conda_env_lambda_py37.yml](./conda_env_lambda_py37.yml)
 
 ML framework:
-+ [Torch](https://pytorch.org/) -- deep learning framework for building the prediction model
-+ [Pytorch_geometric](https://github.com/rusty1s/pytorch_geometric) -- graph neural networks (GNN)
++ [Torch](https://pytorch.org/) - deep learning framework for building the prediction model
++ [Pytorch_geometric](https://github.com/rusty1s/pytorch_geometric) - graph neural networks (GNN)
 
 IMPROVE dependencies:
 + [IMPROVE v0.1.0-alpha](https://jdacs4c-improve.github.io/docs/v0.1.0-alpha/)
