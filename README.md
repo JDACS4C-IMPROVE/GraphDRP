@@ -73,7 +73,7 @@ Note that `./_original_data` contains data files that were used to train and eva
 # Step-by-step instructions
 
 ### 1. Clone the model repository
-```
+```bash
 git clone git@github.com:JDACS4C-IMPROVE/GraphDRP.git
 cd GraphDRP
 git checkout develop
@@ -82,11 +82,11 @@ git checkout develop
 
 ### 2. Set computational environment
 Option 1: create conda env using `yml`
-```
+```bash
 conda env create -f conda_env_lambda_py37.yml
 ```
 
-Option 2: check [conda_env_py37.sh](./conda_env_py37.sh)
+Option 2: use [conda_env_py37.sh](./conda_env_py37.sh)
 
 
 ### 3. Run `setup_improve.sh`.
@@ -96,13 +96,13 @@ source setup_improve.sh
 
 This will:
 1. Download cross-study analysis (CSA) benchmark data into `./csa_data/`.
-2. Clone IMPROVE repo (checkout tag `v0.1.0-alpha`) outside the GraphDRP model repo
-3. Set up env variables: `IMPROVE_DATA_DIR` (to `./csa_data/`) and `PYTHONPATH` (adds IMPROVE repo).
+2. Clone IMPROVE repo (checkout `develop`) outside the GraphDRP model repo
+3. Set up `PYTHONPATH` (adds IMPROVE repo).
 
 
 ### 4. Preprocess CSA benchmark data (_raw data_) to construct model input data (_ML data_)
 ```bash
-python graphdrp_preprocess_improve.py
+python graphdrp_preprocess_improve.py --input_dir ./csa_data/raw_data --output_dir exp_result
 ```
 
 Preprocesses the CSA data and creates train, validation (val), and test datasets.
@@ -112,23 +112,22 @@ Generates:
 * three tabular data files, each containing the drug response values (i.e. AUC) and corresponding metadata: `train_y_data.csv`, `val_y_data.csv`, `test_y_data.csv`
 
 ```
-ml_data
-└── GDSCv1-CCLE
-    └── split_0
-        ├── processed
-        │   ├── test_data.pt
-        │   ├── train_data.pt
-        │   └── val_data.pt
-        ├── test_y_data.csv
-        ├── train_y_data.csv
-        ├── val_y_data.csv
-        └── x_data_gene_expression_scaler.gz
+exp_result
+├── param_log_file.txt
+├── processed
+│   ├── test_data.pt
+│   ├── train_data.pt
+│   └── val_data.pt
+├── test_y_data.csv
+├── train_y_data.csv
+├── val_y_data.csv
+└── x_data_gene_expression_scaler.gz
 ```
 
 
 ### 5. Train GraphDRP model
 ```bash
-python graphdrp_train_improve.py
+python graphdrp_train_improve.py --input_dir exp_result --output_dir exp_result
 ```
 
 Trains GraphDRP using the model input data: `train_data.pt` (training), `val_data.pt` (for early stopping).
@@ -138,30 +137,27 @@ Generates:
 * predictions on val data (tabular data): `val_y_data_predicted.csv`
 * prediction performance scores on val data: `val_scores.json`
 ```
-out_models
-└── GDSCv1
-    └── split_0
-        ├── best -> /lambda_stor/data/apartin/projects/IMPROVE/pan-models/GraphDRP/out_models/GDSCv1/split_0/epochs/002
-        ├── epochs
-        │   ├── 001
-        │   │   ├── ckpt-info.json
-        │   │   └── model.h5
-        │   └── 002
-        │       ├── ckpt-info.json
-        │       └── model.h5
-        ├── last -> /lambda_stor/data/apartin/projects/IMPROVE/pan-models/GraphDRP/out_models/GDSCv1/split_0/epochs/002
-        ├── model.pt
-        ├── out_models
-        │   └── GDSCv1
-        │       └── split_0
-        │           └── ckpt.log
-        ├── val_scores.json
-        └── val_y_data_predicted.csv
+exp_result
+├── history.csv
+├── model.pt
+├── param_log_file.txt
+├── processed
+│   ├── test_data.pt
+│   ├── train_data.pt
+│   └── val_data.pt
+├── test_y_data.csv
+├── train_y_data.csv
+├── val_scores.json
+├── val_y_data.csv
+├── val_y_data_predicted.csv
+└── x_data_gene_expression_scaler.gz
 ```
 
 
 ### 6. Run inference on test data with the trained model
-```python graphdrp_infer_improve.py```
+```bash
+python graphdrp_infer_improve.py --input_data_dir exp_result --input_model_dir exp_result --output_dir exp_result --calc_infer_score true
+```
 
 Evaluates the performance on a test dataset with the trained model.
 
@@ -169,9 +165,20 @@ Generates:
 * predictions on test data (tabular data): `test_y_data_predicted.csv`
 * prediction performance scores on test data: `test_scores.json`
 ```
-out_infer
-└── GDSCv1-CCLE
-    └── split_0
-        ├── test_scores.json
-        └── test_y_data_predicted.csv
+exp_result
+├── history.csv
+├── model.pt
+├── param_log_file.txt
+├── processed
+│   ├── test_data.pt
+│   ├── train_data.pt
+│   └── val_data.pt
+├── test_scores.json
+├── test_y_data.csv
+├── test_y_data_predicted.csv
+├── train_y_data.csv
+├── val_scores.json
+├── val_y_data.csv
+├── val_y_data_predicted.csv
+└── x_data_gene_expression_scaler.gz
 ```
