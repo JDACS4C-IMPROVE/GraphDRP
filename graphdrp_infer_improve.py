@@ -56,7 +56,7 @@ def run(params):
     # ------------------------------------------------------
     # [Req] Create data names for test set
     # ------------------------------------------------------
-    test_data_fname = frm.build_ml_data_name(params, stage="test")
+    test_data_fname = frm.build_ml_data_file_name(data_format=params["data_format"], stage="test")
 
     # GraphDRP -- remove data_format
     test_data_fname = test_data_fname.split(params["data_format"])[0]
@@ -82,7 +82,7 @@ def run(params):
     # Load best model and compute predictions
     # ------------------------------------------------------
     # Load the best saved model (as determined based on val data)
-    modelpath = frm.build_model_path(params, model_dir=params["input_model_dir"]) # [Req]
+    modelpath = frm.build_model_path(model_file_name=params["model_file_name"], model_file_format=params["model_file_format"], model_dir=params["input_model_dir"]) # [Req]
     model = load_GraphDRP(params, modelpath, device)
     model.eval()
 
@@ -123,10 +123,7 @@ def main(args):
     params = cfg.initialize_parameters(
         pathToModelDir=filepath,
         default_config="graphdrp_params.txt",
-        default_model=None,
-        additional_cli_section=None,
-        additional_definitions=additional_definitions,
-        required=None
+        additional_definitions=additional_definitions
     )
     status = run(params)
     print("\nFinished model inference.")

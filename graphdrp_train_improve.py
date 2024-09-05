@@ -66,13 +66,13 @@ def run(params: Dict):
     # ------------------------------------------------------
     # [Req] Build model path
     # ------------------------------------------------------
-    modelpath = frm.build_model_path(params, model_dir=params["output_dir"])
+    modelpath = frm.build_model_path(model_file_name=params["model_file_name"], model_file_format=params["model_file_format"], model_dir=params["output_dir"])
 
     # ------------------------------------------------------
     # [Req] Create data names for train and val sets
     # ------------------------------------------------------
-    train_data_fname = frm.build_ml_data_name(params, stage="train")  # [Req]
-    val_data_fname = frm.build_ml_data_name(params, stage="val")  # [Req]
+    train_data_fname = frm.build_ml_data_file_name(data_format=params["data_format"], stage="train")  # [Req]
+    val_data_fname = frm.build_ml_data_file_name(data_format=params["data_format"], stage="val")  # [Req]
 
     # GraphDRP-specific -- remove data_format
     train_data_fname = train_data_fname.split(params["data_format"])[0]
@@ -231,10 +231,7 @@ def initialize_parameters():
     params = cfg.initialize_parameters(
         pathToModelDir=filepath,
         default_config="graphdrp_params.txt",
-        default_model=None,
-        additional_cli_section=None,
-        additional_definitions=additional_definitions,
-        required=None)
+        additional_definitions=additional_definitions)
     return params
 
 
