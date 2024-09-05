@@ -10,8 +10,8 @@ All the outputs from this infer script are saved in params["output_dir"].
 
 2. Prediction performance scores on test data.
    The performance scores are calculated using the raw model predictions and
-   the true values for performance metrics specified in the metrics_list. The
-   scores are saved as json in test_scores.json
+   the true values for performance metrics. The scores are saved as json in
+   test_scores.json
 """
 
 import sys
@@ -34,8 +34,6 @@ from model_utils.torch_utils import (
     predicting,
 )
 
-
-
 filepath = Path(__file__).resolve().parent # [Req]
 
 
@@ -47,8 +45,7 @@ def run(params):
         params (dict): dict of IMPROVE parameters and parsed values.
 
     Returns:
-        dict: prediction performance scores computed on test data according
-            to the metrics_list.
+        dict: prediction performance scores computed on test data.
     """
     # breakpoint()
     # from pprint import pprint; pprint(params);
