@@ -26,11 +26,11 @@ patience = 20
 ckpt_save_interval = 5
 model_arch = GINConvNet
 log_interval = 30
-cuda_name = cuda:0
+cuda_name = cuda:7
 
 [Infer]
 data_format = .pt
 model_file_name = model
 model_file_format = .pt
 infer_batch = 256
-cuda_name = cuda:0
+cuda_name = cuda:7
