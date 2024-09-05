@@ -10,7 +10,7 @@ A more detailed tutorial can be found HERE (`TODO!`).
 ## Dependencies
 Installation instuctions are detialed below in [Step-by-step instructions](#step-by-step-instructions).
 
-Conda `yml` file [env_gdrp_37_improve.yml](./env_gdrp_37_improve.yml)
+Conda `yml` file [conda_env_gdrp_37_improve.yml](./conda_env_gdrp_37_improve.yml)
 
 ML framework:
 + [Torch](https://pytorch.org/) -- deep learning framework for building the prediction model
