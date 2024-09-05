@@ -65,7 +65,8 @@ Note that `./_original_data` contains data files that were used to train and eva
 + `graphdrp_preprocess_improve.py` - takes benchmark data files and transforms into files for trianing and inference
 + `graphdrp_train_improve.py` - trains the GraphDRP model
 + `graphdrp_infer_improve.py` - runs inference with the trained GraphDRP model
-+ `graphdrp_params.txt` - default parameter file
++ `model_params_def.py` - definitions of parameters that are specific to the model
++ `graphdrp_params.txt` - default parameter file (parameter values specified in this file override the defaults)
 
 
 
@@ -75,14 +76,14 @@ Note that `./_original_data` contains data files that were used to train and eva
 ```
 git clone git@github.com:JDACS4C-IMPROVE/GraphDRP.git
 cd GraphDRP
-git checkout v0.1.0-alpha
+git checkout develop
 ```
 
 
 ### 2. Set computational environment
 Option 1: create conda env using `yml`
 ```
-conda env create -f conda_env_lambda_graphdrp_py37.yml
+conda env create -f conda_env_lambda_py37.yml
 ```
 
 Option 2: check [conda_env_py37.sh](./conda_env_py37.sh)
