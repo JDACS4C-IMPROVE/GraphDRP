@@ -255,7 +255,8 @@ for source_data_name in source_datasets:
                   "--input_model_dir", str(model_dir),
                   "--output_dir", str(infer_dir),
                   "--cuda_name", cuda_name, # DL-specific
-                  "--y_col_name", y_col_name
+                  "--y_col_name", y_col_name,
+                  "--calc_infer_scores", "true"
             ]
             result = subprocess.run(infer_run, capture_output=True,
                                     text=True, check=True)
