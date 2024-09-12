@@ -1,6 +1,7 @@
 """ Python implementation of cross-study analysis workflow """
-# cuda_name = "cuda:6"
-cuda_name = "cuda:7"
+model_name = 'graphdrp'  # Note! Change this for your model.
+cuda_name = "cuda:6"
+# cuda_name = "cuda:7"
 
 import os
 import subprocess
@@ -66,7 +67,6 @@ params = cfg.initialize_parameters(
     pathToModelDir=filepath,
     # default_config="csa_params.txt",
     default_config="csa_params.ini",
-    default_model=None,
     additional_cli_section=None,
     additional_definitions=None,
     required=None
@@ -74,7 +74,6 @@ params = cfg.initialize_parameters(
 params = frm.build_paths(params) # TODO move this to improvelib
 
 # Model scripts
-model_name = 'graphdrp'
 preprocess_python_script = f'{model_name}_preprocess_improve.py'
 train_python_script = f'{model_name}_train_improve.py'
 infer_python_script = f'{model_name}_infer_improve.py'
@@ -84,7 +83,7 @@ infer_python_script = f'{model_name}_infer_improve.py'
 y_col_name = params['y_col_name']
 # maindir = Path(f"./{y_col_name}")
 # maindir = Path(f"./0_{y_col_name}_improvelib") # main output dir
-MAIN_CSA_OUTDIR = Path(f"./0_{y_col_name}_improvelib_small") # main output dir
+MAIN_CSA_OUTDIR = Path(f"./run.csa.full") # main output dir
 # Note! ML data and trained model should be saved to the same dir for inference script
 MAIN_ML_DATA_DIR = MAIN_CSA_OUTDIR / 'ml_data' # output_dir_pp, input_dir_train, input_dir_infer
 MAIN_MODEL_DIR = MAIN_CSA_OUTDIR / 'models' # output_dir_train, input_dir_infer
@@ -96,11 +95,13 @@ splits_dir = Path(params['input_dir']) / params['splits_dir']
 
 ### Source and target data sources
 ## Set 1 - full analysis
-# source_datasets = ["CCLE", "CTRPv2", "gCSI", "GDSCv1", "GDSCv2"]
-# target_datasets = ["CCLE", "CTRPv2", "gCSI", "GDSCv1", "GDSCv2"]
+source_datasets = ["CCLE", "CTRPv2", "gCSI", "GDSCv1", "GDSCv2"]
+target_datasets = ["CCLE", "CTRPv2", "gCSI", "GDSCv1", "GDSCv2"]
 ## Set 2 - smaller datasets
 # source_datasets = ["CCLE", "gCSI", "GDSCv1", "GDSCv2"]
 # target_datasets = ["CCLE", "gCSI", "GDSCv1", "GDSCv2"]
+# source_datasets = ["CCLE", "gCSI", "GDSCv2"]
+# target_datasets = ["CCLE", "gCSI", "GDSCv2"]
 # source_datasets = ["CCLE", "GDSCv1"]
 # target_datasets = ["CCLE", "gCSI", "GDSCv1", "GDSCv2"]
 ## Set 3 - full analysis for a single source
@@ -113,16 +114,16 @@ splits_dir = Path(params['input_dir']) / params['splits_dir']
 # source_datasets = ["CCLE"]
 # target_datasets = ["CCLE"]
 ## Set 5 - single source and target
-source_datasets = ["GDSCv1"]
-target_datasets = ["CCLE"]
+# source_datasets = ["GDSCv1"]
+# target_datasets = ["CCLE"]
 
 only_cross_study = False
 # only_cross_study = True
 
 ## Splits
-# split_nums = []  # all splits
+split_nums = []  # all splits
 # split_nums = [0]
-split_nums = [4, 7]
+# split_nums = [4, 7]
 # split_nums = [1, 4, 7]
 # split_nums = [1, 3, 5, 7, 9]
 
@@ -132,7 +133,8 @@ split_nums = [4, 7]
 # epochs = 50
 # epochs = 70
 # epochs = 100
-epochs = 150
+# epochs = 150
+epochs = 200
 
 
 # ===============================================================
