@@ -1,8 +1,4 @@
-import os
-from pathlib import Path
 
-fdir = Path(__file__).resolve().parent
-required = None
 additional_definitions = [
     {"name": "source_datasets",
      "nargs" : "+",
@@ -32,6 +28,11 @@ additional_definitions = [
      "default": 'graphdrp', ## Change the default to LGBM??
      "help": "Name of the deep learning model"
     },
+    {"name": "model_environment",
+     "type": str,
+     "default": '', ## Change the default to LGBM??
+     "help": "Name of your model conda environment"
+    },
     {"name": "hyperparameters_file",
      "type": str,
      "default": 'hyperparameters_default.json',
@@ -41,6 +42,12 @@ additional_definitions = [
      "type": int,
      "default": 10,
      "help": "Number of epochs"
+    },
+    {"name": "available_accelerators",
+     "nargs" : "+",
+     "type": str,
+     "default": ["0", "1"],
+     "help": "GPU IDs to assign jobs"
     },
     {"name": "use_singularity",
      "type": bool,
@@ -52,4 +59,4 @@ additional_definitions = [
      "default": '',
      "help": "Singularity image file of the model"
     }
-]
+    ]
