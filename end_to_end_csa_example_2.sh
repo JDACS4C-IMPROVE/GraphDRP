@@ -21,22 +21,28 @@ fi
 SPLIT=0
 
 # EPOCHS=2
-EPOCHS=150
-CUDA_NAME=cuda:7
+EPOCHS=200
+CUDA_NAME=cuda:6
+
+# This script abs path
+# script_dir="$(dirname "$0")"
+script_dir="$(cd "$(dirname "$0")" && pwd)"
+echo "Script full path directory: $script_dir"
 
 # ----------------------------------------
 # 1. Within-study
 # ---------------
 
-# SOURCE=CCLE
+SOURCE=CCLE
 # SOURCE=gCSI
-SOURCE=GDSCv1
+# SOURCE=GDSCv1
 TARGET=$SOURCE
 
 # Separate dirs
-ML_DATA_DIR=./res_diff_dirs/ml_data/${SOURCE}-${TARGET}/split_${SPLIT}
-MODEL_DIR=./res_diff_dirs/models/${SOURCE}/split_${SPLIT}
-INFER_DIR=./res_diff_dirs/infer/${SOURCE}-${TARGET}/split_${SPLIT}
+gout=${script_dir}/res.end_to_end2
+ML_DATA_DIR=$gout/ml_data/${SOURCE}-${TARGET}/split_${SPLIT}
+MODEL_DIR=$gout/models/${SOURCE}/split_${SPLIT}
+INFER_DIR=$gout/infer/${SOURCE}-${TARGET}/split_${SPLIT}
 
 # Preprocess (improvelib)
 python graphdrp_preprocess_improve.py \
@@ -70,9 +76,10 @@ SOURCE=GDSCv1
 TARGET=CCLE
 
 # Separate dirs
-ML_DATA_DIR=./res_diff_dirs/ml_data/${SOURCE}-${TARGET}/split_${SPLIT}
-MODEL_DIR=./res_diff_dirs/models/${SOURCE}/split_${SPLIT}
-INFER_DIR=./res_diff_dirs/infer/${SOURCE}-${TARGET}/split_${SPLIT}
+gout=${script_dir}/res.end_to_end2
+ML_DATA_DIR=$gout/ml_data/${SOURCE}-${TARGET}/split_${SPLIT}
+MODEL_DIR=$gout/models/${SOURCE}/split_${SPLIT}
+INFER_DIR=$gout/infer/${SOURCE}-${TARGET}/split_${SPLIT}
 
 # Preprocess (improvelib)
 python graphdrp_preprocess_improve.py \
