@@ -51,7 +51,7 @@ filepath = Path(__file__).resolve().parent # [Req]
 
 
 # [Req]
-def run(params: Dict):
+def run(params: Dict) -> Dict:
     """ Run model training.
 
     Args:
@@ -66,7 +66,11 @@ def run(params: Dict):
     # ------------------------------------------------------
     # [Req] Build model path
     # ------------------------------------------------------
-    modelpath = frm.build_model_path(model_file_name=params["model_file_name"], model_file_format=params["model_file_format"], model_dir=params["output_dir"])
+    modelpath = frm.build_model_path(
+        model_file_name=params["model_file_name"],
+        model_file_format=params["model_file_format"],
+        model_dir=params["output_dir"]
+    )
 
     # ------------------------------------------------------
     # [Req] Create data names for train and val sets
@@ -84,19 +88,23 @@ def run(params: Dict):
     print("\nTrain data:")
     print(f"batch_size: {params['batch_size']}")
     sys.stdout.flush()
-    train_loader = build_GraphDRP_dataloader(data_dir=params["input_dir"],
-                                             data_fname=train_data_fname,
-                                             batch_size=params["batch_size"],
-                                             shuffle=True)
+    train_loader = build_GraphDRP_dataloader(
+        data_dir=params["input_dir"],
+        data_fname=train_data_fname,
+        batch_size=params["batch_size"],
+        shuffle=True
+    )
 
     # Don't shuffle the val_loader, otherwise results will be corrupted
     print("\nVal data:")
     print(f"val_batch: {params['val_batch']}")
     sys.stdout.flush()
-    val_loader = build_GraphDRP_dataloader(data_dir=params["input_dir"],
-                                           data_fname=val_data_fname,
-                                           batch_size=params["val_batch"],
-                                           shuffle=False)
+    val_loader = build_GraphDRP_dataloader(
+        data_dir=params["input_dir"],
+        data_fname=val_data_fname,
+        batch_size=params["val_batch"],
+        shuffle=False
+    )
 
     # ------------------------------------------------------
     # CUDA/CPU device
@@ -199,7 +207,8 @@ def run(params: Dict):
         y_pred=val_pred, 
         stage="val",
         y_col_name=params["y_col_name"],
-        output_dir=params["output_dir"]
+        output_dir=params["output_dir"],
+        input_dir=params["input_dir"]
     )
 
     # ------------------------------------------------------
@@ -213,14 +222,14 @@ def run(params: Dict):
         output_dir=params["output_dir"]
     )
 
-    history.to_csv(Path(params["output_dir"])/"history.csv", index=False)
+    history.to_csv(Path(params["output_dir"]) / "history.csv", index=False)
 
     return val_scores
 
 
 # [Req]
-def initialize_parameters():
-    """This initialize_parameters() is define this way to support Supervisor
+def initialize_parameters() -> Dict:
+    """ This initialize_parameters() is define this way to support Supervisor
     workflows such as HPO.
 
     Returns:
