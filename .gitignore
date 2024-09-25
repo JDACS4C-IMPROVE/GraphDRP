@@ -134,5 +134,7 @@ _misc/*data*
 _misc/*res*
 res*
 out*
+run*
 csa_data*
 ml_data/
+deephyper/
