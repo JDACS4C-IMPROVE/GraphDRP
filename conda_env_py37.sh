@@ -2,6 +2,11 @@
 
 set -e
 
+# Execute this on Lambda nodes before you start creating the conda env!
+# source /etc/profile.d/lmod.sh
+# module load cuda/11.8
+# which nvcc
+
 # Manually run these commands before running this sciprt
 # conda create -n GraphDRP_py37 python=3.7 pip --yes
 # conda activate GraphDRP_py37
@@ -22,7 +27,7 @@ conda install -c conda-forge pyarrow=10.0 --yes
 conda install -c pyston psutil --yes
 
 # IMPROVE
-pip install git+https://github.com/ECP-CANDLE/candle_lib@develop # CANDLE
+# pip install git+https://github.com/ECP-CANDLE/candle_lib@develop # CANDLE
 
 # Other
 # conda install -c conda-forge ipdb=0.13.9 --yes
