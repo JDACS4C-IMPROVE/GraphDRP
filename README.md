@@ -2,22 +2,20 @@
 
 This repository demonstrates how to use the [IMPROVE library v0.1.0-alpha](https://jdacs4c-improve.github.io/docs/v0.1.0-alpha/) for building a drug response prediction (DRP) model using GraphDRP, and provides examples with the benchmark [cross-study analysis (CSA) dataset](https://web.cels.anl.gov/projects/IMPROVE_FTP/candle/public/improve/benchmarks/single_drug_drp/benchmark-data-pilot1/csa_data/).
 
-This version, tagged as `v0.1.0-alpha`, introduces a new API which is designed to encourage broader adoption of IMPROVE and its curated models by the research community.
-
-A more detailed tutorial can be found HERE (`TODO!`).
+This version, tagged as `v0.1.0-2024-09-27`, introduces a new API which is designed to encourage broader adoption of IMPROVE and its curated models by the research community.
 
 
 ## Dependencies
 Installation instuctions are detialed below in [Step-by-step instructions](#step-by-step-instructions).
 
-Conda `yml` file [conda_env_lambda_py37.yml](./conda_env_lambda_py37.yml)
+Conda `yml` file [conda_wo_candle.yml](./conda_wo_candle.yml)
 
 ML framework:
 + [Torch](https://pytorch.org/) - deep learning framework for building the prediction model
 + [Pytorch_geometric](https://github.com/rusty1s/pytorch_geometric) - graph neural networks (GNN)
 
 IMPROVE dependencies:
-+ [IMPROVE v0.1.0-alpha](https://jdacs4c-improve.github.io/docs/v0.1.0-alpha/)
++ [IMPROVE tag v0.1.0-2024-09-27](https://github.com/JDACS4C-IMPROVE/IMPROVE/tree/v0.1.0-2024-09-27)
 
 
 
@@ -76,14 +74,14 @@ Note that `./_original_data` contains data files that were used to train and eva
 ```bash
 git clone git@github.com:JDACS4C-IMPROVE/GraphDRP.git
 cd GraphDRP
-git checkout develop
+git checkout v0.1.0-2024-09-27
 ```
 
 
 ### 2. Set computational environment
 Option 1: create conda env using `yml`
 ```bash
-conda env create -f conda_env_lambda_py37.yml
+conda env create -f conda_wo_candle.yml
 ```
 
 Option 2: use [conda_env_py37.sh](./conda_env_py37.sh)
@@ -96,7 +94,7 @@ source setup_improve.sh
 
 This will:
 1. Download cross-study analysis (CSA) benchmark data into `./csa_data/`.
-2. Clone IMPROVE repo (checkout `develop`) outside the GraphDRP model repo
+2. Clone IMPROVE repo (checkout `v0.1.0-2024-09-27`) outside the GraphDRP model repo
 3. Set up `PYTHONPATH` (adds IMPROVE repo).
 
 

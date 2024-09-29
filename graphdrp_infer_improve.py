@@ -38,7 +38,7 @@ filepath = Path(__file__).resolve().parent # [Req]
 
 
 # [Req]
-def run(params):
+def run(params: Dict) -> bool:
     """ Run model inference.
 
     Args:
@@ -53,7 +53,7 @@ def run(params):
     # ------------------------------------------------------
     # [Req] Create data names for test set
     # ------------------------------------------------------
-    test_data_fname = frm.build_ml_data_file_name(data_format=params["data_format"], stage="test")
+    test_data_fname = frm.build_ml_data_file_name(data_format=params["data_format"], stage="test") # [Req]
 
     # GraphDRP -- remove data_format
     test_data_fname = test_data_fname.split(params["data_format"])[0]
@@ -63,10 +63,12 @@ def run(params):
     # ------------------------------------------------------
     print("\nTest data:")
     print(f"Infer_batch: {params['infer_batch']}")
-    test_loader = build_GraphDRP_dataloader(data_dir=params["input_data_dir"],
-                                            data_fname=test_data_fname,
-                                            batch_size=params["infer_batch"],
-                                            shuffle=False)
+    test_loader = build_GraphDRP_dataloader(
+        data_dir=params["input_data_dir"],
+        data_fname=test_data_fname,
+        batch_size=params["infer_batch"],
+        shuffle=False
+    )
 
     # ------------------------------------------------------
     # CUDA/CPU device
@@ -79,7 +81,11 @@ def run(params):
     # Load best model and compute predictions
     # ------------------------------------------------------
     # Load the best saved model (as determined based on val data)
-    modelpath = frm.build_model_path(model_file_name=params["model_file_name"], model_file_format=params["model_file_format"], model_dir=params["input_model_dir"]) # [Req]
+    modelpath = frm.build_model_path(
+        model_file_name=params["model_file_name"],
+        model_file_format=params["model_file_format"],
+        model_dir=params["input_model_dir"]
+    ) # [Req]
     model = load_GraphDRP(params, modelpath, device)
     model.eval()
 
@@ -94,7 +100,8 @@ def run(params):
         y_pred=test_pred, 
         stage="test",
         y_col_name=params["y_col_name"],
-        output_dir=params["output_dir"]
+        output_dir=params["output_dir"],
+        input_dir=params["input_data_dir"]
     )
 
     # ------------------------------------------------------

@@ -22,18 +22,19 @@ fi
 # # Env var IMPROVE_DATA_DIR
 # export IMPROVE_DATA_DIR="./$data_dir/"
 
-# Clone IMPROVE lib (if needed)
+# Clone IMPROVE lib (if needed) and checkout the branch/tag
 cd ../
 improve_lib_path=$PWD/IMPROVE
-# improve_branch="framework-api"
-improve_branch="develop"
+# improve_branch="develop"
+improve_branch="v0.1.0-2024-09-27"
 if [ -d $improve_lib_path ]; then
-  echo "IMPROVE repo exists in ${improve_lib_path}"
+    echo "IMPROVE repo exists in ${improve_lib_path}"
 else
-    # git clone https://github.com/JDACS4C-IMPROVE/IMPROVE
-    git clone -b $improve_branch https://github.com/JDACS4C-IMPROVE/IMPROVE
+    git clone https://github.com/JDACS4C-IMPROVE/IMPROVE
 fi
-cd $model_name
+cd IMPROVE
+git checkout -f $improve_branch 
+cd ../$model_name
 
 # Env var PYTHOPATH
 export PYTHONPATH=$PYTHONPATH:$improve_lib_path

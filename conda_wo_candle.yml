@@ -202,4 +202,3 @@ dependencies:
   - zipp=3.11.0=py37h06a4308_0
   - zlib=1.2.13=h4ab18f5_6
   - zstd=1.5.2=ha4553b6_0
-prefix: /homes/apartin/miniconda3/envs/graphdrp_py37_improve
