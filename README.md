@@ -1,12 +1,13 @@
 # GraphDRP
 
-This repository demonstrates how to use the [IMPROVE library v0.1.0-alpha](https://jdacs4c-improve.github.io/docs/v0.1.0-alpha/) for building a drug response prediction (DRP) model using GraphDRP, and provides examples with the benchmark [cross-study analysis (CSA) dataset](https://web.cels.anl.gov/projects/IMPROVE_FTP/candle/public/improve/benchmarks/single_drug_drp/benchmark-data-pilot1/csa_data/).
+This repository demonstrates how to use the [IMPROVE library v0.1.0](https://jdacs4c-improve.github.io/docs/v0.1.0-alpha/) for building a drug response prediction (DRP) model using GraphDRP, and provides examples with the benchmark [cross-study analysis (CSA) dataset](https://web.cels.anl.gov/projects/IMPROVE_FTP/candle/public/improve/benchmarks/single_drug_drp/benchmark-data-pilot1/csa_data/).
 
 This version, tagged as `v0.1.0-2024-09-27`, introduces a new API which is designed to encourage broader adoption of IMPROVE and its curated models by the research community.
 
 
+
 ## Dependencies
-Installation instuctions are detialed below in [Step-by-step instructions](#step-by-step-instructions).
+Installation instructions are detialed below in [Step-by-step instructions](#step-by-step-instructions).
 
 Conda `yml` file [conda_wo_candle.yml](./conda_wo_candle.yml)
 
@@ -70,7 +71,7 @@ Note that `./_original_data` contains data files that were used to train and eva
 
 # Step-by-step instructions
 
-### 1. Clone the model repository
+### 1. Clone the model repository and checkout the branch (or tag)
 ```bash
 git clone git@github.com:JDACS4C-IMPROVE/GraphDRP.git
 cd GraphDRP
@@ -94,7 +95,7 @@ source setup_improve.sh
 
 This will:
 1. Download cross-study analysis (CSA) benchmark data into `./csa_data/`.
-2. Clone IMPROVE repo (checkout `v0.1.0-2024-09-27`) outside the GraphDRP model repo
+2. Clone IMPROVE repo (and checkout `v0.1.0-2024-09-27`) outside the GraphDRP model repo
 3. Set up `PYTHONPATH` (adds IMPROVE repo).
 
 
