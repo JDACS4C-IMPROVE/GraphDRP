@@ -49,6 +49,16 @@ from model_utils.torch_utils import (
 
 filepath = Path(__file__).resolve().parent # [Req]
 
+# Set the random seed
+seed = 42
+import random
+random.seed(seed)
+np.random.seed(seed)
+torch.manual_seed(seed)
+if torch.cuda.is_available():
+    torch.cuda.manual_seed_all(seed)
+# torch_geometric.seed(seed) # TODO doesn't work
+
 
 # [Req]
 def run(params: Dict) -> Dict:
