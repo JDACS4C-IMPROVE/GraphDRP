@@ -10,15 +10,23 @@ from sklearn.preprocessing import (
 
 def gene_selection(df: pd.DataFrame,
                    genes_fpath: Union[Path, str],
-                   canc_col_name: str):
+                   canc_col_name: str) -> pd.DataFrame:
     """ Takes a dataframe omics data (e.g., gene expression) and retains only
     the genes specified in genes_fpath.
+
+    Args:
+        df (pd.Dataframe): gene expression df
+        genes_fpath (Path, str): path to file containing gene names to keep
+        canc_col_name (str): col name that contains sample id
+
+    Returns:
+        pd.Dataframe: dataframe containing only the selected genes
     """
     with open(genes_fpath) as f:
         genes = [str(line.rstrip()) for line in f]
     # genes = ["ge_" + str(g) for g in genes]  # This is for our legacy data
     # print("Genes count: {}".format(len(set(genes).intersection(set(df.columns[1:])))))
-    genes = list(set(genes).intersection(set(df.columns[1:])))
+    genes = sorted(list(set(genes).intersection(set(df.columns[1:]))))
     # genes = drp.common_elements(genes, df.columns[1:])
     cols = [canc_col_name] + genes
     return df[cols]
@@ -84,7 +92,7 @@ def scale_df(df: pd.DataFrame,
     return df, scaler
 
 
-def extract_subset_fea(df, fea_list: List, fea_sep: str='_'):
+def extract_subset_fea(df, fea_list: List, fea_sep: str='_') -> pd.DataFrame:
     """ Extract features based feature prefix name. """
     fea = [c for c in df.columns if (c.split(fea_sep)[0]) in fea_list]
     return df[fea]
