@@ -89,7 +89,7 @@ def run(params: Dict):
     # ------------------------------------------------------
     # Gene selection (based on LINCS landmark genes)
     if params["use_lincs"]:
-        genes_fpath = filepath/"model_utils/landmark_genes.txt"
+        genes_fpath = filepath / "model_utils/landmark_genes.txt"
         ge = gene_selection(ge, genes_fpath, canc_col_name=params["canc_col_name"])
 
     # Prefix gene column names with "ge."
@@ -173,7 +173,11 @@ def run(params: Dict):
         rsp_cut = rsp[[params["drug_col_name"], params["canc_col_name"], params["y_col_name"]]].copy()
         # Further prepare data (model-specific)
         xd, xc, y = compose_data_arrays(
-            rsp_cut, smi, ge_sc, params["drug_col_name"], params["canc_col_name"]
+            df_response=rsp_cut,
+            df_drug=smi,
+            df_cell=ge_sc,
+            drug_col_name=params["drug_col_name"],
+            canc_col_name=params["canc_col_name"]
         )
         print(stage.upper(), "data --> xd ", xd.shape, "xc ", xc.shape, "y ", y.shape)
 
@@ -223,6 +227,7 @@ def main(args):
     )
     ml_data_outdir = run(params)
     print("\nFinished data preprocessing.")
+
 
 # [Req]
 if __name__ == "__main__":
