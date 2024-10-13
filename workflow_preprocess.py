@@ -62,18 +62,14 @@ logger = logging.getLogger(f'Start workflow')
 
 @python_app  
 def preprocess(inputs=[]): # 
-    """ parsl implementation (as python_app) of the preprocessing script. """
     import warnings
     import subprocess
-    from improvelib.utils import Timer
-    from improvelib.utils import save_subprocess_stdout
-
+    import improvelib.utils as frm
     def build_split_fname(source_data_name, split, phase):
         """ Build split file name. If file does not exist continue """
-        if split == 'all':
+        if split=='all':
             return f"{source_data_name}_{split}.txt"
         return f"{source_data_name}_split_{split}_{phase}.txt"
-
     params=inputs[0]
     source_data_name=inputs[1]
     split=inputs[2]
@@ -100,16 +96,17 @@ def preprocess(inputs=[]): #
             continue
 
     for target_data_name in params['target_datasets']:
+        ml_data_dir = params['ml_data_dir']/f"{source_data_name}-{target_data_name}"/ \
+                f"split_{split}"
+        if ml_data_dir.exists() is True:
+            continue
         if params['only_cross_study'] and (source_data_name == target_data_name):
             continue # only cross-study
         print(f"\nSource data: {source_data_name}")
         print(f"Target data: {target_data_name}")
 
-        ml_data_dir = params['ml_data_dir']/f"{source_data_name}-{target_data_name}"/ \
-                f"split_{split}"
-        if ml_data_dir.exists() is True:
-            continue
-
+        params['ml_data_outdir'] = params['ml_data_dir']/f"{source_data_name}-{target_data_name}"/f"split_{split}"
+        frm.create_outdir(outdir=params["ml_data_outdir"])
         if source_data_name == target_data_name:
             # If source and target are the same, then infer on the test split
             test_split_file = f"{source_data_name}_split_{split}_test.txt"
@@ -124,9 +121,7 @@ def preprocess(inputs=[]): #
         print(f"train_split_file: {train_split_file}")
         print(f"val_split_file:   {val_split_file}")
         print(f"test_split_file:  {test_split_file}")
-        print(f"ml_data_dir:      {ml_data_dir}")
-
-        timer_preprocess = Timer()
+        print(f"ml_data_outdir:   {params['ml_data_outdir']}")
         if params['use_singularity']:
             preprocess_run = ["singularity", "exec", "--nv",
                 params['singularity_image'], "preprocess.sh",
@@ -137,6 +132,8 @@ def preprocess(inputs=[]): #
                 str("--output_dir " + str(ml_data_dir)),
                 str("--y_col_name " + str(params['y_col_name']))
             ]
+            result = subprocess.run(preprocess_run, capture_output=True,
+                                    text=True, check=True)
         else:
             preprocess_run = ["bash", "execute_in_conda.sh",params['model_environment'], 
                 params['preprocess_python_script'],
@@ -147,22 +144,9 @@ def preprocess(inputs=[]): #
                 "--output_dir", str(ml_data_dir),
                 "--y_col_name", str(params['y_col_name'])
             ]
-        # result = subprocess.run(preprocess_run, capture_output=True,
-        #                         text=True, check=True)
-        result = subprocess.run(preprocess_run,
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.STDOUT,
-                                universal_newlines=True)
-        print(f"returncode = {result.returncode}")
-        save_subprocess_stdout(result, log_dir=ml_data_dir)
-
-        tt = timer_preprocess.display_timer()
-        extra_dict = {"source_data": source_data_name,
-                      "target_data": target_data_name,
-                      "split": split}
-        timer_preprocess.save_timer(ml_data_dir, extra_dict=extra_dict)
-
-    return {'source_data_name': source_data_name, 'split': split}
+            result = subprocess.run(preprocess_run, capture_output=True,
+                                    text=True, check=True)
+    return {'source_data_name':source_data_name, 'split':split}
 
 
 ###############################
@@ -173,6 +157,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 fdir = Path(__file__).resolve().parent
 y_col_name = params['y_col_name']
 logger = logging.getLogger(f"{params['model_name']}")
+params = frm.build_paths(params)  # paths to raw data
 
 #Output directories for preprocess, train and infer
 params['ml_data_dir'] = Path(params['output_dir']) / 'ml_data' 
@@ -188,7 +173,7 @@ params['preprocess_python_script'] = f"{params['model_name']}_preprocess_improve
 preprocess_futures=[]
 for source_data_name in params['source_datasets']:
     for split in params['split']:
-        preprocess_futures.append(preprocess(inputs=[params, source_data_name, split])) 
+            preprocess_futures.append(preprocess(inputs=[params, source_data_name, split])) 
 
 for future_p in preprocess_futures:
     print(future_p.result())

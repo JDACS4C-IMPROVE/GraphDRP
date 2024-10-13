@@ -63,11 +63,10 @@ logger = logging.getLogger(f'Start workflow')
 
 @python_app 
 def train(params, hp_model, source_data_name, split): 
-    """ parsl implementation (as python_app) of the train script. """
     import subprocess
-    from improvelib.utils import Timer
-    from improvelib.utils import save_subprocess_stdout
-
+    import json
+    import time
+    from pathlib import Path
     hp = hp_model[source_data_name]
     if hp.__len__()==0:
         raise Exception(str('Hyperparameters are not defined for ' + source_data_name))
@@ -75,12 +74,11 @@ def train(params, hp_model, source_data_name, split):
     model_dir = params['model_outdir'] / f"{source_data_name}" / f"split_{split}"
     ml_data_dir = params['ml_data_dir']/f"{source_data_name}-{params['target_datasets'][0]}"/ \
                 f"split_{split}"
-
     if model_dir.exists() is False:
         print("\nTrain")
         print(f"ml_data_dir: {ml_data_dir}")
         print(f"model_dir:   {model_dir}")
-        timer_train = Timer()
+        start = time.time()
         if params['use_singularity']:
             train_run = ["singularity", "exec", "--nv",
                 params['singularity_image'], "train.sh",
@@ -91,6 +89,8 @@ def train(params, hp_model, source_data_name, split):
                 str("--learning_rate " + str(hp['learning_rate'])),
                 str("--batch_size " + str(hp['batch_size']))
             ]
+            # result = subprocess.run(train_run, capture_output=True,
+            #                         text=True, check=True)
         else:
             train_run = ["bash", "execute_in_conda.sh",params['model_environment'], 
                         params['train_python_script'],
@@ -101,34 +101,43 @@ def train(params, hp_model, source_data_name, split):
                         "--learning_rate", str(hp['learning_rate']),
                         "--batch_size", str(hp['batch_size'])
             ]
-        # result = subprocess.run(train_run, capture_output=True,
-        #                         text=True, check=True)
+            # result = subprocess.run(train_run, capture_output=True,
+            #                         text=True, check=True)
+
+        # exp C -------
         result = subprocess.run(train_run,
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.STDOUT,
                                 universal_newlines=True)
         print(f"returncode = {result.returncode}")
-        save_subprocess_stdout(result, log_dir=model_dir)
+        result_file_name_stdout = model_dir / 'logs.txt'
+        with open(result_file_name_stdout, 'w') as file:
+            file.write(result.stdout)
+        # exp C -------
 
-        tt = timer_train.display_timer()
-        extra_dict = {"source_data": source_data_name, "split": split}
-        timer_train.save_timer(model_dir, extra_dict=extra_dict)
+        # exp B -------
+        time_diff = time.time() - start
+        hours = int(time_diff // 3600)
+        minutes = int((time_diff % 3600) // 60)
+        seconds = time_diff % 60
+        time_diff_dict = {'hours': hours,
+                          'minutes': minutes,
+                          'seconds': seconds}
+        dir_to_save = model_dir
+        filename = 'runtime.json'
+        with open(Path(dir_to_save) / filename, 'w') as json_file:
+            json.dump(time_diff_dict, json_file, indent=4)
+        # exp B -------
 
-    return {'source_data_name': source_data_name, 'split': split}
+    return {'source_data_name':source_data_name, 'split':split}
 
 @python_app  
 def infer(params, source_data_name, target_data_name, split): # 
-    """ parsl implementation (as python_app) of the infer script. """
     import subprocess
-    from improvelib.utils import Timer
-    from improvelib.utils import save_subprocess_stdout
-
     model_dir = params['model_outdir'] / f"{source_data_name}" / f"split_{split}"
     ml_data_dir = params['ml_data_dir']/f"{source_data_name}-{target_data_name}"/ \
                 f"split_{split}"
     infer_dir = params['infer_dir']/f"{source_data_name}-{target_data_name}"/f"split_{split}"
-
-    timer_infer = Timer()
     if params['use_singularity']:
         infer_run = ["singularity", "exec", "--nv",
                 params['singularity_image'], "infer.sh",
@@ -138,6 +147,8 @@ def infer(params, source_data_name, target_data_name, split): #
                 str("--calc_infer_scores "+ "true"),
                 str("--y_col_name " + str(params['y_col_name']))
         ]
+        result = subprocess.run(infer_run, capture_output=True,
+                                    text=True, check=True)
     else:
         print("\nInfer")
         infer_run = ["bash", "execute_in_conda.sh",params['model_environment'], 
@@ -148,21 +159,8 @@ def infer(params, source_data_name, target_data_name, split): #
                 "--calc_infer_scores", "true",
                 "--y_col_name", str(params['y_col_name'])
             ]
-    # result = subprocess.run(infer_run, capture_output=True,
-    #                         text=True, check=True)
-    result = subprocess.run(infer_run,
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.STDOUT,
-                            universal_newlines=True)
-    print(f"returncode = {result.returncode}")
-    save_subprocess_stdout(result, log_dir=infer_dir)
-
-    tt = timer_infer.display_timer()
-    extra_dict = {"source_data": source_data_name,
-                  "target_data": target_data_name,
-                  "split": split}
-    timer_infer.save_timer(infer_dir, extra_dict=extra_dict)
-
+        result = subprocess.run(infer_run, capture_output=True,
+                                text=True, check=True)
     return True
 
 ###############################
