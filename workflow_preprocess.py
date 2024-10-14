@@ -65,6 +65,7 @@ def preprocess(inputs=[]):
     import subprocess
     import time
     import warnings
+    from pathlib import Path
 
     def build_split_fname(source_data_name, split, phase):
         """ Build split file name. If file does not exist continue """
