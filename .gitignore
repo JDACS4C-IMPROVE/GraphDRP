@@ -137,4 +137,7 @@ out*
 run*
 csa_data*
 ml_data/
+param_log_file.txt
 deephyper/
+postproc*
+
