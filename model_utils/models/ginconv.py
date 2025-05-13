@@ -16,9 +16,15 @@ class GINConvNet(torch.nn.Module):
         embed_dim=128,
         output_dim=128,
         dropout=0.2,
-        num_genes=942
+        num_genes=942,
+        in_dim=None
     ):
-
+        """
+        If loading a previously saved model, `in_dim` should be provided as an
+        input argument. This avoids the need to run a dummy forward pass inside
+        __init__ method to infer `in_dim`, ensuring consistency with the original
+        model architecture.
+        """
         super(GINConvNet, self).__init__()
 
         self.output_dim = output_dim  # ap
@@ -72,23 +78,28 @@ class GINConvNet(torch.nn.Module):
         # (ap) Determine in_dim (Option 2: determine dynamically)
         # Compute in_dim dynamically using a dummy forward pass
         # breakpoint()
-        with torch.no_grad():
-            dummy_target = torch.zeros(1, 1, num_genes)
-            dummy_target = dummy_target.to(next(self.parameters()).device)  # Move to correct device
+        if in_dim is not None:
+            # In the case when the model was previously created and saved, we
+            # don't need run the dummy forward pass to determine in_dim.
+            self.in_dim = in_dim
+        else:
+            with torch.no_grad():
+                dummy_target = torch.zeros(1, 1, num_genes)
+                dummy_target = dummy_target.to(next(self.parameters()).device) # Move to correct device
 
-            conv_xt = self.conv_xt_1(dummy_target)
-            conv_xt = F.relu(conv_xt)
-            conv_xt = self.pool_xt_1(conv_xt)
+                conv_xt = self.conv_xt_1(dummy_target)
+                conv_xt = F.relu(conv_xt)
+                conv_xt = self.pool_xt_1(conv_xt)
 
-            conv_xt = self.conv_xt_2(conv_xt)
-            conv_xt = F.relu(conv_xt)
-            conv_xt = self.pool_xt_2(conv_xt)
+                conv_xt = self.conv_xt_2(conv_xt)
+                conv_xt = F.relu(conv_xt)
+                conv_xt = self.pool_xt_2(conv_xt)
 
-            conv_xt = self.conv_xt_3(conv_xt)
-            conv_xt = F.relu(conv_xt)
-            conv_xt = self.pool_xt_3(conv_xt)
+                conv_xt = self.conv_xt_3(conv_xt)
+                conv_xt = F.relu(conv_xt)
+                conv_xt = self.pool_xt_3(conv_xt)
 
-            self.in_dim = conv_xt.shape[1] * conv_xt.shape[2] # Dynamically determined
+                self.in_dim = conv_xt.shape[1] * conv_xt.shape[2] # Dynamically determined
 
         self.fc1_xt = nn.Linear(self.in_dim, output_dim)
         # self.fc1_xt = nn.Linear(3968, output_dim)

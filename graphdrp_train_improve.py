@@ -183,7 +183,11 @@ def run(params: Dict) -> Dict:
         print(f"{early_stop_metric}, {val_scores[early_stop_metric]}")
         sys.stdout.flush()
         if val_scores[early_stop_metric] < best_score:
-            torch.save(model.state_dict(), modelpath)
+            # torch.save(model.state_dict(), modelpath)
+            torch.save({
+                'model_state_dict': model.state_dict(),
+                'in_dim': model.in_dim # Assuming in_dim is stored as attribute
+            }, modelpath)
             best_epoch = epoch + 1
             best_score = val_scores[early_stop_metric]
             print(f"{early_stop_metric} improved at epoch {best_epoch};  "\

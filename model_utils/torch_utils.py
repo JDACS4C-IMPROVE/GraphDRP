@@ -249,9 +249,14 @@ def load_GraphDRP(params, modelpath, device):
     model_class = MODEL_REGISTRY.get(params["model_arch"])
     if model_class is None:
         raise ValueError(f"Unknown model: {params['model_arch']}")
-    model = model_class().to(device)
+    # model = model_class().to(device)
+    # model.load_state_dict(torch.load(modelpath))
 
-    model.load_state_dict(torch.load(modelpath))
+    checkpoint = torch.load(modelpath)
+    in_dim = checkpoint.get('in_dim', None)
+    model = model_class(in_dim=in_dim).to(device)  # Pass in_dim explicitly
+    model.load_state_dict(checkpoint['model_state_dict'])
+
     model.eval()
     return model
 
