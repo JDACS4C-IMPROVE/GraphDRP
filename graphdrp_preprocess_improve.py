@@ -33,8 +33,6 @@ from improvelib.applications.drug_response_prediction.config import DRPPreproces
 from improvelib.utils import str2bool
 import improvelib.utils as frm
 # Application-specific (DRP) imports
-import improvelib.applications.drug_response_prediction.drug_utils as drugs_utils
-import improvelib.applications.drug_response_prediction.omics_utils as omics_utils
 import improvelib.applications.drug_response_prediction.drp_utils as drp
 
 # Model-specific imports
@@ -58,8 +56,6 @@ def run(params: Dict):
         str: directory name that was used to save the preprocessed (generated)
             ML data files.
     """
-    # breakpoint()
-    # from pprint import pprint; pprint(params);
 
     # ------------------------------------------------------
     # [Req] Load X data (feature representations)
@@ -77,12 +73,15 @@ def run(params: Dict):
     # data, then the model must use the provided data loaders to load the data files
     # from the x_data dir.
     print("\nLoads omics data.")
-    omics_obj = omics_utils.OmicsLoader(params)
-    ge = omics_obj.dfs['cancer_gene_expression.tsv'] # return gene expression
+    ge = drp.get_x_data(file = params['cell_transcriptomic_file'], 
+                                        benchmark_dir = params['input_dir'], 
+                                        column_name = params['canc_col_name'])
+    ge.reset_index()
 
     print("\nLoad drugs data.")
-    drugs_obj = drugs_utils.DrugsLoader(params)
-    smi = drugs_obj.dfs['drug_SMILES.tsv']  # return SMILES data
+    smi = drp.get_x_data(file = params['drug_smiles_file'], 
+                    benchmark_dir = params['input_dir'], 
+                    column_name = params['drug_col_name'])
 
     # ------------------------------------------------------
     # Further preprocess X data
@@ -114,12 +113,12 @@ def run(params: Dict):
     # ------------------------------------------------------
     # Load and combine responses
     print("Create feature scaler.")
-    rsp_tr = drp.DrugResponseLoader(params,
-                                    split_file=params["train_split_file"],
-                                    verbose=False).dfs["response.tsv"]
-    rsp_vl = drp.DrugResponseLoader(params,
-                                    split_file=params["val_split_file"],
-                                    verbose=False).dfs["response.tsv"]
+    rsp_tr = drp.get_response_data(split_file=params["train_split_file"], 
+                                    benchmark_dir=params['input_dir'], 
+                                    response_file=params['y_data_file'])
+    rsp_vl = drp.get_response_data(split_file=params["val_split_file"], 
+                                    benchmark_dir=params['input_dir'], 
+                                    response_file=params['y_data_file'])
     rsp = pd.concat([rsp_tr, rsp_vl], axis=0)
 
     # Retian feature rows that are present in the y data (response dataframe)
@@ -154,9 +153,9 @@ def run(params: Dict):
         # --------------------------------
         # [Req] Load response data
         # --------------------------------
-        rsp = drp.DrugResponseLoader(params,
-                                     split_file=split_file,
-                                     verbose=False).dfs["response.tsv"]
+        rsp = drp.get_response_data(split_file=split_file, 
+                                    benchmark_dir=params['input_dir'], 
+                                    response_file=params['y_data_file'])
 
         # --------------------------------
         # Data prep
@@ -223,15 +222,15 @@ def run(params: Dict):
 
 # [Req]
 def main(args):
-    # [Req]
-    additional_definitions = preprocess_params
     cfg = DRPPreprocessConfig()
-    params = cfg.initialize_parameters(
-        pathToModelDir=filepath,
-        default_config="graphdrp_params.txt",
-        additional_definitions=additional_definitions
-    )
+    params = cfg.initialize_parameters(pathToModelDir=filepath,
+                                       default_config="graphdrp_params.ini",
+                                       additional_definitions=preprocess_params)
+    timer_preprocess = frm.Timer()
     ml_data_outdir = run(params)
+    timer_preprocess.save_timer(dir_to_save=params["output_dir"], 
+                                filename='runtime_preprocess.json', 
+                                extra_dict={"stage": "preprocess"})
     print("\nFinished data preprocessing.")
 
 
