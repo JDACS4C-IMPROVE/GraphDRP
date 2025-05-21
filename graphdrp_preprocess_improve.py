@@ -22,15 +22,12 @@ All the outputs from this preprocessing script are saved in params["output_dir"]
 import sys
 from pathlib import Path
 from typing import Dict
-
-import numpy as np
 import pandas as pd
 import joblib
 
 # [Req] IMPROVE imports
 # Core improvelib imports
 from improvelib.applications.drug_response_prediction.config import DRPPreprocessConfig
-from improvelib.utils import str2bool
 import improvelib.utils as frm
 # Application-specific (DRP) imports
 import improvelib.applications.drug_response_prediction.drp_utils as drp
@@ -56,6 +53,14 @@ def run(params: Dict):
         str: directory name that was used to save the preprocessed (generated)
             ML data files.
     """
+    # ------------------------------------------------------
+    # [Req] Validity check of feature representations
+    # ------------------------------------------------------
+    ## need to add
+
+    # ------------------------------------------------------
+    # [Req] Determine preprocessing on training data
+    # ------------------------------------------------------
 
     # ------------------------------------------------------
     # [Req] Load X data (feature representations)
@@ -76,65 +81,34 @@ def run(params: Dict):
     ge = drp.get_x_data(file = params['cell_transcriptomic_file'], 
                                         benchmark_dir = params['input_dir'], 
                                         column_name = params['canc_col_name'])
-    ge.reset_index()
+    #ge.reset_index()
 
     print("\nLoad drugs data.")
     smi = drp.get_x_data(file = params['drug_smiles_file'], 
                     benchmark_dir = params['input_dir'], 
                     column_name = params['drug_col_name'])
+    
+    print("Load train response data.")
+    response_train = drp.get_response_data(split_file=params["train_split_file"], 
+                                   benchmark_dir=params['input_dir'], 
+                                   response_file=params['y_data_file'])
 
-    # ------------------------------------------------------
-    # Further preprocess X data
-    # ------------------------------------------------------
-    # Gene selection (based on LINCS landmark genes)
-    if params["use_lincs"]:
-        genes_fpath = filepath / "model_utils/landmark_genes.txt"
-        ge = gene_selection(ge, genes_fpath, canc_col_name=params["canc_col_name"])
+    print("Find intersection of training data.")
+    response_train = drp.get_response_with_features(response_train, ge, params['canc_col_name'])
+    response_train = drp.get_response_with_features(response_train, smi, params['drug_col_name'])
+    ge_train = drp.get_features_in_response(ge, response_train, params['canc_col_name'])
 
-    # Prefix gene column names with "ge."
-    fea_sep = "."
-    fea_prefix = "ge"
-    ge = ge.rename(columns={fea: f"{fea_prefix}{fea_sep}{fea}" for fea in ge.columns[1:]})
+    print("Determine transformations.")
+    drp.determine_transform(ge_train, 'ge_transform', params['cell_transcriptomic_transform'], params['output_dir'])
+
+
+
 
     # Prep molecular graph data for GraphDRP
-    smi = smi.reset_index()
-    # smi.columns = [params["drug_col_name"], "SMILES"]
-    if 'SMILES' in smi.columns:
-        smi = smi[[smi.columns[0], "SMILES"]]
-        smi.columns = [params["drug_col_name"], 'SMILES']
-    else:
-        smi = smi.iloc[:, :2]
-        smi.columns = [params["drug_col_name"], 'SMILES']
-    drug_smiles = smi["SMILES"].values  # list of smiles
-    smiles_graphs = build_graph_dict_from_smiles_collection(drug_smiles)
+    #smi = smi.reset_index()
 
-    # ------------------------------------------------------
-    # Create feature scaler
-    # ------------------------------------------------------
-    # Load and combine responses
-    print("Create feature scaler.")
-    rsp_tr = drp.get_response_data(split_file=params["train_split_file"], 
-                                    benchmark_dir=params['input_dir'], 
-                                    response_file=params['y_data_file'])
-    rsp_vl = drp.get_response_data(split_file=params["val_split_file"], 
-                                    benchmark_dir=params['input_dir'], 
-                                    response_file=params['y_data_file'])
-    rsp = pd.concat([rsp_tr, rsp_vl], axis=0)
 
-    # Retian feature rows that are present in the y data (response dataframe)
-    # Intersection of omics features, drug features, and responses
-    rsp = rsp.merge( ge[params["canc_col_name"]], on=params["canc_col_name"], how="inner")
-    rsp = rsp.merge(smi[params["drug_col_name"]], on=params["drug_col_name"], how="inner")
-    ge_sub = ge[ge[params["canc_col_name"]].isin(rsp[params["canc_col_name"]])].reset_index(drop=True)
-    # TODO consider computing smi_sub
 
-    # Scale gene expression
-    _, ge_scaler = scale_df(ge_sub, scaler_name=params["scaling"])
-    ge_scaler_fpath = Path(params["output_dir"]) / params["ge_scaler_fname"]
-    joblib.dump(ge_scaler, ge_scaler_fpath)
-    print("Scaler object for gene expression: ", ge_scaler_fpath)
-
-    del rsp, rsp_tr, rsp_vl, ge_sub
 
     # ------------------------------------------------------
     # [Req] Construct ML data for every stage (train, val, test)
@@ -149,38 +123,38 @@ def run(params: Dict):
               "test": params["test_split_file"]}
 
     for stage, split_file in stages.items():
+        print(f"Prepare data for stage {stage}.")
+        print(f"Find intersection of {stage} data.")
+        response_stage = drp.get_response_data(split_file=split_file, 
+                                benchmark_dir=params['input_dir'], 
+                                response_file=params['y_data_file'])
+        response_stage = drp.get_response_with_features(response_stage, ge, params['canc_col_name'])
+        response_stage = drp.get_response_with_features(response_stage, md, params['drug_col_name'])
+        ge_stage = drp.get_features_in_response(ge, response_stage, params['canc_col_name'])
+        smi_stage = drp.get_features_in_response(smi, response_stage, params['drug_col_name'])
 
-        # --------------------------------
-        # [Req] Load response data
-        # --------------------------------
-        rsp = drp.get_response_data(split_file=split_file, 
-                                    benchmark_dir=params['input_dir'], 
-                                    response_file=params['y_data_file'])
+        print(f"Transform {stage} data.")
+        ge_stage = drp.transform_data(ge_stage, 'ge_transform', params['output_dir'])
+        # Prefix gene column names with "ge."
+        fea_sep = "."
+        fea_prefix = "ge"
+        ge_stage = ge_stage.rename(columns={fea: f"{fea_prefix}{fea_sep}{fea}" for fea in ge_stage.columns[1:]})
 
-        # --------------------------------
-        # Data prep
-        # --------------------------------
-        # Retain (canc, drug) responses for which both omics and drug features
-        # are available.
-        rsp = rsp.merge( ge[params["canc_col_name"]], on=params["canc_col_name"], how="inner")
-        rsp = rsp.merge(smi[params["drug_col_name"]], on=params["drug_col_name"], how="inner")
-        ge_sub = ge[ge[params["canc_col_name"]].isin(rsp[params["canc_col_name"]])].reset_index(drop=True)
-        smi_sub = smi[smi[params["drug_col_name"]].isin(rsp[params["drug_col_name"]])].reset_index(drop=True)
-        # print(rsp[[params["canc_col_name"], params["drug_col_name"]]].nunique())
+        if 'SMILES' in smi_stage.columns:
+            smi_stage = smi_stage[['SMILES']]
+        else:
+            smi_stage.columns = ['SMILES']
+        smiles_graphs = build_graph_dict_from_smiles_collection(smi_stage['SMILES'].values)
 
-        # Scale features
-        ge_sc, _ = scale_df(ge_sub, scaler=ge_scaler) # scale gene expression
-        # print("GE mean:", ge_sc.iloc[:,1:].mean(axis=0).mean())
-        # print("GE var: ", ge_sc.iloc[:,1:].var(axis=0).mean())
 
         # Sub-select desired response column (y_col_name)
         # ... and reduce response df to 3 columns: drug_id, cell_id and selected drug_response
-        rsp_cut = rsp[[params["drug_col_name"], params["canc_col_name"], params["y_col_name"]]].copy()
+        rsp_cut = response_stage[[params["drug_col_name"], params["canc_col_name"], params["y_col_name"]]].copy()
         # Further prepare data (model-specific)
         xd, xc, y = compose_data_arrays(
             df_response=rsp_cut,
-            df_drug=smi,
-            df_cell=ge_sc,
+            df_drug=smi_stage,
+            df_cell=ge_stage,
             drug_col_name=params["drug_col_name"],
             canc_col_name=params["canc_col_name"]
         )
@@ -215,7 +189,7 @@ def run(params: Dict):
                        smile_graph=smiles_graphs)
 
         # [Req] Save y dataframe for the current stage
-        frm.save_stage_ydf(ydf=rsp, stage=stage, output_dir=params["output_dir"])
+        frm.save_stage_ydf(ydf=response_stage, stage=stage, output_dir=params["output_dir"])
 
     return params["output_dir"]
 

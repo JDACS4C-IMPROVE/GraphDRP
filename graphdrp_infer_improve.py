@@ -22,7 +22,6 @@ import pandas as pd
 
 # [Req] IMPROVE imports
 from improvelib.applications.drug_response_prediction.config import DRPInferConfig
-from improvelib.utils import str2bool
 import improvelib.utils as frm
 
 # Model-specific imports
@@ -47,8 +46,6 @@ def run(params: Dict) -> bool:
     Returns:
         dict: prediction performance scores computed on test data.
     """
-    # breakpoint()
-    # from pprint import pprint; pprint(params);
 
     # ------------------------------------------------------
     # [Req] Create data names for test set

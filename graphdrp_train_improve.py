@@ -32,9 +32,7 @@ import torch
 
 # [Req] IMPROVE imports
 from improvelib.applications.drug_response_prediction.config import DRPTrainConfig
-from improvelib.utils import str2bool
 import improvelib.utils as frm
-from improvelib.utils import Timer
 from improvelib.metrics import compute_metrics
 
 # Model-specific imports

@@ -34,8 +34,8 @@ def compose_data_arrays(df_response: pd.DataFrame,
     # count_miss_drug = 0
 
     # Convert to indices for rapid lookup (??)
-    df_drug = df_drug.set_index([drug_col_name])
-    df_cell = df_cell.set_index([canc_col_name])
+    ##df_drug = df_drug.set_index([drug_col_name])
+    ##df_cell = df_cell.set_index([canc_col_name])
 
     for i in range(df_response.shape[0]):  # tuples of (drug name, cell id, response)
         if i > 0 and (i%15000 == 0):
