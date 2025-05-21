@@ -36,7 +36,7 @@ import improvelib.applications.drug_response_prediction.drp_utils as drp
 from model_params_def import preprocess_params # [Req]
 from model_utils.torch_utils import TestbedDataset
 from model_utils.utils import gene_selection, scale_df
-from model_utils.rdkit_utils import build_graph_dict_from_smiles_collection
+from model_utils.rdkit_utils import build_graph_dict_from_smiles_collection, check_smiles
 from model_utils.np_utils import compose_data_arrays
 
 filepath = Path(__file__).resolve().parent # [Req]
@@ -56,37 +56,23 @@ def run(params: Dict):
     # ------------------------------------------------------
     # [Req] Validity check of feature representations
     # ------------------------------------------------------
-    ## need to add
-
-    # ------------------------------------------------------
-    # [Req] Determine preprocessing on training data
-    # ------------------------------------------------------
-
-    # ------------------------------------------------------
-    # [Req] Load X data (feature representations)
-    # ------------------------------------------------------
-    # Use the provided data loaders to load data required by the model.
-    #
-    # Benchmark data includes three dirs: x_data, y_data, splits.
-    # The x_data contains files that represent feature information such as
-    # cancer representation (e.g., omics) and drug representation (e.g., SMILES).
-    #
-    # Prediction models utilize various types of feature representations.
-    # Drug response prediction (DRP) models generally use omics and drug features.
-    #
-    # If the model uses omics data types that are provided as part of the benchmark
-    # data, then the model must use the provided data loaders to load the data files
-    # from the x_data dir.
-    print("\nLoads omics data.")
-    ge = drp.get_x_data(file = params['cell_transcriptomic_file'], 
-                                        benchmark_dir = params['input_dir'], 
-                                        column_name = params['canc_col_name'])
-    #ge.reset_index()
-
     print("\nLoad drugs data.")
     smi = drp.get_x_data(file = params['drug_smiles_file'], 
                     benchmark_dir = params['input_dir'], 
                     column_name = params['drug_col_name'])
+    if 'SMILES' in smi_stage.columns:
+        smi_stage = smi_stage[['SMILES']]
+    else:
+        smi_stage.columns = ['SMILES']
+    smi = check_smiles(smi)
+
+    # ------------------------------------------------------
+    # [Req] Determine preprocessing on training data
+    # ------------------------------------------------------
+    print("\nLoads omics data.")
+    ge = drp.get_x_data(file = params['cell_transcriptomic_file'], 
+                                        benchmark_dir = params['input_dir'], 
+                                        column_name = params['canc_col_name'])
     
     print("Load train response data.")
     response_train = drp.get_response_data(split_file=params["train_split_file"], 
@@ -101,22 +87,9 @@ def run(params: Dict):
     print("Determine transformations.")
     drp.determine_transform(ge_train, 'ge_transform', params['cell_transcriptomic_transform'], params['output_dir'])
 
-
-
-
-    # Prep molecular graph data for GraphDRP
-    #smi = smi.reset_index()
-
-
-
-
     # ------------------------------------------------------
     # [Req] Construct ML data for every stage (train, val, test)
     # ------------------------------------------------------
-    # All models must load response data (y data) using DrugResponseLoader().
-    # Below, we iterate over the 3 split files (train, val, test) and load
-    # response data, filtered by the split ids from the split files.
-
     # Dict with split files corresponding to the three sets (train, val, and test)
     stages = {"train": params["train_split_file"],
               "val": params["val_split_file"],
@@ -140,17 +113,10 @@ def run(params: Dict):
         fea_prefix = "ge"
         ge_stage = ge_stage.rename(columns={fea: f"{fea_prefix}{fea_sep}{fea}" for fea in ge_stage.columns[1:]})
 
-        if 'SMILES' in smi_stage.columns:
-            smi_stage = smi_stage[['SMILES']]
-        else:
-            smi_stage.columns = ['SMILES']
         smiles_graphs = build_graph_dict_from_smiles_collection(smi_stage['SMILES'].values)
 
-
-        # Sub-select desired response column (y_col_name)
-        # ... and reduce response df to 3 columns: drug_id, cell_id and selected drug_response
+        print(f"Compose arrays for {stage} data.")
         rsp_cut = response_stage[[params["drug_col_name"], params["canc_col_name"], params["y_col_name"]]].copy()
-        # Further prepare data (model-specific)
         xd, xc, y = compose_data_arrays(
             df_response=rsp_cut,
             df_drug=smi_stage,
@@ -165,6 +131,7 @@ def run(params: Dict):
         # The implementation of this step depends on the model.
         # -----------------------
         # [Req] Create data name
+        print(f"Save {stage} data.")
         data_fname = frm.build_ml_data_file_name(data_format=params["data_format"], stage=stage)
 
         # Revmoe data_format because TestbedDataset() appends '.pt' to the
