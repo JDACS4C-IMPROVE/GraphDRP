@@ -129,7 +129,7 @@ def run(params: Dict):
                                 benchmark_dir=params['input_dir'], 
                                 response_file=params['y_data_file'])
         response_stage = drp.get_response_with_features(response_stage, ge, params['canc_col_name'])
-        response_stage = drp.get_response_with_features(response_stage, md, params['drug_col_name'])
+        response_stage = drp.get_response_with_features(response_stage, smi, params['drug_col_name'])
         ge_stage = drp.get_features_in_response(ge, response_stage, params['canc_col_name'])
         smi_stage = drp.get_features_in_response(smi, response_stage, params['drug_col_name'])
 
