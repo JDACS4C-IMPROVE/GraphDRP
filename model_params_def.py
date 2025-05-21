@@ -6,24 +6,7 @@ If no params are required by the model, then it should be an empty list.
 from improvelib.utils import str2bool
 
 
-preprocess_params = [
-    {"name": "use_lincs",
-     "type": str2bool,
-     "default": True,
-     "help": "Flag to indicate if landmark genes are used for gene selection.",
-    },
-    {"name": "scaling",
-     "type": str,
-     "default": "std",
-     "choice": ["std", "minmax", "miabs", "robust"],
-     "help": "Scaler for gene expression data.",
-    },
-    {"name": "ge_scaler_fname",
-     "type": str,
-     "default": "x_data_gene_expression_scaler.gz",
-     "help": "File name to save the gene expression scaler object.",
-    },
-]
+preprocess_params = []
 
 
 train_params = [
