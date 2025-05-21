@@ -60,10 +60,10 @@ def run(params: Dict):
     smi = drp.get_x_data(file = params['drug_smiles_file'], 
                     benchmark_dir = params['input_dir'], 
                     column_name = params['drug_col_name'])
-    if 'SMILES' in smi_stage.columns:
-        smi_stage = smi_stage[['SMILES']]
+    if 'SMILES' in smi.columns:
+        smi = smi[['SMILES']]
     else:
-        smi_stage.columns = ['SMILES']
+        smi.columns = ['SMILES']
     smi = check_smiles(smi)
 
     # ------------------------------------------------------
