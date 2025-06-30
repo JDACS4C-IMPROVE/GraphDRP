@@ -35,7 +35,6 @@ import improvelib.applications.drug_response_prediction.drp_utils as drp
 # Model-specific imports
 from model_params_def import preprocess_params # [Req]
 from model_utils.torch_utils import TestbedDataset
-from model_utils.utils import gene_selection, scale_df
 from model_utils.rdkit_utils import build_graph_dict_from_smiles_collection, check_smiles
 from model_utils.np_utils import compose_data_arrays
 
@@ -57,7 +56,7 @@ def run(params: Dict):
     # [Req] Validity check of feature representations
     # ------------------------------------------------------
     print("\nLoad drugs data.")
-    smi = drp.get_x_data(file = params['drug_smiles_file'], 
+    smi = frm.get_x_data(file = params['drug_smiles_file'], 
                     benchmark_dir = params['input_dir'], 
                     column_name = params['drug_col_name'])
     if 'SMILES' in smi.columns:
@@ -70,22 +69,22 @@ def run(params: Dict):
     # [Req] Determine preprocessing on training data
     # ------------------------------------------------------
     print("\nLoads omics data.")
-    ge = drp.get_x_data(file = params['cell_transcriptomic_file'], 
+    ge = frm.get_x_data(file = params['cell_transcriptomic_file'], 
                                         benchmark_dir = params['input_dir'], 
                                         column_name = params['canc_col_name'])
     
     print("Load train response data.")
-    response_train = drp.get_response_data(split_file=params["train_split_file"], 
+    response_train = frm.get_y_data_data(split_file=params["train_split_file"], 
                                    benchmark_dir=params['input_dir'], 
-                                   response_file=params['y_data_file'])
+                                   y_data_file=params['y_data_file'])
 
     print("Find intersection of training data.")
-    response_train = drp.get_response_with_features(response_train, ge, params['canc_col_name'])
-    response_train = drp.get_response_with_features(response_train, smi, params['drug_col_name'])
-    ge_train = drp.get_features_in_response(ge, response_train, params['canc_col_name'])
+    response_train = frm.get_y_data_with_features(response_train, ge, params['canc_col_name'])
+    response_train = frm.get_y_data_with_features(response_train, smi, params['drug_col_name'])
+    ge_train = frm.get_features_in_y_data(ge, response_train, params['canc_col_name'])
 
     print("Determine transformations.")
-    drp.determine_transform(ge_train, 'ge_transform', params['cell_transcriptomic_transform'], params['output_dir'])
+    frm.determine_transform(ge_train, 'ge_transform', params['cell_transcriptomic_transform'], params['output_dir'])
 
     # ------------------------------------------------------
     # [Req] Construct ML data for every stage (train, val, test)
@@ -98,16 +97,16 @@ def run(params: Dict):
     for stage, split_file in stages.items():
         print(f"Prepare data for stage {stage}.")
         print(f"Find intersection of {stage} data.")
-        response_stage = drp.get_response_data(split_file=split_file, 
+        response_stage = frm.get_y_data_data(split_file=split_file, 
                                 benchmark_dir=params['input_dir'], 
-                                response_file=params['y_data_file'])
-        response_stage = drp.get_response_with_features(response_stage, ge, params['canc_col_name'])
-        response_stage = drp.get_response_with_features(response_stage, smi, params['drug_col_name'])
-        ge_stage = drp.get_features_in_response(ge, response_stage, params['canc_col_name'])
-        smi_stage = drp.get_features_in_response(smi, response_stage, params['drug_col_name'])
+                                y_data_file=params['y_data_file'])
+        response_stage = frm.get_y_data_with_features(response_stage, ge, params['canc_col_name'])
+        response_stage = frm.get_y_data_with_features(response_stage, smi, params['drug_col_name'])
+        ge_stage = frm.get_features_in_y_data(ge, response_stage, params['canc_col_name'])
+        smi_stage = frm.get_features_in_y_data(smi, response_stage, params['drug_col_name'])
 
         print(f"Transform {stage} data.")
-        ge_stage = drp.transform_data(ge_stage, 'ge_transform', params['output_dir'])
+        ge_stage = frm.transform_data(ge_stage, 'ge_transform', params['output_dir'])
         # Prefix gene column names with "ge."
         fea_sep = "."
         fea_prefix = "ge"
