@@ -74,7 +74,7 @@ def run(params: Dict):
                                         column_name = params['canc_col_name'])
     
     print("Load train response data.")
-    response_train = frm.get_y_data_data(split_file=params["train_split_file"], 
+    response_train = frm.get_y_data(split_file=params["train_split_file"], 
                                    benchmark_dir=params['input_dir'], 
                                    y_data_file=params['y_data_file'])
 
@@ -97,7 +97,7 @@ def run(params: Dict):
     for stage, split_file in stages.items():
         print(f"Prepare data for stage {stage}.")
         print(f"Find intersection of {stage} data.")
-        response_stage = frm.get_y_data_data(split_file=split_file, 
+        response_stage = frm.get_y_data(split_file=split_file, 
                                 benchmark_dir=params['input_dir'], 
                                 y_data_file=params['y_data_file'])
         response_stage = frm.get_y_data_with_features(response_stage, ge, params['canc_col_name'])
