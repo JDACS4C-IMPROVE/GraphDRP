@@ -32,9 +32,7 @@ import torch
 
 # [Req] IMPROVE imports
 from improvelib.applications.drug_response_prediction.config import DRPTrainConfig
-from improvelib.utils import str2bool
 import improvelib.utils as frm
-from improvelib.utils import Timer
 from improvelib.metrics import compute_metrics
 
 # Model-specific imports
@@ -250,19 +248,16 @@ def run(params: Dict) -> Dict:
 
 # [Req]
 def main(args):
-    # timer_train = Timer()
-    # [Req]
-    additional_definitions = train_params
     cfg = DRPTrainConfig()
-    params = cfg.initialize_parameters(
-        pathToModelDir=filepath,
-        default_config="graphdrp_params.txt",
-        additional_definitions=additional_definitions)
+    params = cfg.initialize_parameters(pathToModelDir=filepath,
+                                       default_config="graphdrp_params.ini",
+                                       additional_definitions=train_params)
+    timer_train = frm.Timer() 
     val_scores = run(params)
+    timer_train.save_timer(dir_to_save=params["output_dir"], 
+                           filename='runtime_train.json', 
+                           extra_dict={"stage": "train"})
     print("\nFinished model training.")
-    # tt = timer_train.display_timer()
-    # extra_dict = {"stage": "train"}
-    # timer_train.save_timer(params["output_dir"], extra_dict=extra_dict)
 
 
 # [Req]

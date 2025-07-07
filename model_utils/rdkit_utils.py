@@ -9,6 +9,21 @@ import numpy as np
 from rdkit import Chem
 import networkx as nx
 
+def check_smiles(smiles_df):
+    smi_to_drop = []
+    for i, row in smiles_df.iterrows():
+        try:
+            mol = Chem.MolFromSmiles(row['SMILES'])
+            c_size = mol.GetNumAtoms()
+            if c_size < 2:
+                print(f"Invalid SMILE string {row['SMILES']}, ID is {i}, removing from analysis.")
+                smi_to_drop = smi_to_drop + [i]
+        except:
+            print(f"Invalid SMILE string {row['SMILES']}, ID is {i}, removing from analysis.")
+            smi_to_drop = smi_to_drop + [i]   
+    smiles_df = smiles_df.drop(smi_to_drop)
+    return smiles_df
+
 
 def atom_features(atom):
     """ (ap) Extract atom features and put into array. """

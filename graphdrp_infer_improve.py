@@ -22,7 +22,6 @@ import pandas as pd
 
 # [Req] IMPROVE imports
 from improvelib.applications.drug_response_prediction.config import DRPInferConfig
-from improvelib.utils import str2bool
 import improvelib.utils as frm
 
 # Model-specific imports
@@ -47,8 +46,6 @@ def run(params: Dict) -> bool:
     Returns:
         dict: prediction performance scores computed on test data.
     """
-    # breakpoint()
-    # from pprint import pprint; pprint(params);
 
     # ------------------------------------------------------
     # [Req] Create data names for test set
@@ -121,15 +118,15 @@ def run(params: Dict) -> bool:
 
 # [Req]
 def main(args):
-    # [Req]
-    additional_definitions = infer_params
     cfg = DRPInferConfig()
-    params = cfg.initialize_parameters(
-        pathToModelDir=filepath,
-        default_config="graphdrp_params.txt",
-        additional_definitions=additional_definitions
-    )
+    params = cfg.initialize_parameters(pathToModelDir=filepath,
+                                       default_config="graphdrp_params.ini",
+                                       additional_definitions=infer_params)
+    timer_infer = frm.Timer()
     status = run(params)
+    timer_infer.save_timer(dir_to_save=params["output_dir"], 
+                           filename='runtime_infer.json', 
+                           extra_dict={"stage": "infer"})
     print("\nFinished model inference.")
 
 
