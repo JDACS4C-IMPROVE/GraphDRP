@@ -13,9 +13,8 @@ def check_smiles(smiles_df):
     smi_to_drop = []
     for i, row in smiles_df.iterrows():
         try:
-            mol = Chem.MolFromSmiles(row['SMILES'])
-            c_size = mol.GetNumAtoms()
-            if c_size < 2:
+            c_size, features, edge_index = smile_to_graph(row['SMILES'])
+            if features == [] or edge_index == []:
                 print(f"Invalid SMILE string {row['SMILES']}, ID is {i}, removing from analysis.")
                 smi_to_drop = smi_to_drop + [i]
         except:
