@@ -1,0 +1,18 @@
+[Global_Params]
+model_name = GraphDRP
+
+[Preprocess]
+test_split_file = tcga_test_all.txt
+data_format = .pt
+y_data_files = [["response_tcga.tsv"]]
+x_data_canc_files = [["cancer_gene_expression.tsv", ["Gene_Symbol"]]]
+x_data_drug_files = [["drug_SMILES.tsv"]]
+use_lincs = True
+scaling = std
+
+[Infer]
+data_format = .pt
+model_file_name = model
+model_file_format = .pt
+infer_batch = 256
+cuda_name = cuda:7
